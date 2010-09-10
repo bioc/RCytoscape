@@ -1,0 +1,69 @@
+exportClasses (CytoscapeWindowClass)
+
+exportMethods (
+   destroyWindow,
+   destroyAllWindows,
+   displayGraph,
+   firstNeighbors,
+   getArrowShapes,
+   getLayoutNames,
+   getLineStyles,
+   getNodeShapes,
+   getAttributeClassNames,
+   getWindowCount,
+   getWindowList,
+   layout,
+   ping,
+   redraw,
+   sendNodes,
+   sendEdges,
+   sendNodeAttributes,
+   sendNodeAttributesDirect,
+   sendEdgeAttributes,
+   sendEdgeAttributesDirect,
+   dockPanel,
+   floatPanel,
+   hidePanel,
+   setNodeLabelRule,
+   setNodeColorRule,
+   setNodeShapeRule,
+   setNodeSizeRule,
+   setEdgeLineStyleRule,
+   setEdgeTargetArrowRule,
+   setEdgeSourceArrowRule,
+   setEdgeColorRule,
+   getAllNodes,
+   getAllEdges,
+   clearSelection,
+   selectNodes,
+   getSelectedNodes,
+   getSelectedNodeCount,
+   sfn, 
+   hideSelectedNodes,
+   unhideAll
+   )
+
+export(
+   CytoscapeWindow,
+   noa.names,
+   noa,
+   eda.names,
+   eda,
+   cy2.edge.names,
+   makeSimpleGraph,
+   makeRandomGraph
+   )
+
+importClassesFrom(graph, graph)
+
+importClassesFrom(methods, character, integer)
+
+importMethodsFrom(graph, edgeData, "edgeData<-", edgeDataDefaults,
+                 "edgeDataDefaults<-", edgeNames, edges, inEdges,
+                 nodeData, "nodeData<-", nodeDataDefaults,
+                 "nodeDataDefaults<-", nodes)
+
+importFrom(methods, "@<-", new)
+
+importFrom(XMLRPC, xml.rpc)
+

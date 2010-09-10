@@ -1,0 +1,48 @@
+\name{CytoscapeWindow}
+\alias{CytoscapeWindow}
+\title{
+CytoscapeWindow
+}
+\description{
+The constructor for the CytoscapeWindowClass
+}
+\usage{
+CytoscapeWindow(title = "default", graph = new("graphNEL", edgemode='directed'), host = "localhost", rpcPort = 9000, create.window = TRUE)
+}
+
+\arguments{
+  \item{title}{
+    A character string, this is the name you will see on the Cytoscape
+    network window.  Multiple windows with the same name are currently
+    allowed. 
+}
+  \item{graph}{
+    A Bioconductor graph. 
+}
+  \item{host}{
+    Defaults to 'localhost', this is the domain name of a machine which
+    is running Cytoscape with the appropriate XMLRPC server plugin.
+}
+  \item{rpcPort}{
+    Defaults to 9000, this may be any port to which the CytoscapeRPC
+    server is listening.
+}
+  \item{create.window}{
+     Defaults to TRUE, but if you want a CytoscapeWindow just to call
+     what in Java we would call 'class methods' -- getWindowList () for
+     instance, a CytoscapeWindow without an actual window can be useful.
+}
+}
+\value{
+  An object of the CytoscapeWindow Class.
+}
+\author{
+  Paul Shannon
+}
+
+
+\examples{
+  cw <- CytoscapeWindow ('demo', new ('graphNEL'))
+}
+
+\keyword{ graph }

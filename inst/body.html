@@ -1,0 +1,501 @@
+<a name='overview'>
+<center><h3>Overview</h3></center>
+CRytoscape is an R package which provides function call access to the popular network visualization program <a href=http://www.cytoscape.org>Cytoscape</a>. In addition to the community of Cytoscape developers, the author is grateful to Jan Bot (who provided the indispensable 
+<a href='https://wiki.nbic.nl/index.php/CytoscapeRPC>CytoscapeRPC</a> plugin; to Duncan Lang and his <a href='http://www.omegahat.org/XMLRPC/'>XMLRPC</a> pacakge; and to <a href='http://ws.apache.org/xmlrpc/'>Apache XML-RPC</a>.
+<p>
+
+The package, in brief, allows you to create R/Bioconductor graphNELs, add edge and node attributes, and to transmit them
+to Cytoscape for display, exploration, and analysis.  'Visualization rules' may be compactly expressed, so that the visual attributes
+of the graph (in Cytoscape) is determined by data attributes of the graph (specified or calcuated in R).  For instance,
+that the displayed color or size of a node should be a function of a log fold expression change; color could be a function of the number of instances observed of the object a particular node represents.  See, for instance, <b>set.node.color.rule</b> and <b>set.node.size.rule</b>.
+
+<br><hr>
+<a name='status'>
+<center><h3>Status</h3></center>
+This package is new, so expect some rough edges and bugs.   Suggestions and bug reports are always welcome.
+
+<p>
+
+Some Plans and Some Known Problems:
+
+<ol>
+   <li> I plan to rewrite the package to use S4 objects, and submit to Bioconductor by the end of the summer.
+   <li> The Bioconductor group will be releasing a new multigraph class soon, which I wish to support.
+   <li> Large graphs (i.e. hundreds of nodes and edges, especially with extensive text node and edge attributes) transmit very slowly.  This might require some
+        changes to the XMLRPC package.
+</ol>
+
+<br><hr>
+<a name='contact'>
+<center><h3>Contact</h3>
+
+Paul Shannon:  &nbsp; pshannon &nbsp; AT &nbsp; systemsbiology &nbsp; DOT &nbsp; org
+
+</center>
+
+<br><hr>
+<a name='add.edge.attributes'>
+<b>add.edge.attributes (attribute.name, edge.names, values, type)</b> <p>
+<p>
+Add (or replace) attributes on the specified edges.   The example adds a double precision 'confidence' attribute to two edges; a graph with these edges is presumed to already be residing (and displayed) in Cytoscape.
+<p>
+<pre><code>
+  edge.names =  c ("B (synthetic lethal) C", "A (phoshorylates) B")
+  attribute.name = 'confidence'
+  values = c (0.98, 0.72)
+  type = 'double'
+  add.edge.attributes (attribute.name, edge.names, values, type)
+</code></pre>
+  <p> <font color='red'>todo:  add window.title parameter</font>
+<br><hr>
+<a name='add.graph'>
+<b>add.graph (graph, window.title)</b> <p>
+
+Given a graphNEL that you have constructed in R (see <a href=#make.simple.graph>make.simple.graph</a> for details), add it to a 
+new window (with the specified window.title) in Cytoscape.  Once it is displayed in Cytoscape, you probably want to do layout and redraw:
+<pre><code>
+
+  g = make.simple.graph ()
+  window.title = 'test'
+  add.graph (g, window.title)
+  cy.layout (window.title, 'jgraph-spring')
+
+</code></pre>
+
+
+<br><hr>
+<a name='add.node.attributes'>
+<b>add.node.attributes (attribute.name, nodes, values, given.attribute.type)</b> <p>
+
+<pre><code>
+  add.node.attributes ('count', c ('A', 'B', 'C'), c (1, 2, 10), 'int')
+</code></pre>
+
+  <p> <font color='red'>todo:  add window.title parameter</font>
+
+<br><hr>
+<a name='clear'>
+<b>clear (window.title)</b><p>
+
+Clears any selections in the specified window, both nodes and edges.
+
+<br><hr>
+<a name='clear.msg'>
+<b>clear.msg ()</b> <p>
+
+Erases any text previously written to the Cytoscape status bar, in the outermost, lower left Cytoscape frame.
+
+<br><hr>
+<a name='count.selected.nodes'>
+<b>count.selected.nodes (window.title)</b> <p>
+
+
+<br><hr>
+<a name='create.window'>
+<b>create.window (title)</b> <p>
+
+The title of a window created with this command can be subsequently used as an argument to add.graph ().
+
+<br><hr>
+<a name='cy.layout'>
+<b>cy.layout (window.title, layout.name='jgraph-spring')</b><p>
+
+See get.layout.names () for the possibilities.  yFiles organic or hierarchic are useful layouts which are, as yet, unavailable except through the Cytoscape menus.
+<br><hr>
+<a name='dock.panel'>
+<b>dock.panel (panelName)</b><p>
+
+The 3 'panel' commands (hide, dock, float) operate upon the panels often found at the east, south and west positions in the Cytoscape Desktop. <br>
+You specify a panel by matching (regardless of case) the first letters of its name.  Thus 'Control', 'c', 'control panel' all select the Cytoscape "Control Panel".
+
+<br><hr>
+<a name='eda'>
+<b>eda (graph, edge.attribute.name)</b><p>
+Returns the values of this attribute for all edges.    Note that this is a convenience function for graphNEL objects; it does not operate on the Cytoscape version of the graph.
+<pre><code>
+eda (g, 'edgeType')
+             A|B                B|C                C|A 
+"phoshorylates" "synthetic lethal"        "undefined" 
+
+</code></pre>
+
+<br><hr>
+<a name='eda.names'>
+<b>eda.names (graph)</b><p>
+
+Operates on a graphNEL.  Returns the name of all the attributes on the edges.
+
+<pre><code>
+eda.names (g)
+[1] "edgeType"
+</code></pre>
+
+
+<br><hr>
+<a name='float.panel'>
+<b>float.panel (panelName)</b><p>
+
+The 3 'panel' commands (hide, dock, float) operate upon the panels often found at the east, south and west positions in the Cytoscape Desktop. <br>
+You specify a panel by matching (regardless of case) the first letters of its name.  Thus 'Control', 'c', 'control panel' all select the Cytoscape "Control Panel".
+
+
+<br><hr>
+<a name='get.all.edges'>
+<b>get.all.edges (window.title)</b><p>
+
+Interrogates Cytoscape, returning the names of all the edges of the graph in the specified window.
+
+
+<br><hr>
+<a name='get.all.nodes'>
+<b>get.all.nodes (window.title)</b><p>
+
+
+Interrogates Cytoscape, returning the names of all the nodes of the graph in the specified window.
+
+<br><hr>
+<a name='get.arrow.shapes'>
+<b>get.arrow.shapes ()</b> <p>
+
+Returns the standard Cytoscape names for possible edge arrow types.
+
+
+<br><hr>
+<a name='get.layout.names'>
+<b>get.layout.names ()</b> <p>
+
+Returns the standard Cytoscape names for the available layout algorithms, for use by cy.layout ().  Alas, the yFiles layouts are neither returned here, nor can they be invoked programmatically.
+
+<pre><code>
+get.layout.names ()
+ [1] "jgraph-circle"         "attribute-circle"      "jgraph-annealing"      "jgraph-radial-tree"    "Kamada-Kawai-Noweight" "Fruchterman-Rheingold"
+ [7] "Kamada-Kawai"          "jgraph-gem"            "hierarchical"          "circular"              "isom"                  "jgraph-moen"          
+[13] "jgraph-sugiyama"       "attributes-layout"     "grid"                  "jgraph-tree"           "force-directed"        "degree-circle"        
+[19] "jgraph-spring"        
+</pre></code>
+
+<br><hr>
+<a name='get.line.styles'>
+<b>get.line.styles ()</b><p>
+
+Returns the standard Cytoscape names for the available line styles, which may be used in subsequent calls to <b>set.edge.line.style.rule ()</b>
+
+<pre><code>
+get.line.styles ()
+ [1] "SOLID"            "LONG_DASH"        "EQUAL_DASH"       "DASH_DOT"         "DOT"              "ZIGZAG"           "SINEWAVE"         "VERTICAL_SLASH"  
+ [9] "FORWARD_SLASH"    "BACKWARD_SLASH"   "PARALLEL_LINES"   "CONTIGUOUS_ARROW" "SEPARATE_ARROW"  
+</pre></code>
+
+<br><hr>
+<a name='get.node.shapes'>
+<b>get.node.shapes ()</b><p>
+
+Returns the standard Cytoscape names for the available node shapes, which may be used in subsequent calls to  <b>set.node.shape.rule ()</b>
+<pre><code>
+get.node.shapes ()
+ [1] "trapezoid"     "round_rect"    "ellipse"       "triangle"      "rect_3d"       "diamond"       "parallelogram" "octagon"       "trapezoid_2"  
+[10] "rect"          "hexagon"      
+</code></pre>
+
+<br><hr>
+<a name='get.selected.nodes'>
+<b>get.selected.nodes (window.title)</b><p>
+
+Return all nodes selected in the specified window, if done so manually, or programmatically. 
+
+<br><hr>
+<a name='get.window.id'>
+<b>get.window.id (window.title)</b><p>
+
+Get a named list of Cytoscape's current windows, named by a number, values are the titles supplied when they were created.
+
+<pre><code>
+window.list ()
+     10       9 
+"fubar"  "test" 
+</code></pre>
+
+<br><hr>
+<a name='get.window.titles'>
+<b>get.window.titles ()</b><p>
+
+<pre><code>
+get.window.titles ()
+[1] "fubar" "test" 
+</code></pre>
+
+
+<br><hr>
+<a name='hide.panel'>
+<b>hide.panel (panelName)</b><p>
+
+
+The 3 'panel' commands (hide, dock, float) operate upon the panels often found at the east, south and west positions in the Cytoscape Desktop. <br>
+You specify a panel by matching (regardless of case) the first letters of its name.  Thus 'Control', 'c', 'control panel' all select the Cytoscape "Control Panel".
+
+<br><hr>
+<a name='hide.selected.nodes'>
+<b>hide.selected.nodes (window.title)</b><p>
+
+<font color=red> Once hidden, these cannot (at present: 7/15/2010) be retrieved.  This bug has been reported to Jan. </font>
+
+<br><hr>
+<a name='kill.all.windows'>
+<b>kill.all.windows ()</b><p>
+
+Destroy all windows currently open within Cytoscape.
+
+<br><hr>
+<a name='kill.window.by.id'>
+<b>kill.window.by.id (window.id)</b><p>
+
+
+<pre><code>
+window.list ()
+     10       9 
+"fubar"  "test" 
+
+kill.window.by.id (10)
+</code></pre>
+
+
+<br><hr>
+<a name='kill.window.by.title'>
+<b>kill.window.by.title (window.title)</b><p>
+
+<pre><code>
+window.list ()
+     10       9 
+"fubar"  "test" 
+
+kill.window.by.title ('fubar')
+</code></pre>
+
+
+<br><hr>
+<a name='noa'>
+<b>noa (graph, node.attribute.name)</b><p>
+Returns the values of this attribute for all nodes.    Note that this is a convenience function for graphNEL objects; it does not operate on the Cytoscape version of the graph.
+<pre><code>
+noa (g, 'type')
+     A.A                    B.B                    C.C 
+    "kinase" "transcription factor"         "glycoprotein" 
+
+</code></pre>
+
+
+<br><hr>
+<a name='noa.names'>
+<b>noa.names (graph)</b><p>
+
+<pre><code>
+> noa.names (g)
+[1] "type"  "lfc"   "label" "count"
+</code></pre>
+
+<br><hr>
+<a name='ping'>
+<b>ping ()</b><p>
+
+Tries to contact the XMLRPC server in the CytoscapeRPC plugin.  A good function to call as you start a session, and if anything seems amiss.
+
+<pre><code>
+ping ()
+[1] Connected to Cytoscape on port 9000
+</code></pre>
+
+<br><hr>
+<a name='printf'>
+<b>printf (...)</b><p>
+
+A convenience function, acting much like the C counterpart.
+
+
+<br><hr>
+<a name='redraw'>
+<b>redraw (window.title)</b> <p>
+
+After many Cytoscape operations invoked from R, there is no apparent change in the Cytoscape display until this function is called.
+
+<br><hr>
+<a name='select'><p>
+<b>select (window.title, nodes)</b><p>
+
+Selects the specified nodes.  
+
+<br><hr>
+<a name='set.edge.color.rule'>
+<b>set.edge.color.rule (window.title, edge.attribute.name, default.color, attribute.values, colors)</b><p>
+
+The value of the specified edge attribute determine the colors in which the edges are rendered.  In the example below, any edge whose
+country attbibute is 'andorra' is rendered in yellow (#FFFF00).
+
+<pre><code>
+set.edge.color.rule ('test', 'country',  'black', c ('spain', 'andorra', 'france'), c ('#FF0000', '#FFFF00', '#00FF00'))
+</pre></code>
+
+<br><hr>
+<a name='set.edge.line.style.rule'>
+<b>set.edge.line.style.rule (window.title, edge.attribute.name, attribute.values, line.styles, default.style='SOLID')</b><p>
+
+The value of the specified edge attribute determine the line style in which the edges are rendered.  In the example below, any edge whose
+country attbibute is 'andorra' is rendered as a line made up of dots.
+
+<pre><code>
+set.edge.line.style.rule ('test', 'country', c ('spain', 'andorra', 'france'), c ('SINEWAVE', 'DOT', 'PARALLEL_LINES'))
+</pre></code>
+
+
+<br><hr>
+<a name='set.node.color'>
+<b>set.node.color (window.title, node.name, red, green, blue)</b><p>
+
+A pass-through method.  This seems to permanently insulate the specified node from any node.color rules.
+
+<br><hr>
+<a name='set.node.color.rule'>
+<b>set.node.color.rule (node.attribute.name, control.points)</b><p>
+
+The value of the specified attribute is mapped into color space.
+
+<pre><code>
+set.node.color.rule ('lfc', c ('-3.0:#00FF00', '0.0:#FFFFFF', '3.0:#FF0000'))  
+</code></pre>
+
+<br><hr>
+<a name='set.node.label.rule'>
+<b>set.node.label.rule (window.title, node.attribute.name)</b><p>
+
+A simple pass-through rule.  The text value of the specified node attribute is used to labe the nodes.  We typically use an entrez geneID as the node name, and
+assign the gene's symbol as the value of the label attribute, and then
+
+<pre><code>
+set.node.label.rule ('test', 'label')
+</code></pre>
+
+<br><hr>
+<a name='set.node.shape.rule'>
+<b>set.node.shape.rule (window.title, node.attribute.name, attribute.values, node.shapes, default.shape='ellipse')</b><p>
+
+The value of the specified attribute determines the node shape, in a mapping specified by the node shape rule:
+
+<pre><code>
+set.node.shape.rule (window.title='test', node.attribute.name='type', 
+                     c ('kinase', 'transcription factor', 'glycoprotein'),
+                     c ('round_rect', 'diamond', 'ellipse'))
+</pre></code>
+
+
+
+
+<br><hr>
+<a name='set.node.size.rule'>
+<b>set.node.size.rule (node.attribute.name, attribute.values, node.sizes)</b><p>
+
+Interpolating as neccessary, the values of the specified (numerical) node attribute determine the size at which the node is rendered.
+
+<pre><code>
+ set.node.size.rule ('count', c (1, 10, 20), c (3, 50, 80))
+</code></pre>
+
+
+
+<br><hr>
+<a name='set.source.arrow.rule'>
+<b>set.source.arrow.rule (window.title, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW')</b><p>
+
+Discrete values of the specfified edge attribute determine what style of arrow is drawn at the source node of each edge:
+
+<pre><code>
+ set.source.arrow.rule ('test', 'country', c ('france', 'andorra', 'spain'), c ('WHITE_ARROW', 'BLACK_DIAMOND', 'COLOR_CIRCLE'))
+</code></pre>
+
+
+<br><hr>
+<a name='set.target.arrow.rule'>
+<b>set.target.arrow.rule (window.title, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW')</b><p>
+
+Discrete values of the specfified edge attribute determine what style of arrow is drawn at the target node of each edge:
+
+<pre><code>
+set.target.arrow.rule ('test', 'country', c ('france', 'andorra', 'spain'), c ('WHITE_ARROW', 'BLACK_DIAMOND', 'COLOR_CIRCLE'))
+</code></pre>
+
+<br><hr>
+<a name='status.msg'>
+<b>status.msg (msg)</b><p>
+
+Display a message in the lower left border of the Cytoscape Desktop window.  
+
+
+<br><hr>
+<a name='unhide.all'>
+<b>unhide.all (window.title)</b><p>
+
+This doesn't work properly yet.  It is supposed to make visible any nodes or edges which had been previously hidden.
+
+<br><hr>
+<a name='window.count'>
+<b>window.count ()</b><p>
+
+How many windows are currently on the Cytoscape Desktop?
+
+<br><hr>
+<a name='window.list'>
+<b>window.list ()</b><p>
+
+Returns a named list, named by window number, values are the window titles.
+
+
+
+<br><hr>
+<a name='make.simple.graph'>
+<pre><code><b>make.simple.graph = function ()</b>
+{
+  g = new ('graphNEL', edgemode='directed')
+  nodeDataDefaults (g, attr='type') = 'undefined'
+  attr (nodeDataDefaults (g, attr='type'), 'class') = 'STRING'
+
+  nodeDataDefaults (g, attr='lfc') = 1.0
+  attr (nodeDataDefaults (g, attr='lfc'), 'class') = 'FLOATING'
+
+  nodeDataDefaults (g, attr='label') = 'default node label'
+  attr (nodeDataDefaults (g, attr='label'), 'class') = 'STRING'
+
+  nodeDataDefaults (g, attr='count') = '0'
+  attr (nodeDataDefaults (g, attr='count'), 'class') = 'INTEGER'
+
+  edgeDataDefaults (g, attr='edgeType') = 'undefined'
+  attr (edgeDataDefaults (g, attr='edgeType'), 'class') = 'STRING'
+
+  g = graph::addNode ('A', g)
+  g = graph::addNode ('B', g)
+  g = graph::addNode ('C', g)
+  nodeData (g, 'A', 'type') = 'kinase'
+  nodeData (g, 'B', 'type') = 'transcription factor'
+  nodeData (g, 'C', 'type') = 'glycoprotein'
+
+  nodeData (g, 'A', 'lfc') = '-3.0'
+  nodeData (g, 'B', 'lfc') = '0.0'
+  nodeData (g, 'C', 'lfc') = '3.0'
+
+  nodeData (g, 'A', 'count') = '2'
+  nodeData (g, 'B', 'count') = '30'
+  nodeData (g, 'C', 'count') = '10e6'
+
+  nodeData (g, 'A', 'label') = 'Gene A'
+  nodeData (g, 'B', 'label') = 'Gene B'
+  nodeData (g, 'C', 'label') = 'Gene C'
+
+  g = graph::addEdge ('A', 'B', g)
+  g = graph::addEdge ('B', 'C', g)
+  g = graph::addEdge ('C', 'A', g)
+
+  edgeData (g, 'A', 'B', 'edgeType') = 'phoshorylates'
+  edgeData (g, 'B', 'C', 'edgeType') = 'synthetic lethal'
+
+  return (g)
+
+} # make.simple.graph
+
+</code></pre>

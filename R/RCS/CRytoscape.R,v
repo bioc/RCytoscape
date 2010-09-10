@@ -1,0 +1,871 @@
+head	1.6;
+access;
+symbols;
+locks
+	pshannon:1.6; strict;
+comment	@# @;
+
+
+1.6
+date	2010.07.15.20.23.57;	author pshannon;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2010.07.14.14.43.45;	author pshannon;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2010.07.07.01.03.22;	author pshannon;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2010.07.04.03.29.57;	author pshannon;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2010.07.03.23.45.56;	author pshannon;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2010.07.03.18.52.33;	author pshannon;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.6
+log
+@removed superfluous .First.lib function
+@
+text
+@# crytoscape/R/crytoscape.R
+#------------------------------------------------------------------------------------------------------------------------
+port = 9000
+uri = sprintf ('http://localhost:%d', port)
+#------------------------------------------------------------------------------------------------------------------------
+printf = function (...) print (noquote (sprintf (...)))
+#------------------------------------------------------------------------------------------------------------------------
+ping = function ()
+{
+
+  response = xml.rpc (uri, 'Cytoscape.test')
+  #printf ('response: %s', response)
+  if (response == "It works!")
+    return (noquote (sprintf ("Connected to Cytoscape on port %d", port)))
+  else
+    return (noquote (sprintf ("Error!  could not connect to Cytoscape on port %d", port)))
+
+} # ping
+#------------------------------------------------------------------------------------------------------------------------
+create.window = function (title)
+{
+   return (as.integer (xml.rpc (uri, 'Cytoscape.createNetwork', title)))
+}
+#------------------------------------------------------------------------------------------------------------------------
+get.function.names = function ()
+{
+  #return (xml.rpc (uri, 'Cytoscape.getFunctions'))
+  return (xml.rpc (uri, 'Cytoscape.trait_names'))
+
+} # get.function.names
+#------------------------------------------------------------------------------------------------------------------------
+find.function.name = function (searchString)
+{
+  all.names = get.function.names ()
+  matches = grep (searchString, all.names, ignore.case=T)
+  return (all.names [matches])
+
+} # find.function.name
+#------------------------------------------------------------------------------------------------------------------------
+get.function.detail = function (function.name)
+{
+  if (!function.name %in% get.function.names ())
+    return (sprintf ("Error: '%s' is not a recognized function name", function.name))
+
+  full.function.info <<- xml.rpc (uri, 'Cytoscape.getFunctions')
+
+  function.list <<- strsplit (full.function.info, '\n') [[1]]
+  matched.functions.indices = grep (function.name, function.list, ignore.case=T)
+  result.0 = function.list [matched.functions.indices]
+  result.1 = as.character (sapply (result.0, function (x) sub ('tudelft.CytoscapeRPC.CytoscapeRPCCallHandler.', '', x)))
+  result.2 = as.character (sapply (result.1, function (x) sub (' throws org.apache.xmlrpc.XmlRpcException', '', x)))
+
+  return (result.2)
+  
+} # get.function.detail
+#------------------------------------------------------------------------------------------------------------------------
+window.count = function ()
+{
+  return (xml.rpc (uri, 'Cytoscape.getNetworkCount'))
+
+} # window.count
+#------------------------------------------------------------------------------------------------------------------------
+window.list = function ()
+{
+  if (window.count () == 0)
+    return (c ())
+
+  result.raw <<- xml.rpc (uri, 'Cytoscape.getNetworkList')
+  result = c ()
+
+  for (i in 1:length (result.raw)) {
+    id = result.raw [[i]]$networkID
+    title = result.raw [[i]]$networktitle
+    result [[id]] = title
+    } # for i
+
+  return (result)
+
+} # window.list
+#------------------------------------------------------------------------------------------------------------------------
+kill.window.by.title = function (window.title)
+{
+  window.id = get.window.id (window.title)
+  id = as.character (window.id)
+  xml.rpc (uri, 'Cytoscape.destroyNetwork', id)
+}
+#------------------------------------------------------------------------------------------------------------------------
+kill.window.by.id = function (window.id)
+{
+  id = as.character (window.id)
+  #printf ('destroying window by id (%s): %s', class (id), id)
+  xml.rpc (uri, 'Cytoscape.destroyNetwork', id)
+}
+#------------------------------------------------------------------------------------------------------------------------
+get.layout.names = function ()
+{
+  xml.rpc (uri, 'Cytoscape.getLayoutNames')
+
+} # get.layout.names
+#------------------------------------------------------------------------------------------------------------------------
+cy.layout = function (window.title, layout.name='jgraph-spring')
+{
+  if (!layout.name %in% get.layout.names ()) {
+    printf ("layout '%s' is not recognized; call get.layout.names () to see those which are supported", layout.name)
+    return ()
+    }
+
+  window.id = get.window.id (window.title)
+  return (xml.rpc (uri, 'Cytoscape.performLayout', as.character (window.id), layout.name))
+
+} # cy.layout
+#------------------------------------------------------------------------------------------------------------------------
+get.window.id = function (window.title)
+{
+  win.list = window.list ()
+
+  if (!window.title %in% as.character (win.list))
+    return (NA)
+
+  window.id = as.integer (names (win.list) [which (as.character (win.list) == window.title)])
+  return (window.id)
+
+} # get.window.id
+#------------------------------------------------------------------------------------------------------------------------
+get.window.titles = function ()
+{
+  win.list = window.list ()
+  if (length (win.list) == 0)
+    return (NA)
+  return (as.character (win.list))
+  
+} # get.window.titles
+#------------------------------------------------------------------------------------------------------------------------
+kill.all.windows = function ()
+{
+  window.ids = as.integer (names (window.list ()))
+  sapply (window.ids, kill.window.by.id)
+
+} # kill.all.windows
+#------------------------------------------------------------------------------------------------------------------------
+add.graph = function (graph, window.title)
+{
+  win.list = window.list ()
+  if (window.title %in% as.character (win.list))
+    window.id = get.window.id (window.title)
+  else
+    window.id = create.window (window.title)
+
+  printf ('createNodes: %s', xml.rpc (uri, 'Cytoscape.createNodes', as.character (window.id),  nodes (graph)))
+
+  for (noa.name in noa.names (graph)) {
+    printf ('-------- adding node attribute %s', noa.name)
+    for (node in nodes (graph)) {
+      #printf ('   attrs for node %s', node)
+      value = unlist (nodeData (graph, node, noa.name), use.names=FALSE)
+      #printf (' after unlist, value is %s', value)
+      if (is.na (value))
+        next
+      #printf ('class of value: %s', class (value))
+      if (! 'class' %in% names (attributes (nodeDataDefaults (graph, noa.name)))) {
+         printf ('Error! you must explicitly specify the R class of every node attribute, by assigning the "class" attribute of the nodeDataDefaults.')
+         printf ("For example:  attr (nodeDataDefaults (yourGraph, 'lfc'), 'class') = 'numeric'")
+         printf ("The %s node attribute in the current graph has no such explicit assigment.", noa.name)
+         stop (sprintf ("need to assign 'class' attribute of node attribute '%s'.", noa.name));
+         } 
+      attribute.class = attr (nodeDataDefaults (graph, noa.name), 'class')
+      add.node.attribute (noa.name, node, value, attribute.class)
+      } # for node
+    } # for noa.name 
+
+  for (source.node in names (edges (graph))) {
+    for (target.node in edges (graph)[[source.node]]) {
+      interaction = 'unknown'
+      if ('edgeType' %in% names (edgeDataDefaults (graph)))
+        interaction = as.character (edgeData (graph, source.node, target.node, 'edgeType'))
+      else if ('type' %in% names (edgeDataDefaults (graph)))
+        interaction = as.character (edgeData (graph, source.node, target.node, 'type'))
+      printf ('creating edge  %s (%s) %s', source.node, interaction, target.node)     
+      xml.rpc (uri, 'Cytoscape.createEdge', source.node, target.node, interaction, TRUE)
+
+      } # for target.node
+    } # for source.node
+
+} # add.graph
+#------------------------------------------------------------------------------------------------------------------------
+add.node.attribute = function (attribute.name, node, value, given.attribute.type)
+{
+  given.attribute.type = tolower (given.attribute.type)
+
+  if (is.null (given.attribute.type) || length (given.attribute.type) == 0)   # NULL, or non-null but empty
+    attribute.class = 'STRING'
+  else { 
+    if (given.attribute.type %in% c ('floating', 'numeric', 'double')) {
+      value = as.numeric (value)
+      standard.type.name = 'FLOATING'
+      }
+    else if (given.attribute.type %in% c ('integer', 'int')) {
+      value = as.integer (value)
+      standard.type.name = 'INTEGER'
+      }
+    else if (given.attribute.type %in% c ('string', 'char', 'character')) {
+      value = as.character (value)
+      standard.type.name = 'STRING'
+      }
+    } # if class attribute set on this node attribute
+
+ # printf ('class (value): %s', class (value))
+ # printf ('class: %s   attribute.name: %s   node: %s   value: %s', given.attribute.type, attribute.name, node, value)
+  
+  result = xml.rpc (uri, 'Cytoscape.addNodeAttribute', attribute.name, standard.type.name, node, value, .convert=T)
+  #printf ('addNodeAttribute result: %s', result)
+  return (result)
+
+} # add.node.attribute
+#------------------------------------------------------------------------------------------------------------------------
+add.node.attributes = function (attribute.name, nodes, values, given.attribute.type)
+{
+  #printf ('entering add.node.attributes: %s', date ())
+
+  given.attribute.type = tolower (given.attribute.type)
+
+  if (is.null (given.attribute.type) || length (given.attribute.type) == 0)   # NULL, or non-null but empty
+    attribute.class = 'STRING'
+  else { 
+    if (given.attribute.type %in% c ('floating', 'numeric', 'double')) {
+      values = as.numeric (values)
+      standard.type.name = 'DOUBLE'
+      }
+    else if (given.attribute.type %in% c ('integer', 'int')) {
+      values = as.integer (values)
+      standard.type.name = 'INTEGER'
+      }
+    else if (given.attribute.type %in% c ('string', 'char', 'character')) {
+      values = as.character (values)
+      standard.type.name = 'STRING'
+      }
+    } # if class attribute set on this node attribute
+
+  #printf ('class (value): %s', class (value))
+  #printf ('class: %s   attribute.name: %s   node: %s   value: %s', type, attribute.name, node, value)
+
+  noa.list = as.list (values)
+  names (noa.list) = nodes
+
+  #printf ('add.node.attributes, before xml.rpc: %s', date ())
+  
+  result = 'no match'
+  if (standard.type.name == 'INTEGER')
+    result = xml.rpc (uri, 'Cytoscape.addIntegerNodeAttributes', attribute.name, nodes, values, .convert=T)
+  else if (standard.type.name == 'DOUBLE') {
+    #printf ('calling addCoubleNodeAttributes: %s', date ())
+    result = xml.rpc (uri, 'Cytoscape.addDoubleNodeAttributes', attribute.name, nodes, values, .convert=T)
+    #printf ('back from addCoubleNodeAttributes: %s', date ())
+    }
+  else if (standard.type.name == 'STRING')
+    result = xml.rpc (uri, 'Cytoscape.addStringNodeAttributes', attribute.name, nodes, values, .convert=T)
+
+  #printf ('addNodeAttribute result: %s', result)
+  #printf ('leaving add.node.attributes: %s', date ())
+
+  return (result)
+
+} # add.node.attributes
+#------------------------------------------------------------------------------------------------------------------------
+redraw = function (window.title)
+{
+  window.id = get.window.id (window.title)
+  xml.rpc (uri,  "Cytoscape.redraw", as.character (window.id))
+
+} # redraw
+#------------------------------------------------------------------------------------------------------------------------
+noa.names = function (graph)
+{
+  return (names (nodeDataDefaults (graph)))
+}
+#------------------------------------------------------------------------------------------
+eda.names = function (graph)
+{
+  return (names (edgeDataDefaults (graph)))
+}
+#------------------------------------------------------------------------------------------
+noa = function (graph, node.attribute.name)
+{
+  unlist (sapply (nodes (graph), function (x)  (nodeData (graph, x, node.attribute.name))))
+
+} # eda
+#------------------------------------------------------------------------------------------
+eda = function (graph, edge.attribute.name)
+{
+  unlist (sapply (names (edgeData (graph)), function (n) edgeData (graph)[[n]][[edge.attribute.name]]))
+
+} # eda
+attr (eda, 'demo') <- "eda (g, 'edgeType')"
+attr (eda, 'man')  <- "returns the value of specified attribute for all edges in the supplied graph"
+attr (eda, 'file') <- "CRytoscape/R/CRytoscape.R"
+#------------------------------------------------------------------------------------------
+set.node.label.rule = function (window.title, node.attribute.name)
+{
+  window.id = as.character (get.window.id (window.title))
+
+  xml.rpc (uri, 'Cytoscape.setNodeLabel', window.id, node.attribute.name, 'label', 'default'); redraw (window.title)
+
+} # set.node.label.rule
+#------------------------------------------------------------------------------------------
+set.node.color.rule = function (node.attribute.name, control.points)
+{
+  #printf ('entering set.node.color.rule: %s', date ())
+  if (length (control.points) != 3) {
+    printf ("no support yet for node.color rules with anything other than 3 control points")
+    return ()
+    }
+
+  min.pair = strsplit (control.points [1], ':') [[1]]
+  min.value = as.double (min.pair [1])
+  min.color = min.pair [2]
+
+  mid.pair = strsplit (control.points [2], ':') [[1]]
+  mid.value = as.double (mid.pair [1])
+  mid.color = mid.pair [2]
+
+  max.pair = strsplit (control.points [3], ':') [[1]]
+  max.value = as.double (max.pair [1])
+  max.color = max.pair [2]
+  
+  xml.rpc (uri, "Cytoscape.createContinuousNodeColorVisualStyle", node.attribute.name, 'Node Color', 
+            min.color, mid.color, max.color, min.value, mid.value, max.value, .convert=F)
+  #printf ('leaving set.node.color.rule: %s', date ())
+
+
+} # set.node.color.rule
+attr (set.node.color.rule, 'demo') <- "node.color ('lfc', c ('-3.0:green', '0.0:white', '3.0:red'))"
+attr (set.node.color.rule, 'man')  <- "specifies how data attributes control the fill color of nodes"
+attr (set.node.color.rule, 'file') <- "CRytoscape/R/CRytoscape.R"
+#------------------------------------------------------------------------------------------
+set.node.size.rule = function (node.attribute.name, attribute.values, node.sizes)
+{
+ xml.rpc (uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Size', node.sizes, attribute.values)
+
+} # set.node.size.rule
+#------------------------------------------------------------------------------------------
+set.node.color = function (window.title, node.name, red, green, blue)
+{
+  window.id = as.character (get.window.id (window.title))
+  xml.rpc (uri, "Cytoscape.setNodeFillColor", window.id, node.name, as.integer (red) , as.integer(green), as.integer (blue), .convert=T)
+
+} # set.node.color
+#------------------------------------------------------------------------------------------------------------------------
+get.node.shapes = function ()
+{
+  return (xml.rpc (uri, 'Cytoscape.getNodeShapeNames'))
+
+} # get.node.shapes
+#------------------------------------------------------------------------------------------------------------------------
+get.line.styles = function ()
+{
+  return (xml.rpc (uri, 'Cytoscape.getLineStyleNames'))
+}
+#------------------------------------------------------------------------------------------------------------------------
+get.arrow.shapes = function ()
+{
+  return (xml.rpc (uri, 'Cytoscape.getArrowShapeNames'))
+}
+#------------------------------------------------------------------------------------------------------------------------
+set.node.shape.rule = function (window.title, node.attribute.name, attribute.values, node.shapes, default.shape='ellipse')
+{
+  window.id = as.character (get.window.id (window.title))
+  result = xml.rpc (uri, "Cytoscape.setNodeShapeRule", window.id, node.attribute.name, default.shape, attribute.values, node.shapes, .convert=T)
+  return (result)
+
+} # set.node.shape.rule
+#------------------------------------------------------------------------------------------------------------------------
+get.all.nodes = function (window.title)
+{
+  window.id = as.character (get.window.id (window.title))
+  result = xml.rpc (uri, "Cytoscape.getAllNodes", .convert=T)
+  return (result)
+
+} # get.all.edges
+#------------------------------------------------------------------------------------------------------------------------
+get.all.edges = function (window.title)
+{
+  window.id = as.character (get.window.id (window.title))
+  result = xml.rpc (uri, "Cytoscape.getAllEdges", window.id, .convert=T)
+  return (result)
+
+} # get.all.edges
+#------------------------------------------------------------------------------------------------------------------------
+add.edge.attributes = function (attribute.name, edge.names, values, type)
+{
+  type = tolower (type)
+
+  if (type == 'floating' || type == 'double')
+    xml.rpc (uri, 'Cytoscape.addDoubleEdgeAttributes', attribute.name, edge.names, as.numeric (values), .convert=t)
+
+  if (type == 'integer' || type == 'int')
+    xml.rpc (uri, 'Cytoscape.addIntegerEdgeAttributes', attribute.name, edge.names, as.integer (values), .convert=t)
+
+  if (type == 'string' || type == 'char' || type == 'character')
+    xml.rpc (uri, 'Cytoscape.addStringEdgeAttributes', attribute.name, edge.names, as.character (values), .convert=t)
+
+} # add.edge.attributes
+#------------------------------------------------------------------------------------------------------------------------
+set.edge.line.style.rule = function (window.title, edge.attribute.name, attribute.values, line.styles, default.style='SOLID')
+{
+  window.id = as.character (get.window.id (window.title))
+  result = xml.rpc (uri, "Cytoscape.setEdgeLineStyleRule", window.id, edge.attribute.name, default.style, attribute.values, line.styles, .convert=T)
+  return (result)
+
+} # set.edge.line.style.rule
+#------------------------------------------------------------------------------------------------------------------------
+set.target.arrow.rule = function (window.title, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW')
+{
+  window.id = as.character (get.window.id (window.title))
+  result = xml.rpc (uri, "Cytoscape.setEdgeTargetArrowRule", window.id, edge.attribute.name, default, attribute.values, arrows, .convert=T)
+  return (result)
+
+} # set.target.arrow.rule
+#------------------------------------------------------------------------------------------------------------------------
+set.source.arrow.rule = function (window.title, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW')
+{
+  window.id = as.character (get.window.id (window.title))
+  result = xml.rpc (uri, "Cytoscape.setEdgeSourceArrowRule", window.id, edge.attribute.name, default, attribute.values, arrows, .convert=T)
+  return (result)
+
+} # set.target.arrow.rule
+#------------------------------------------------------------------------------------------------------------------------
+set.edge.color.rule = function (window.title, node.attribute.name, default.color, attribute.values, colors)
+{
+  window.id = as.character (get.window.id (window.title))
+  
+  xml.rpc (uri, "Cytoscape.setEdgeColorRule", window.id, node.attribute.name, default.color, attribute.values, colors, .convert=T)
+
+} # set.edge.color.rule
+#------------------------------------------------------------------------------------------------------------------------
+hide.panel = function (panelName)
+{
+ xml.rpc (uri, 'Cytoscape.hidePanel', panelName)
+
+} # hide.panel
+#------------------------------------------------------------------------------------------------------------------------
+dock.panel = function (panelName)
+{
+ xml.rpc (uri, 'Cytoscape.dockPanel', panelName)
+
+} # dock.panel
+#------------------------------------------------------------------------------------------------------------------------
+float.panel = function (panelName)
+{
+ xml.rpc (uri, 'Cytoscape.floatPanel', panelName)
+
+} # float.panel
+#------------------------------------------------------------------------------------------------------------------------
+status.msg = function (msg)
+{
+  xml.rpc (uri, 'Cytoscape.setStatusBarMessage', msg)
+}
+#------------------------------------------------------------------------------------------------------------------------
+clear.msg = function ()
+{
+  xml.rpc (uri, 'Cytoscape.clearStatusBarMessage')
+}
+#------------------------------------------------------------------------------------------------------------------------
+select = function (window.title, nodes)
+{
+  window.id = as.character (get.window.id (window.title))
+  result = xml.rpc (uri, 'Cytoscape.selectNodes', window.id, nodes, .convert=T)
+  redraw (window.title)
+  return (result)
+
+} # select
+#------------------------------------------------------------------------------------------------------------------------
+clear = function (window.title)
+{
+  window.id = as.character (get.window.id (window.title))
+  result = xml.rpc (uri, 'Cytoscape.clearSelection', window.id, .convert=T)
+  redraw (window.title)
+  return (result)
+
+}  # clear
+#------------------------------------------------------------------------------------------------------------------------
+hide.selected.nodes = function (window.title)
+{
+  window.id = as.character (get.window.id (window.title))
+  return (xml.rpc (uri, 'Cytoscape.hideSelectedNodes', window.id, .convert=T))
+}
+#------------------------------------------------------------------------------------------------------------------------
+get.selected.nodes = function (window.title)
+{
+  if (count.selected.nodes (window.title) == 0)
+    return (NA)
+  
+  window.id = as.character (get.window.id (window.title))
+  return (xml.rpc (uri, 'Cytoscape.getSelectedNodes', window.id, .convert=T))
+}
+#------------------------------------------------------------------------------------------------------------------------
+count.selected.nodes = function (window.title)
+{
+  window.id = as.character (get.window.id (window.title))
+  return (xml.rpc (uri, 'Cytoscape.countSelectedNodes', window.id, .convert=T))
+}
+#------------------------------------------------------------------------------------------------------------------------
+unhide.all = function (window.title)
+{
+  window.id = as.character (get.window.id (window.title))
+  return (xml.rpc (uri, 'Cytoscape.unhideAll', window.id, .convert=T))
+}
+#------------------------------------------------------------------------------------------------------------------------
+
+@
+
+
+1.5
+log
+@removing print statements, in preparation for first (alpha) release
+@
+text
+@a1 11
+# repak = function () source ('../R/CRytoscape.R')
+#------------------------------------------------------------------------------------------------------------------------
+#.First.lib = function (libname, pkgname)
+#{
+#  dataDir <- system.file (package='CRytoscape')
+#  full.path <- paste (dataDir, 'data/g.escMethylation.RData', sep='/')
+#  print (sprintf ('path to load from: %s', full.path))
+#  print (sprintf ('loading small graph: %s', load (full.path)))
+#  
+#
+#} # .First.lib
+d14 1
+a14 1
+    return (sprintf ("connected to Cytoscape on port %d", port))
+d16 1
+a16 1
+    return (sprintf ("Error!  could not connect to Cytoscape on port %d", port))
+d149 1
+a149 1
+  #printf ('createNodes: %s', xml.rpc (uri, 'Cytoscape.createNodes', as.character (window.id),  nodes (graph)))
+d152 1
+a152 1
+    #printf ('-------- adding node attribute %s', noa.name)
+a159 1
+      print (173)
+a166 6
+      print (175)
+      printf ('noa.name: %s', noa.name)
+      printf ('node: %s', node)
+      printf ('value: %s', value)
+      printf ('attribute.class: %s', attribute.class)
+      print (177)
+a167 1
+      print (179)
+d178 3
+a180 2
+      printf ('calling Cytoscape.createEdge for %s (%s) %s', source.node, interaction, target.node)
+      printf ('createEdge: %s', xml.rpc (uri, 'Cytoscape.createEdge', source.node, target.node, interaction, TRUE))
+d208 1
+a208 1
+  printf ('class: %s   attribute.name: %s   node: %s   value: %s', given.attribute.type, attribute.name, node, value)
+d211 2
+a212 1
+  printf ('addNodeAttribute result: %s', result)
+d218 1
+a218 1
+  printf ('entering add.node.attributes: %s', date ())
+d245 1
+a245 1
+  printf ('add.node.attributes, before xml.rpc: %s', date ())
+d251 1
+a251 1
+    printf ('calling addCoubleNodeAttributes: %s', date ())
+d253 1
+a253 1
+    printf ('back from addCoubleNodeAttributes: %s', date ())
+d259 1
+a259 1
+  printf ('leaving add.node.attributes: %s', date ())
+d307 1
+a307 1
+  printf ('entering set.node.color.rule: %s', date ())
+d327 1
+a327 1
+  printf ('leaving set.node.color.rule: %s', date ())
+@
+
+
+1.4
+log
+@before removing add.node.attribute, in deference to the plural form:  add.node.attributes
+@
+text
+@d23 1
+a23 1
+  printf ('response: %s', response)
+d102 1
+a102 1
+  printf ('destroying window by id (%s): %s', class (id), id)
+d160 1
+a160 1
+  printf ('createNodes: %s', xml.rpc (uri, 'Cytoscape.createNodes', as.character (window.id),  nodes (graph)))
+d163 1
+a163 1
+    printf ('-------- adding node attribute %s', noa.name)
+d165 1
+a165 1
+      printf ('   attrs for node %s', node)
+d167 1
+a167 2
+      printf (' after unlist, value is %s', value)
+      print (168)
+a169 1
+      print (171)
+d197 1
+d235 2
+d261 2
+d267 2
+a268 1
+  else if (standard.type.name == 'DOUBLE')
+d270 2
+d276 2
+d324 1
+d344 2
+d498 26
+a523 11
+#hide = function (window.title)
+#{
+#  hideSelectedNodes
+#}
+##------------------------------------------------------------------------------------------------------------------------
+#get.selected.nodes = function (window.title)
+#{
+#
+#  getSelectedNodes(String networkID)
+#
+#}
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d92 1
+a92 1
+destroy.window.by.title = function (window.title)
+d99 1
+a99 1
+destroy.window.by.id = function (window.id)
+d112 1
+a112 1
+layout = function (window.title, layout.name='jgraph-spring')
+d122 1
+a122 1
+} # layout
+d145 1
+a145 1
+destroy.all.windows = function ()
+d148 1
+a148 1
+  sapply (window.ids, destroy.window)
+d150 1
+a150 1
+} # destroy.all.windows
+d165 1
+d167 2
+d171 9
+a179 1
+      printf ('class of value: %s', class (value))
+d181 6
+d188 1
+d205 1
+a205 1
+add.node.attribute = function (attribute.name, node, value, type)
+d207 3
+a209 1
+  if (is.null (type) || length (type) == 0)   # NULL, or non-null but empty
+d212 1
+a212 1
+    if (type [1] == 'FLOATING')
+d214 3
+a216 1
+    else if (type [1] == 'INTEGER')
+d218 6
+d226 2
+a227 2
+  printf ('class (value): %s', class (value))
+  printf ('class: %s   attribute.name: %s   node: %s   value: %s', type, attribute.name, node, value)
+d229 1
+a229 1
+  result = xml.rpc (uri, 'Cytoscape.addNodeAttribute', attribute.name, type, node, value, .convert=T)
+d234 1
+a234 1
+add.node.attributes = function (attribute.name, nodes, values, type)
+d236 3
+a238 1
+  if (is.null (type) || length (type) == 0)   # NULL, or non-null but empty
+d241 1
+a241 1
+    if (type == 'FLOATING')
+d243 3
+a245 1
+    else if (type == 'INTEGER')
+d247 7
+a253 1
+    } # if class attribute set
+d262 1
+a262 1
+  if (type == 'INTEGER')
+d264 1
+a264 1
+  else if (type == 'DOUBLE')
+d266 2
+d306 8
+d360 10
+d378 122
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d92 8
+a99 1
+destroy.window = function (window.id)
+d102 1
+d112 1
+a112 1
+layout = function (layout.name='grid', window.title)
+d211 1
+a211 1
+    if (type [1] == 'FLOATING')
+d213 1
+a213 1
+    else if (type [1] == 'INTEGER')
+d223 6
+a228 1
+  result = xml.rpc (uri, 'Cytoscape.addNodeAttributes', attribute.name, nodes, values, .convert=T)
+d237 1
+a237 1
+  xml.rpc ("http://localhost:9000", "Cytoscape.redraw", as.character (window.id))
+d285 1
+a285 1
+  xml.rpc ("http://localhost:9000", "Cytoscape.createContinuousNodeColorVisualStyle", node.attribute.name, 'Node Color', 
+d293 1
+a293 1
+set.node.size.rule = function (node.attribute.name, control.points)
+d295 1
+d297 1
+a297 4
+server.Cytoscape.createContinuousNodeVisualStyle ('score','Node Size', [10.,20.,40.,60.,80.], [0.,0.7,0.9,0.95,1.] )
+
+
+}
+d299 1
+a299 1
+node.size = function (node.attribute.name, control.points)
+d301 2
+d304 1
+a304 18
+  attribute.values = c ()
+  node.sizes = c ()
+  for (cp in control.points) {
+    tokens = strsplit (cp, ':') [[1]]
+    stopifnot (length (tokens) == 2)
+    new.value = as.numeric (tokens [1])
+    new.size = as.numeric (tokens [2])
+    attribut.values = c (attribute.values, new.value)
+    node.sizes = c (node.sizes, new.size)
+    } # for cp
+
+  xml.rpc ("http://localhost:9000", "Cytoscape.createContinuousNodeVisualStyle", node.attribute.name, 'Node Size', attribute.values, node.sizes)
+
+
+} # node.size		
+attr (node.size, 'demo') <- "node.size ('count', c ('1:10', '10:30', '10000:100'))"
+attr (node.size, 'man')  <- "specifies how some data attribute controls the size of the nodes"
+attr (node.size, 'file') <- "CRytoscape/R/CRytoscape.R"
+d306 1
+a306 1
+apply.node.color.rule = function (window.title, nodeAttribute, name.value.pairs)
+d308 1
+a308 2
+  window.id = as.character (get.window.id (window.title))
+  #xml.rpc ("http://localhost:9000", "Cytoscape.setNodeFillColor", window.id, node.name, as.integer (red) , as.integer(green), as.integer (blue), .convert=F)
+d310 1
+a310 1
+} # apply.node.color.rule
+d312 1
+a312 1
+set.node.color = function (window.title, node.name, red, green, blue)
+d315 2
+a316 1
+  xml.rpc ("http://localhost:9000", "Cytoscape.setNodeFillColor", window.id, node.name, as.integer (red) , as.integer(green), as.integer (blue), .convert=F)
+d318 1
+a318 1
+} # set.node.color
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a162 13
+      #if (is.null (attribute.class))
+      #  attribute.class = 'STRING'
+      #if (length (attribute.class) == 1) {
+      #   printf ('attr class: %s', attribute.class)
+      #  if (attribute.class == 'FLOATING')
+      #    value = as.numeric (value)
+      #  else if (attribute.class == 'INTEGER')
+      #    value = as.integer (value)
+      #  } # if class attribute set on this node attribute
+      #printf ('class (value): %s', class (value))
+      #printf ('class: %s   noa.name: %s   node: %s   value: %s', attribute.class, noa.name, node, value)
+      #result = xml.rpc (uri, 'Cytoscape.addNodeAttribute', noa.name, attribute.class, node, value, .convert=F)
+      #printf ('addNodeAttribute result: %s', result)
+d198 23
+d280 8
+@

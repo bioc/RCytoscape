@@ -13,6 +13,7 @@ exportMethods (
    getWindowCount,
    getWindowList,
    layout,
+   setPosition,
    ping,
    redraw,
    sendNodes,
@@ -24,13 +25,18 @@ exportMethods (
    dockPanel,
    floatPanel,
    hidePanel,
+   setNodeTooltipRule,
+   setEdgeTooltipRule,
    setNodeLabelRule,
    setNodeColorRule,
+   setNodeBorderColorRule,
    setNodeShapeRule,
    setNodeSizeRule,
    setEdgeLineStyleRule,
    setEdgeTargetArrowRule,
    setEdgeSourceArrowRule,
+   setEdgeTargetArrowColorRule,
+   setEdgeSourceArrowColorRule,
    setEdgeColorRule,
    getAllNodes,
    getAllEdges,
@@ -38,9 +44,14 @@ exportMethods (
    selectNodes,
    getSelectedNodes,
    getSelectedNodeCount,
-   sfn, 
+   sfn,
+   getGraph,
+   setGraph,
    hideSelectedNodes,
-   unhideAll
+   unhideAll,
+   version,
+   msg,
+   clearMsg
    )
 
 export(
@@ -51,7 +62,10 @@ export(
    eda,
    cy2.edge.names,
    makeSimpleGraph,
-   makeRandomGraph
+   makeRandomGraph,
+   initNodeAttribute,
+   initEdgeAttribute
+
    )
 
 importClassesFrom(graph, graph)

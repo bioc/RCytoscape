@@ -8,7 +8,7 @@ Specify how data attributes -- for the specified named attribute -- are
 mapped to the source arrow type.}
 
 \usage{
-setEdgeSourceArrowRule(obj, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW')
+setEdgeSourceArrowRule(obj, edge.attribute.name, attribute.values, arrows, default='Arrow')
 }
 
 \arguments{
@@ -34,7 +34,7 @@ None.
 
 \examples{
   cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  arrows <- c ('WHITE_ARROW', 'BLACK_DIAMOND', 'COLOR_CIRCLE')
+  arrows <- c ('Arrow', 'Diamond', 'Circle')
   edgeType.values <- c ('phosphorylates', 'synthetic lethal', 'undefined')
   setEdgeSourceArrowRule (cw, 'edgeType', edgeType.values, arrows)
   redraw (cw)

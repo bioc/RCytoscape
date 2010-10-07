@@ -10,4 +10,7 @@ testverbose:
 
 
 check:
-	(cd ../..; R CMD check --no-latex RCytoscape)
+	(cd ../..; R CMD check --no-latex --no-vignettes RCytoscape)
+
+codoc:
+	(cd ../..; R CMD check --no-latex --no-vignettes --no-tests --no-examples RCytoscape)

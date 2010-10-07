@@ -14,7 +14,7 @@ setNodeLabelRule(obj, node.attribute.name)
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
   \item{node.attribute.name}{the node attribute whose values will, when this
-rule is applied, determine the label on each code.}
+rule is applied, determine the label on each node.}
 }
 
 \value{

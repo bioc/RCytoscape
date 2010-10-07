@@ -6,11 +6,12 @@
 Layout the current graph according to the specified algorithm.
 }
 \usage{
-layout(obj, layout.name)
+layout(obj, layout.name='jgraph-spring')
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
-  \item{layout.name}{a \code{string}, one of the values returned by \code{getLayoutNames}. }
+  \item{layout.name}{a \code{string}, one of the values returned by
+    \code{getLayoutNames}, 'jgraph-spring' by default. }
 }
 
 \value{

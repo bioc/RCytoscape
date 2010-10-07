@@ -1,7 +1,7 @@
-\name{setNodeColorRule}
-\alias{setNodeColorRule}
-\alias{setNodeColorRule,CytoscapeWindowClass-method}
-\title{setNodeColorRule}
+\name{setNodeBorderColorRule}
+\alias{setNodeBorderColorRule}
+\alias{setNodeBorderColorRule,CytoscapeWindowClass-method}
+\title{setNodeBorderColorRule}
 \description{
 Specify how data attributes -- for the specified named attribute -- are
 mapped to node color.  There are two modes:  'interpolate' and
@@ -26,7 +26,7 @@ dark red.
 }
 
 \usage{
-setNodeColorRule(obj, node.attribute.name, control.points, colors, mode='interpolate', default.color='#000000')
+setNodeBorderColorRule(obj, node.attribute.name, control.points, colors, mode='interpolate', default.color='#000000')
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
@@ -47,7 +47,7 @@ rule is applied, determine the color of each node.}
     control.points as colors. If are data attribute values are found on
     the nodes which do not appear in  your list, they will displayed in
     the default color.}
-  \item{default.color}{'#000000' (black) by default, to catch your
+    \item{default.color}{'#000000' (black) by default, to catch your
       eye.  Used primarily in mode=='lookup' and in mode='interpolate'
       if you fail to specify 'above' and 'below' values.}
 }
@@ -67,12 +67,12 @@ None.
     # paint negative values shades of green, positive values shades of
     # red, out-of-range low values are dark green; out-of-range high
     # values are dark red
-  node.colors <- c ("#00AA00", "#00FF00", "#FFFFFF", "#FF0000", "#AA0000")
-  setNodeColorRule (cw, node.attribute.name='lfc', control.points, node.colors, mode='interpolate')
+  colors <- c ("#00AA00", "#00FF00", "#FFFFFF", "#FF0000", "#AA0000")
+  setNodeBorderColorRule (cw, node.attribute.name='lfc', control.points, colors, mode='interpolate')
   redraw (cw)
   data.values <- c ("kinase", "transcription factor", "glycoprotein")
-  node.colors <- c ("#0000AA", "#FFFF00", "#0000AA") 
-  setNodeColorRule (cw, node.attribute.name='type', data.values,   node.colors, mode='lookup', default.color='#AA0000')
+  colors <- c ("#0000AA", "#FFFF00", "#0000AA") 
+  setNodeBorderColorRule (cw, node.attribute.name='type', data.values,   colors, mode='lookup', default.color='#AA0000')
 }
 
 

@@ -16,6 +16,9 @@ setClass ("CytoscapeWindowClass",
 
 #------------------------------------------------------------------------------------------------------------------------
 setGeneric ('ping',                     signature='obj', function (obj) standardGeneric ('ping'))
+setGeneric ('version',                  signature='obj', function (obj) standardGeneric ('version'))
+setGeneric ('msg',                      signature='obj', function (obj, string) standardGeneric ('msg'))
+setGeneric ('clearMsg',                 signature='obj', function (obj) standardGeneric ('clearMsg'))
 setGeneric ('createWindow',             signature='obj', function (obj) standardGeneric ('createWindow'))
 setGeneric ('getWindowCount',           signature='obj', function (obj) standardGeneric ('getWindowCount'))
 setGeneric ('getWindowList',            signature='obj', function (obj) standardGeneric ('getWindowList'))
@@ -26,6 +29,8 @@ setGeneric ('getLayoutNames',           signature='obj', function (obj) standard
 setGeneric ('getLineStyles',            signature='obj', function (obj) standardGeneric ('getLineStyles'))
 setGeneric ('getNodeShapes',            signature='obj', function (obj) standardGeneric ('getNodeShapes'))
 setGeneric ('getAttributeClassNames',   signature='obj', function (obj) standardGeneric ('getAttributeClassNames'))
+setGeneric ('setGraph',                 signature='obj', function (obj, graph) standardGeneric ('setGraph'))
+setGeneric ('getGraph',                 signature='obj', function (obj) standardGeneric ('getGraph'))
 setGeneric ('sendNodes',                signature='obj', function (obj) standardGeneric ('sendNodes'))
 setGeneric ('sendEdges',                signature='obj', function (obj) standardGeneric ('sendEdges'))
 setGeneric ('sendNodeAttributes',       signature='obj', function (obj, attribute.name) standardGeneric ('sendNodeAttributes'))
@@ -33,25 +38,38 @@ setGeneric ('sendNodeAttributesDirect', signature='obj',
     function (obj, attribute.name, attribute.type, node.names, values) standardGeneric ('sendNodeAttributesDirect'))
 setGeneric ('sendEdgeAttributes',       signature='obj', function (obj, attribute.name) standardGeneric ('sendEdgeAttributes'))
 setGeneric ('sendEdgeAttributesDirect', signature='obj', 
-   function (obj, attribute.name, attribute.type, edge.names, values) standardGeneric ('sendEdgeAttributesDirect'))
+    function (obj, attribute.name, attribute.type, edge.names, values) standardGeneric ('sendEdgeAttributesDirect'))
 setGeneric ('displayGraph',             signature='obj', function (obj) standardGeneric ('displayGraph'))
-setGeneric ('layout',                   signature='obj', function (obj, layout.name) standardGeneric ('layout'))
+setGeneric ('layout',                   signature='obj', function (obj, layout.name='jgraph-spring') standardGeneric ('layout'))
+setGeneric ('setPosition',              signature='obj', function (obj, node.names, x.coords, y.coords) standardGeneric ('setPosition'))
 setGeneric ('redraw',                   signature='obj', function (obj) standardGeneric ('redraw'))
 setGeneric ('hidePanel',                signature='obj', function (obj, panelName) standardGeneric ('hidePanel'))
 setGeneric ('dockPanel',                signature='obj', function (obj, panelName) standardGeneric ('dockPanel'))
 setGeneric ('floatPanel',               signature='obj', function (obj, panelName) standardGeneric ('floatPanel'))
+setGeneric ('setNodeTooltipRule',       signature='obj', function (obj, node.attribute.name) standardGeneric ('setNodeTooltipRule'))
+setGeneric ('setEdgeTooltipRule',       signature='obj', function (obj, edge.attribute.name) standardGeneric ('setEdgeTooltipRule'))
 setGeneric ('setNodeLabelRule',         signature='obj', function (obj, node.attribute.name) standardGeneric ('setNodeLabelRule'))
-setGeneric ('setNodeColorRule',         signature='obj', function (obj, node.attribute.name, control.points, colors) standardGeneric ('setNodeColorRule'))
+setGeneric ('setNodeColorRule',         signature='obj', 
+    function (obj, node.attribute.name, control.points, colors, mode='interpolate', default.color='#000000') standardGeneric ('setNodeColorRule'))
+setGeneric ('setNodeBorderColorRule',   signature='obj', 
+    function (obj, node.attribute.name, control.points, colors, mode='interpolate', default.color='#000000') standardGeneric ('setNodeBorderColorRule'))
 setGeneric ('setNodeShapeRule',         signature='obj', 
-     function (obj, node.attribute.name, attribute.values, node.shapes, default.shape='ellipse') standardGeneric ('setNodeShapeRule'))
+    function (obj, node.attribute.name, attribute.values, node.shapes, default.shape='ellipse') standardGeneric ('setNodeShapeRule'))
 setGeneric ('setNodeSizeRule',          signature='obj', 
-     function (obj, node.attribute.name, attribute.values, node.sizes) standardGeneric ('setNodeSizeRule'))
+    function (obj, node.attribute.name, control.points, node.sizes, mode='interpolate', default.size=40) standardGeneric ('setNodeSizeRule'))
+#setGeneric ('setBorderWidth',           signature='obj', function (obj, new.size) standardGeneric ('setNodeBorderWidth'))
 setGeneric ('setEdgeLineStyleRule',     signature='obj', 
-     function (obj, edge.attribute.name, attribute.values, line.styles, default.style='SOLID') standardGeneric ('setEdgeLineStyleRule'))
+    function (obj, edge.attribute.name, attribute.values, line.styles, default.style='SOLID') standardGeneric ('setEdgeLineStyleRule'))
 setGeneric ('setEdgeTargetArrowRule',   signature='obj', 
-     function (obj, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW') standardGeneric ('setEdgeTargetArrowRule'))
+    function (obj, edge.attribute.name, attribute.values, arrows, default='Arrow') standardGeneric ('setEdgeTargetArrowRule'))
 setGeneric ('setEdgeSourceArrowRule',   signature='obj', 
-     function (obj, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW') standardGeneric ('setEdgeSourceArrowRule'))
+    function (obj, edge.attribute.name, attribute.values, arrows, default='Arrow') standardGeneric ('setEdgeSourceArrowRule'))
+
+setGeneric ('setEdgeTargetArrowColorRule',   signature='obj', 
+    function (obj, edge.attribute.name, attribute.values, colors, default.color='#000000') standardGeneric ('setEdgeTargetArrowColorRule'))
+setGeneric ('setEdgeSourceArrowColorRule',   signature='obj', 
+    function (obj, edge.attribute.name, attribute.values, colors, default.color='#000000') standardGeneric ('setEdgeSourceArrowColorRule'))
+
 setGeneric ('setEdgeColorRule',         signature='obj', function (obj, attribute.name, attribute.values, colors) standardGeneric ('setEdgeColorRule'))
 setGeneric ('getAllNodes',              signature='obj', function (obj) standardGeneric ('getAllNodes'))
 setGeneric ('getAllEdges',              signature='obj', function (obj) standardGeneric ('getAllEdges'))
@@ -88,8 +106,11 @@ CytoscapeWindow = function (title='default', graph=new('graphNEL', edgemode='dir
 
   if (! 'label' %in% noa.names (graph)) {
     write ('nodes have no label attribute -- adding default labels', stderr ())
-    nodeDataDefaults (graph, 'label') = ''
-    attr (nodeDataDefaults (graph, attr = "label"), "class") = "STRING"
+    graph = initNodeAttribute (graph, 'label', 'char', '')
+
+    #nodeDataDefaults (graph, 'label') = ''
+    #attr (nodeDataDefaults (graph, attr = "label"), "class") = "STRING"
+
     if (length (nodes (graph) > 0))
       for (node in nodes (graph))
         nodeData (graph, node, 'label') = node
@@ -105,6 +126,21 @@ CytoscapeWindow = function (title='default', graph=new('graphNEL', edgemode='dir
 setMethod ('ping', 'CytoscapeWindowClass', 
   function (obj) { 
     return (xml.rpc (obj@uri, 'Cytoscape.test'))
+    })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('version', 'CytoscapeWindowClass', 
+  function (obj) { 
+    return (xml.rpc (obj@uri, 'Cytoscape.version'))
+    })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('msg', 'CytoscapeWindowClass', 
+  function (obj, string) { 
+    return (xml.rpc (obj@uri, 'Cytoscape.setStatusBarMessage', string))
+    })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('clearMsg', 'CytoscapeWindowClass', 
+  function (obj) { 
+    return (xml.rpc (obj@uri, 'Cytoscape.clearStatusBarMessage'))
     })
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('createWindow', 'CytoscapeWindowClass',
@@ -189,6 +225,23 @@ setMethod ('getLayoutNames', 'CytoscapeWindowClass',
      }) # getLayoutNames
 
 #------------------------------------------------------------------------------------------------------------------------
+setMethod ('setGraph', 'CytoscapeWindowClass',
+
+  function (obj, graph) {
+    if (edgemode (graph) == 'undirected') 
+      graph = remove.redundancies.in.undirected.graph (graph)
+    obj@graph = graph
+    return (obj)
+    })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getGraph', 'CytoscapeWindowClass',
+
+  function (obj) {
+    return (obj@graph)
+    })
+
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('sendNodes', 'CytoscapeWindowClass',
 
   function (obj) {
@@ -227,6 +280,27 @@ setMethod ('layout', 'CytoscapeWindowClass',
     id = as.character (obj@window.id)
     return (xml.rpc (obj@uri, 'Cytoscape.performLayout', id, layout.name))
     }) # cy.layout
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setPosition', 'CytoscapeWindowClass',
+
+  function (obj, node.names, x.coords, y.coords) {
+
+    count = length (node.names)
+    stopifnot (length (x.coords) == count)
+    stopifnot (length (y.coords) == count)
+
+    if (count == 0)
+      return ()
+
+    id = as.character (obj@window.id)
+
+    if (count == 1)
+      return (xml.rpc (obj@uri, 'Cytoscape.setNodePosition', id, node.names, x.coords, y.coords))
+    else 
+      return (xml.rpc (obj@uri, 'Cytoscape.setNodesPositions', id, node.names, x.coords, y.coords))
+
+    }) # cy.setPosition
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('sendNodeAttributes', 'CytoscapeWindowClass',
@@ -388,6 +462,30 @@ setMethod ('floatPanel', 'CytoscapeWindowClass',
      })
 
 #------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeTooltipRule', 'CytoscapeWindowClass',
+
+  function (obj, node.attribute.name) {
+    id = as.character (obj@window.id)
+    viz.style.name = 'default'
+    attribute.values = as.character (noa (obj@graph, node.attribute.name))
+    tooltips = attribute.values
+    xml.rpc (obj@uri, 'Cytoscape.discreteMapper', id, viz.style.name, node.attribute.name, 'Node Tooltip', '', 
+             attribute.values, tooltips)
+    })  # setNodeTooltipRule
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setEdgeTooltipRule', 'CytoscapeWindowClass',
+
+  function (obj, edge.attribute.name) {
+    id = as.character (obj@window.id)
+    viz.style.name = 'default'
+    attribute.values = as.character (eda (obj@graph, edge.attribute.name))
+    tooltips = attribute.values
+    xml.rpc (obj@uri, 'Cytoscape.discreteMapper', id, viz.style.name, edge.attribute.name, 'Edge Tooltip', '', 
+             attribute.values, tooltips)
+    })  # setEdgeTooltipRule
+
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeLabelRule', 'CytoscapeWindowClass',
 
   function (obj, node.attribute.name) {
@@ -399,27 +497,88 @@ setMethod ('setNodeLabelRule', 'CytoscapeWindowClass',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeColorRule', 'CytoscapeWindowClass',
 
-   function (obj, node.attribute.name, control.points, colors) {
+   function (obj, node.attribute.name, control.points, colors, mode='interpolate', default.color='#000000') {
 
-     if (!(length (control.points) == 3 & length (colors) == 3)) {
-       write (sprintf ('cp: %d', length (control.points)), stderr ())
-       write (sprintf ('co: %d', length (colors)), stderr ())
-       write ("Error! RCytoscape:setNodeColorRule.  No support yet for node.color rules with anything other than 3 control points", stderr ())
+     if (!mode %in% c ('interpolate', 'lookup')) {
+       write ("Error! RCytoscape:setNodeColorRule.  mode must be 'interpolate' (the default) or 'lookup'.", stderr ())
        return ()
        }
 
-     min.value = control.points [1]
-     mid.value = control.points [2]
-     max.value = control.points [3]
+     if (mode=='interpolate') {  # need a 'below' color and an 'above' color.  so there should be two more colors than control.points 
+       if (length (control.points) == length (colors)) { # called did not supply 'below' and 'above' values; manufacture them
+         colors = c (colors [1], colors, colors [length (colors)])
+         write ("RCytoscape::setNodeColorRule, no 'below' or 'above' colors specified.  Inferred from supplied colors.", stderr ());
+         } # 
 
-     min.color = colors [1]
-     mid.color = colors [2]
-     max.color = colors [3]
-     
-     result = xml.rpc (obj@uri, "Cytoscape.createContinuousNodeColorVisualStyle", node.attribute.name, 'Node Color', 
-                       min.color, mid.color, max.color, min.value, mid.value, max.value, .convert=TRUE)
-     invisible (result)
+       good.args = length (control.points) == (length (colors) - 2)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (colors)), stderr ())
+         write ("Error! RCytoscape:setNodeColorRule, interpolate mode.", stderr ())
+         write ("Expecting 1 color for each control.point, one for 'above' color, one for 'below' color.", stderr ())
+         return ()
+         }
+       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Color', control.points, colors)
+       invisible (result)
+       } # if mode==interpolate
+
+     else { # use a discrete rule, with no interpolation
+       good.args = length (control.points) == length (colors)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (colors)), stderr ())
+         write ("Error! RCytoscape:setNodeColorRule.  Expecting exactly as many colors as control.points in lookup mode.", stderr ())
+         return ()
+         }
+
+       default.style = 'default'
+       result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', as.character (obj@window.id), default.style, 
+                         node.attribute.name, 'Node Color', default.color, control.points, colors)
+       invisible (result)
+       } # else: !interpolate
      }) # setNodeColorRule
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeBorderColorRule', 'CytoscapeWindowClass',
+
+   function (obj, node.attribute.name, control.points, colors, mode='interpolate', default.color='#000000') {
+
+     if (!mode %in% c ('interpolate', 'lookup')) {
+       write ("Error! RCytoscape:setNodeBorderColorRule.  mode must be 'interpolate' (the default) or 'lookup'.", stderr ())
+       return ()
+       }
+
+     if (mode=='interpolate') {  # need a 'below' color and an 'above' color.  so there should be two more colors than control.points 
+       if (length (control.points) == length (colors))  # called did not supply 'below' and 'above' values; manufacture them
+         colors = c (default.color, colors, default.color)
+
+       good.args = length (control.points) == (length (colors) - 2)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (colors)), stderr ())
+         write ("Error! RCytoscape:setNodeBorderColorRule, interpolate mode.", stderr ())
+         write ("Expecting 1 color for each control.point, one for 'above' color, one for 'below' color.", stderr ())
+         return ()
+         }
+       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Border Color', control.points, colors)
+       invisible (result)
+       } # if mode==interpolate
+
+     else { # use a discrete rule, with no interpolation
+       good.args = length (control.points) == length (colors)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (colors)), stderr ())
+         write ("Error! RCytoscape:setNodeBorderColorRule.  Expecting exactly as many colors as control.points in lookup mode.", stderr ())
+         return ()
+         }
+
+       default.style = 'default'
+       result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', as.character (obj@window.id), default.style, 
+                         node.attribute.name, 'Node Border Color', default.color, control.points, colors)
+       invisible (result)
+       } # else: !interpolate
+     }) # setNodeBorderColorRule
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeShapeRule', 'CytoscapeWindowClass',
@@ -434,25 +593,68 @@ setMethod ('setNodeShapeRule', 'CytoscapeWindowClass',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeSizeRule', 'CytoscapeWindowClass',
 
-   function (obj, node.attribute.name, attribute.values, node.sizes) {
-     id = as.character (obj@window.id)
-        # take the first and last node size, prepend and append them respectively, so that there are 2 more
-        # visual attribute values (in this case, node size in pixels) than there are node data attribute values
-     adjusted.node.sizes = c (node.sizes [1], node.sizes, c (node.sizes [length (node.sizes)]))
-     result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Size', 
-                       attribute.values, adjusted.node.sizes)
-     return (result)
+#   function (obj, node.attribute.name, attribute.values, node.sizes) {
+#     id = as.character (obj@window.id)
+#        # take the first and last node size, prepend and append them respectively, so that there are 2 more
+#        # visual attribute values (in this case, node size in pixels) than there are node data attribute values
+#     adjusted.node.sizes = c (node.sizes [1], node.sizes, c (node.sizes [length (node.sizes)]))
+#     result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Size', 
+#                       attribute.values, adjusted.node.sizes)
+#     return (result)
+#     }) # setNodeSizeRule
+
+   function (obj, node.attribute.name, control.points, node.sizes, mode='interpolate', default.size=40) {
+
+     if (!mode %in% c ('interpolate', 'lookup')) {
+       write ("Error! RCytoscape:setNodeSizeRule.  mode must be 'interpolate' (the default) or 'lookup'.", stderr ())
+       return ()
+       }
+
+     if (mode=='interpolate') {  # need a 'below' size and an 'above' size.  so there should be two more colors than control.points 
+       if (length (control.points) == length (node.sizes)) { # caller did not supply 'below' and 'above' values; manufacture them
+         node.sizes = c (node.sizes [1], node.sizes, node.sizes [length (node.sizes)])
+         write ("RCytoscape::setNodeSizeRule, no 'below' or 'above' sizes specified.  Inferred from node.sizes.", stderr ())
+         } # 
+
+       good.args = length (control.points) == (length (node.sizes) - 2)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (node.sizes)), stderr ())
+         write ("Error! RCytoscape:setNodeSizeRule, interpolate mode.", stderr ())
+         write ("Expecting 1 node.size for each control.point, one for 'above' size, one for 'below' size.", stderr ())
+         return ()
+         }
+       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Size', control.points, node.sizes)
+       invisible (result)
+       } # if mode==interpolate
+
+     else { # use a discrete rule, with no interpolation
+       good.args = length (control.points) == length (node.sizes)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (node.sizes)), stderr ())
+         write ("Error! RCytoscape:setNodeSizeRule.  Expecting exactly as many node.sizes as control.points in lookup mode.", stderr ())
+         return ()
+         }
+
+       default.style = 'default'
+       result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', as.character (obj@window.id), default.style, 
+                         node.attribute.name, 'Node Size', as.character (default.size), 
+                         as.character (control.points), as.character (node.sizes))
+       invisible (result)
+       } # else: !interpolate
      }) # setNodeSizeRule
+
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setEdgeColorRule', 'CytoscapeWindowClass',
 
-   function (obj, attribute.name, attribute.values, colors) {
+ function (obj, attribute.name, attribute.values, colors) {
      id = as.character (obj@window.id)
      default.color = '#000000'
      result = xml.rpc (obj@uri, "Cytoscape.setEdgeColorRule", id, attribute.name, default.color, attribute.values, colors, .convert=TRUE)
      return (result)
-     }) # set.edge.color.rule
+     }) # setEdgeColorRule
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setEdgeLineStyleRule', 'CytoscapeWindowClass',
@@ -467,7 +669,7 @@ setMethod ('setEdgeLineStyleRule', 'CytoscapeWindowClass',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setEdgeTargetArrowRule', 'CytoscapeWindowClass', 
 
-   function (obj, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW') {
+   function (obj, edge.attribute.name, attribute.values, arrows, default='Arrow') {
      id = as.character (obj@window.id)
      result = xml.rpc (obj@uri, "Cytoscape.setEdgeTargetArrowRule", id, edge.attribute.name, default, attribute.values, arrows, .convert=TRUE)
      return (result)
@@ -476,9 +678,31 @@ setMethod ('setEdgeTargetArrowRule', 'CytoscapeWindowClass',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setEdgeSourceArrowRule', 'CytoscapeWindowClass', 
 
-   function (obj, edge.attribute.name, attribute.values, arrows, default='BLACK_ARROW') {
+   function (obj, edge.attribute.name, attribute.values, arrows, default='Arrow') {
      id = as.character (obj@window.id)
      result = xml.rpc (obj@uri, "Cytoscape.setEdgeSourceArrowRule", id, edge.attribute.name, default, attribute.values, arrows, .convert=TRUE)
+     return (result)
+     }) # setTargetArrowRule
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setEdgeTargetArrowColorRule', 'CytoscapeWindowClass', 
+
+   function (obj, edge.attribute.name, attribute.values, colors, default.color='#000000') {
+     id = as.character (obj@window.id)
+     style.name = 'default'
+     result = xml.rpc (obj@uri, "Cytoscape.discreteMapper", id, style.name, edge.attribute.name,
+                      'Edge Target Arrow Color', default.color, attribute.values, colors, .convert=TRUE)
+     return (result)
+     }) # setTargetArrowRule
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setEdgeSourceArrowColorRule', 'CytoscapeWindowClass', 
+
+   function (obj, edge.attribute.name, attribute.values, colors, default.color='#000000') {
+     id = as.character (obj@window.id)
+     style.name = 'default'
+     result = xml.rpc (obj@uri, "Cytoscape.discreteMapper", id, style.name, edge.attribute.name,
+                      'Edge Source Arrow Color', default.color, attribute.values, colors, .convert=TRUE)
      return (result)
      }) # setTargetArrowRule
 
@@ -487,7 +711,11 @@ setMethod ('getAllNodes', 'CytoscapeWindowClass',
 
    function (obj) {
      id = as.character (obj@window.id)
+     #count = xml.rpc (obj@uri, "Cytoscape.countNodes")
+     #if (count == 0)
+     #  return ()
        # todo:  getting all nodes should be inherently a window-specific operation
+     #result = xml.rpc (obj@uri, "Cytoscape.getAllNodes", id, .convert=TRUE)
      result = xml.rpc (obj@uri, "Cytoscape.getAllNodes", .convert=TRUE)
      return (result)
      }) # getAllNodes
@@ -497,7 +725,10 @@ setMethod ('getAllEdges', 'CytoscapeWindowClass',
 
    function (obj) {
      id = as.character (obj@window.id)
-     result = xml.rpc (obj@uri, "Cytoscape.getAllEdges", .convert=TRUE)
+     count = xml.rpc (obj@uri, "Cytoscape.countEdges", id)
+     if (count == 0)
+       return ()
+     result = xml.rpc (obj@uri, "Cytoscape.getAllEdges", id, .convert=TRUE)
      return (result)
      }) # getAllEdges
 
@@ -642,34 +873,16 @@ cy2.edge.names = function (graph)
 makeSimpleGraph = function ()
 {
   g = new ('graphNEL', edgemode='directed')
-  nodeDataDefaults (g, attr='type') = 'undefined'
-  attr (nodeDataDefaults (g, attr='type'), 'class') = 'STRING'
 
-  nodeDataDefaults (g, attr='lfc') = 1.0
-  attr (nodeDataDefaults (g, attr='lfc'), 'class') = 'DOUBLE'
+  g = initNodeAttribute (g, 'type', 'char', 'undefined')
+  g = initNodeAttribute (g, 'lfc', 'numeric', 1.0)
+  g = initNodeAttribute (g, 'label', 'char', 'default node label')
+  g = initNodeAttribute (g, 'count', 'integer', 0)
 
-  nodeDataDefaults (g, attr='label') = 'default node label'
-  attr (nodeDataDefaults (g, attr='label'), 'class') = 'STRING'
+  g = initEdgeAttribute (g, 'edgeType', 'char', 'undefined')
+  g = initEdgeAttribute (g, 'score', 'numeric', 0.0)
+  g = initEdgeAttribute (g, 'misc',   'char', 'default misc')
 
-  nodeDataDefaults (g, attr='count') = '0'
-  attr (nodeDataDefaults (g, attr='count'), 'class') = 'INTEGER'
-
-  edgeDataDefaults (g, attr='edgeType') = 'undefined'
-  attr (edgeDataDefaults (g, attr='edgeType'), 'class') = 'STRING'
-
-  edgeDataDefaults (g, attr='score') = 0.0
-  attr (edgeDataDefaults (g, attr='score'), 'class') = 'DOUBLE'
-
-  edgeDataDefaults (g, attr='misc') = 'default misc'
-  attr (edgeDataDefaults (g, attr='misc'), 'class') = 'STRING'
-
-    # from src/tudelft/CytoscapeRPC/CyAttributeAdderImpl
-    #    STRING("STRING"),
-    #    INTEGER("INTEGER"),
-    #    FLOATING("FLOATING"),
-    #    BOOLEAN("BOOLEAN"),
-    #    LIST("SIMPLE_LIST"),
-    #    MAP("SIMPLE_MAP");
   g = graph::addNode ('A', g)
   g = graph::addNode ('B', g)
   g = graph::addNode ('C', g)
@@ -756,6 +969,40 @@ remove.redundancies.in.undirected.graph = function (gu)
   return (g)
 
 } # remove.redundancies.in.undirected.graph 
+#------------------------------------------------------------------------------------------------------------------------
+initNodeAttribute = function (graph, attribute.name, attribute.type, default.value)
+{
+  stopifnot (attribute.type %in% c ('char', 'integer', 'numeric'))
+  if (attribute.type == 'char')
+    attribute.type = 'STRING'
+  else if (attribute.type == 'integer')
+    attribute.type = 'INTEGER'
+  else if (attribute.type == 'numeric')
+    attribute.type = 'FLOATING'
+
+  nodeDataDefaults (graph, attr=attribute.name) = default.value
+  attr (nodeDataDefaults (graph, attr=attribute.name), 'class') = attribute.type
+
+  return (graph)
+
+} # initNodeAttribute
+#------------------------------------------------------------------------------------------------------------------------
+initEdgeAttribute = function (graph, attribute.name, attribute.type, default.value)
+{
+  stopifnot (attribute.type %in% c ('char', 'integer', 'numeric'))
+  if (attribute.type == 'char')
+    attribute.type = 'STRING'
+  else if (attribute.type == 'integer')
+    attribute.type = 'INTEGER'
+  else if (attribute.type == 'numeric')
+    attribute.type = 'FLOATING'
+
+  edgeDataDefaults (graph, attr=attribute.name) = default.value
+  attr (edgeDataDefaults (graph, attr=attribute.name), 'class') = attribute.type
+
+  return (graph)
+
+} # initEdgettribute
 #------------------------------------------------------------------------------------------------------------------------
 .cleanup = function (libpath)
 {

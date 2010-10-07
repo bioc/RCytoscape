@@ -48,8 +48,8 @@ In addition to this package (RCytoscape), you will need:
       \url{http://www.omegahat.org/XMLRPC/}
   \item Cytoscape version 2.7, which can be downloaded from 
      \url{http://cytoscape.org}.
-  \item CytoscapeRPC, version 1.0, a Cytoscape plugin which provides the Cytoscape end of the communication layer, can be downloaded from the Cytoscape plugins website:
-     \url{http://cytoscape.org/plugins.php}.
+  \item CytoscapeRPC, version 1.1, a Cytoscape plugin which provides the Cytoscape end of the communication layer, can be downloaded from the Cytoscape plugins website:
+     \url{http://cytoscape.org/plugins.html}.
 \end{itemize}
 
 \section{Getting Started}
@@ -133,16 +133,38 @@ Now we will add some visual mapping (vizmap) rules, whose goal is to feed the ey
   redraw (cw)
 @ 
 
-<<g4>>=
-  setNodeColorRule (cw, 'lfc', c (-4.0, 0.0, 4.0), c ('#00FF00', '#FFFFFF', '#FF0000'))
+The node shape rule, above, is an example of a 'lookup' rule, which is sometimes referred to as a 'discrete' rule.  The
+network has three nodes, each of them a gene, and each of them has a 'moleculeType' attribute.  In this case, the values
+are 'kinase', 'TF' (for transcription factor) and 'cytokine'.  These are the discrete values taken on by the
+moleculeType node attribute.  For each, we specify the shape we wish to use in rendering that type of molecule.  Thus, there
+is a discrete set of values, and we map from those values to shapes by a simple 'lookup' process.
 
+(Note (7 October 2010):  Cytoscape 2.7 apparently has some bugs in handling default values in vizmap rules.  For the time being, in creating a lookup rule, it is best to specify a complete mapping between data values and, i.e., node shape.  That is, specify all possible discrete data values, and provide an explicit mapping for all of them.)
+
+A second class of rules uses interpolation.  In the classic example, every node (every gene) has a mRNA expression
+values, expressed as a log fold change ('lfc') ratio, experiment vs. control.  Nodes with negative lfc are rendered in
+shades of green; nodes with positive lfc are rendered in shades of red.  Nodes with lfc == 0 are rendered in white.  All
+intermediate values are rendered in appropriately interpolated shades of either green or red.
+
+setNodeColorRule and setNodeSizeRule are, by default, interpolation rules.  But they may also be called as lookup rules:  use parameter mode='lookup' to accomplish this, and provide as many data points and sizes (or colors) needed to cover all possible values of the attribute you are mapping.
+
+<<g4>>=
+  setNodeColorRule (cw, 'lfc', c (-3.0, 0.0, 3.0), c ('#00AA00', '#00FF00', '#FFFFFF', '#FF0000', '#AA0000'))
 @ 
-Add a node size rule, using 'lfc' again as the controlling node attribute.
+Note that there \emph{five} colors, but only three control.points.  The extra two colors instruct the mapper which colors to use if the stated data attribute (lfc) has a value less than the smallest control point (paint it a darkish green, #00AA00) or larger than the largets control point (paint it a darkish red, #AA0000).  These extreme (or out-of-bounds) colors may be omitted:
+
+<<g41>>=
+  setNodeColorRule (cw, 'lfc', c (-3.0, 0.0, 3.0), c ('#00FF00', '#FFFFFF', '#FF0000'))
+@ 
+
+in which case RCytoscape will resuse the first and last values (green and red) for out-of-bounds values, and issue a warning to the console.
+
+Now, add a node size rule, using 'lfc' again as the controlling node attribute.
 
 <<g5>>=
   control.points = c (-1.2, 2.0, 4.0)
-  node.sizes     = c (20, 50, 200)
-  setNodeSizeRule (cw, 'lfc', control.points, node.sizes)
+  node.sizes     = c (10, 20, 50, 200, 205)
+  setNodeSizeRule (cw, 'lfc', control.points, node.sizes, mode='interpolate')
 
 @ 
 \section{Add some edges, edge attributes, and some rules for their rendering.}

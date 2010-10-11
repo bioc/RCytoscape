@@ -151,7 +151,7 @@ setNodeColorRule and setNodeSizeRule are, by default, interpolation rules.  But 
 <<g4>>=
   setNodeColorRule (cw, 'lfc', c (-3.0, 0.0, 3.0), c ('#00AA00', '#00FF00', '#FFFFFF', '#FF0000', '#AA0000'))
 @ 
-Note that there \emph{five} colors, but only three control.points.  The extra two colors instruct the mapper which colors to use if the stated data attribute (lfc) has a value less than the smallest control point (paint it a darkish green, #00AA00) or larger than the largets control point (paint it a darkish red, #AA0000).  These extreme (or out-of-bounds) colors may be omitted:
+Note that there \emph{five} colors, but only three control.points.  The extra two colors instruct the mapper which colors to use if the stated data attribute (lfc) has a value less than the smallest control point (paint it a darkish green, \#00AA00) or larger than the largets control point (paint it a darkish red, \#AA0000).  These extreme (or out-of-bounds) colors may be omitted:
 
 <<g41>>=
   setNodeColorRule (cw, 'lfc', c (-3.0, 0.0, 3.0), c ('#00FF00', '#FFFFFF', '#FF0000'))

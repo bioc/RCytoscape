@@ -1,0 +1,47 @@
+\name{setDefaultNodeBorderWidth}
+\alias{setDefaultNodeBorderWidth}
+\alias{setDefaultNodeBorderWidth,CytoscapeWindowClass-method}
+\title{setDefaultNodeBorderWidth}
+\description{
+In the specified CytoscapeWindow, stipulate the color for all nodeBorders
+other than those mentioned in a node border color rule.
+}
+\usage{
+setDefaultNodeBorderWidth(obj, new.width, vizmap.style.name = "default")
+}
+\arguments{
+  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{new.width}{a \code{String} object, a hex string, of the form '#RRGGBB'.}
+  \item{vizmap.style.name}{a \code{String} object.}
+}
+
+\value{
+None.
+}
+\author{Paul Shannon}
+
+\seealso{
+   setDefaultNodeShape
+   setDefaultNodeColor
+   setDefaultNodeSize
+   setDefaultNodeColor
+   setDefaultNodeBorderColor
+   setDefaultNodeBorderWidth
+   setDefaultNodeFontSize
+   setDefaultNodeLabelColor
+   setDefaultEdgeLineWidth
+   setEdgeColorRule
+   setNodeBorderColorRule
+ }
+
+\examples{
+  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw, 'jgraph-spring')
+  setDefaultNodeBorderWidth (cw, 5)
+  redraw (cw)
+}
+
+
+\keyword{graph}

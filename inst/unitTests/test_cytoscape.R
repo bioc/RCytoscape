@@ -30,6 +30,17 @@ run.tests = function ()
    test.sendEdgeAttributes ()
    test.cy2.edge.names ()
    test.panelOperations ()
+
+   test.setDefaultNodeShape ()
+   test.setDefaultNodeColor ()
+   test.setDefaultNodeSize ()
+   test.setDefaultNodeBorderColor ()
+   test.setDefaultNodeBorderWidth ()
+   test.setDefaultNodeFontSize ()
+   test.setDefaultNodeLabelColor ()
+   test.setDefaultEdgeLineWidth ()
+   test.setDefaultEdgeColor ()
+
    test.setNodeLabelRule ()
    test.setNodeTooltipRule ()
    test.setEdgeTooltipRule ()
@@ -53,54 +64,7 @@ run.tests = function ()
    test.setGraph ()
    test.setPosition ()
 
-
-#  test.remove.redundancies.in.undirected.graph ()
-#
-#  test.create.class ()
-#
-#  test.getWindowList ()
-#  test.destroyWindow ()
-#  test.destroyAllWindows ()
-#  
-#  test.getNodeShapes ()
-#  test.getArrowShapes ()
-#  test.getLineStyles ()
-#  test.getLayoutNames ()
-#  test.getAttributeClassNames ()
-#
-#  test.sendNodes ()
-#  test.sendNodeAttributes ()
-#
-#  test.sendEdges ()
-#  test.cy2.edge.names ()
-#  test.sendEdgeAttributes ()
-#
-#  test.panelOperations ()
-#
-#  test.setNodeLabelRule ()
-#  test.setNodeTooltipRule ()
-#  test.setEdgeTooltipRule ()
-#  test.setNodeTooltipRule ()
-#  test.setNodeColorRule ()
-#  test.setNodeBorderColorRule ()
-#  test.setNodeShapeRule ()
-#  test.setNodeSizeRule ()
-#
-#  test.getAllNodes ()
-#  test.getAllEdges ()
-#
-#  test.selectNodes ()
-#  # test.hideSelectedNodes ()   # waiting on a cy 2.8 fix
-#
-#  test.setEdgeLineStyleRule ()
-#  test.setEdgeColorRule ()
-#  test.setEdgeTargetArrowRule ()
-#  test.setEdgeSourceArrowRule ()
-#
-#  test.movie ()
-#  test.randomUndirectedGraph ()
-
-  options ('warn'=0)
+   options ('warn'=0)
 
 } # run.tests
 #------------------------------------------------------------------------------------------------------------------------
@@ -331,6 +295,227 @@ test.panelOperations = function ()
 
 } # test.panelOperations
 #------------------------------------------------------------------------------------------------------------------------
+test.setDefaultNodeShape = function (direct=FALSE)
+{
+  write ('test.setDefaultNodeShape', stderr ())
+
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultNodeShape', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+   shapes = getNodeShapes (cwe)
+
+   if (direct) {  # debug
+     for (shape in shapes) {
+       if (!exists ('xml.rpc')) library (XMLRPC)
+       xml.rpc (cwe@uri, 'Cytoscape.setDefaultVizMapValue', 'default', 'Node Shape', shape); 
+       redraw (cwe); 
+       system ('sleep 1')
+       } # for shape
+     } # direct
+
+  setDefaultNodeShape (cwe, 'octagon'); redraw (cwe)
+  msg (cwe, 'octagon')
+  system ('sleep 1')
+  setDefaultNodeShape (cwe, 'ellipse');  redraw (cwe)
+  msg (cwe,'ellipse')
+  system ('sleep 1')
+  setDefaultNodeShape (cwe, 'triangle');  redraw (cwe)
+  msg (cwe, 'triangle')
+
+} # test.setDefaultNodeShape
+#------------------------------------------------------------------------------------------------------------------------
+test.setDefaultNodeColor = function (direct=FALSE)
+{
+  write ('test.setDefaultNodeColor', stderr ())
+
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultNodeColor', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+  hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+  if (direct) {  # useful for debuggin
+    for (i in 1:3) {
+      if (!exists ('xml.rpc')) library (XMLRPC)
+      xml.rpc (cwe@uri, 'Cytoscape.setDefaultVizMapValue', 'default', 'Node Color', '#AAAA00'); redraw (cwe)
+      xml.rpc (cwe@uri, 'Cytoscape.setDefaultVizMapValue', 'default', 'Node Color', '#00AAAA'); redraw (cwe)
+      } # for i
+    } # direct
+
+  setDefaultNodeColor (cwe, '#AA00AA')
+  redraw (cwe)
+
+} # test.setDefaultNodeColor
+#------------------------------------------------------------------------------------------------------------------------
+test.setDefaultNodeSize = function (direct=FALSE)
+{
+  write ('test.setDefaultNodeSize', stderr ())
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultNodeSize', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+  hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+  for (i in 1:3) {
+    setDefaultNodeSize (cwe, 20)
+    redraw (cwe)
+    system ('sleep 1')
+    setDefaultNodeSize (cwe, 200)
+    redraw (cwe)
+    system ('sleep 1')
+    } # for i
+
+  setDefaultNodeSize (cwe, 60)
+  redraw (cwe)
+
+} # test.setDefaultNodeSize
+#------------------------------------------------------------------------------------------------------------------------
+test.setDefaultNodeBorderColor = function (direct=FALSE)
+{
+  write ('test.setDefaultNodeBorderColor', stderr ())
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultNodeBorderColor', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+  hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+  for (i in 1:3) {
+    setDefaultNodeBorderColor (cwe, '#FFFFFF'); 
+    redraw (cwe)
+    system ('sleep 1')
+    setDefaultNodeBorderColor (cwe, '#FF0000'); 
+    redraw (cwe)
+    system ('sleep 1')
+    } # for i
+
+} # test.setDefaultNodeBorderColor
+#------------------------------------------------------------------------------------------------------------------------
+test.setDefaultNodeBorderWidth = function (direct=FALSE)
+{
+  write ('test.setDefaultNodeBorderWidth', stderr ())
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultNodeBorderWidth', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+  hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+
+  for (i in 1:3) {
+    setDefaultNodeBorderWidth (cwe, 5)
+    redraw (cwe)
+    system ('sleep 1')
+    setDefaultNodeBorderWidth (cwe, 0)
+    redraw (cwe)
+    system ('sleep 1')
+    } # for i
+
+  setDefaultNodeBorderWidth (cwe, 1)
+  redraw (cwe)
+
+} # test.setDefaultNodeBorderWidth
+#------------------------------------------------------------------------------------------------------------------------
+test.setDefaultNodeFontSize = function (direct=FALSE)
+{
+  write ('test.setDefaultNodeFontSize', stderr ())
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultNodeFontSize', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+  hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+  for (i in 1:3) {
+    setDefaultNodeFontSize (cwe, 3); redraw (cwe)
+    system ('sleep 1')
+    setDefaultNodeFontSize (cwe, 30); redraw (cwe)
+    system ('sleep 1')
+    }
+  
+  setDefaultNodeFontSize (cwe, 12); redraw (cwe)
+
+} # test.setDefaultNodeFontSize
+#------------------------------------------------------------------------------------------------------------------------
+test.setDefaultNodeLabelColor = function (direct=FALSE)
+{
+  write ('test.setDefaultNodeLabelColor', stderr ())
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultNodeLabelColor', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+  hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+
+  for (i in 1:3) {
+    setDefaultNodeLabelColor (cwe, '#FFAAAA');redraw (cwe)
+    system ('sleep 1')
+    setDefaultNodeLabelColor (cwe, '#000000');redraw (cwe)
+    system ('sleep 1')
+    } # for i
+
+} # test.setDefaultNodeLabelColor
+#------------------------------------------------------------------------------------------------------------------------
+test.setDefaultEdgeLineWidth = function (direct=FALSE)
+{
+  write ('test.setDefaultEdgeLineWidth', stderr ())
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultEdgeLineWidth', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+  hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+
+  for (i in 1:3) {
+    setDefaultEdgeLineWidth (cwe, 5); redraw (cwe)
+    system ('sleep 1')
+    setDefaultEdgeLineWidth (cwe, 0); redraw (cwe)
+    system ('sleep 1')
+    }
+
+  setDefaultEdgeLineWidth (cwe, 1); redraw (cwe)
+
+} # test.setDefaultEdgeLineWidth
+#------------------------------------------------------------------------------------------------------------------------
+test.setDefaultEdgeColor = function (direct=FALSE)
+{
+  write ('test.setDefaultEdgeColor', stderr ())
+  if (!exists ('cwe')) {
+    cwe <<- CytoscapeWindow ('test.setDefaultEdgeColor', graph=RCytoscape::makeSimpleGraph ())
+    displayGraph (cwe)
+    layout (cwe, 'jgraph-spring')
+    redraw (cwe)
+    }
+
+  hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
+
+  for (i in 1:3) {
+    setDefaultEdgeColor (cwe, '#FFFFFF'); redraw (cwe)
+    system ('sleep 1')
+    setDefaultEdgeColor (cwe, '#FF0000'); redraw (cwe)
+    system ('sleep 1')
+    } # for i
+
+  setDefaultEdgeColor (cwe, '#000000'); redraw (cwe)
+
+} # test.setDefaultEdgeColor
+#------------------------------------------------------------------------------------------------------------------------
 test.setNodeLabelRule = function ()
 {
   write ('test.setNodeLabelRule', stderr ())
@@ -518,13 +703,13 @@ test.setNodeShapeRule = function ()
     redraw (cwe)
     }
 
-  node.attribute.name = 'type'
-  attribute.values = as.character (noa (getGraph (cwe), 'type'))
-  checkEquals (length (attribute.values), 3)
-  for (i in 1:2) {
-    node.shapes = getNodeShapes (cwe) [sample (length (getNodeShapes (cwe)), 3)]
-    setNodeShapeRule (cwe, node.attribute.name='type', attribute.values, node.shapes)
-    } # for i
+     # specify shapes for only two of the three nodes and node types.  make sure that the third node gets
+     # the default shape
+  
+     # make rule for 2 of 3 node types, leaving the third as the default
+  node.shapes = c ('diamond', 'triangle')
+  attribute.values = c ('kinase', 'glycoprotein')
+  setNodeShapeRule (cwe, node.attribute.name='type', attribute.values, node.shapes, default.shape='ellipse')
 
   msg (cwe, 'test.setNodeShapeRule')
 
@@ -923,27 +1108,36 @@ test.setGraph = function ()
 #------------------------------------------------------------------------------------------------------------------------
 test.setPosition = function ()
 {
+  print ('test.setPosition')
+
   if (!exists ('cwe')) {
-    cwe <<- CytoscapeWindow ('test.setNodeLabelRule', graph=RCytoscape::makeSimpleGraph ())
+    cwe <<- CytoscapeWindow ('test.setPosition', graph=RCytoscape::makeSimpleGraph ())
     displayGraph (cwe)
     layout (cwe, 'jgraph-spring')
     redraw (cwe)
     }
 
-  set.seed (123)
   layout (cwe, 'jgraph-spring')   # get a reasonable starting layout, with the nodes well-separate
 
-  for (i in 1:50) {    # first do the single node case
-    x = 5 * runif (1)
-    y = 5 * runif (1)
-    setPosition (cwe, nodes (getGraph (cwe)) [1], x, y)
-    } # for i
+  center.x = 200
+  center.y = 200
+  radius = 200
+  angles = rep (seq (0, 360, 5), 3)  # sweep through full revoltion 3 times, 5 degrees at a time
+    # move just the A node, swinging it around the 'center' at 200, 200.  
+    # it would be nice not know more about the coordinate system than I now do, perhaps to
+    # query current position on any node
+  for (angle in angles) {
+    angle.in.radians = angle * pi / 180
+    x = center.x + (radius * cos (angle.in.radians))
+    y = center.y + (radius * sin (angle.in.radians))
+    setPosition (cwe, 'A', x, y)
+    }
 
-  for (i in 1:5) {    # now do all the nodes in every call
-    x = runif (3, 1, 100)
-    y = runif (3, 1, 100)
-    setPosition (cwe, nodes (getGraph (cwe)), x, y)
-    } # for i
+ # for (i in 1:5) {    # now do all the nodes in every call
+  #  x = runif (3, 1, 100)
+  #  y = runif (3, 1, 100)
+  #  setPosition (cwe, nodes (getGraph (cwe)), x, y)
+  #  } # for i
 
 } # test.setPosition
 #------------------------------------------------------------------------------------------------------------------------

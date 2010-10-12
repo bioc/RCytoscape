@@ -282,7 +282,7 @@ Despite its simplicity, RCytoscape's \emph{\textbf{setPosition}} method provides
 
 @ 
 
-\section{Movies:  explore time course data by animating node color and size)
+\section{Movies:  explore time course data by animating node color and size}
 
 Timecourse microarray expression experiments are commonplace in molecular biology research.  Once reduced, the expression data is often summarized as a lfc (log fold change, experiment vs control) and a p-value for each gene at each time point.  Many Bioconductor packages can be used to find biologically interesting patterns in such data, but visualization -- as one aspect of exploratory data analysis -- should not be overlooked.  Here is a toy problem, a small example illustrating how this can be accomplished with RCytoscape.
 

@@ -134,6 +134,19 @@ CytoscapeWindow = function (title='default', graph=new('graphNEL', edgemode='dir
     } # if no label node attribute
 
   cw = new ('CytoscapeWindowClass', title=title, graph=graph, uri=uri)
+  plugin.version.string = version (cw)
+  plugin.version = as.numeric ((strsplit (plugin.version.string,' ')[[1]][1]))
+  
+  expected.version = 1.2
+  if (plugin.version < expected.version) { 
+    write (' ', stderr ())
+    write (sprintf ('This version of the RCytoscape package requires CytoscapeRPC plugin version %s or greater.', expected.version), stderr ())
+    write (sprintf ('However, you are using version %s.   You must upgrade.', plugin.version), stderr ())
+    write ('Please visit the plugins page at http://www.cytoscape.org.', stderr ())
+    write (' ', stderr ())
+    stop ('Wrong CytoscapeRPC version.')
+    }
+    
   if (create.window)
     cw@window.id = createWindow (cw)
   return (cw)
@@ -800,12 +813,12 @@ setMethod ('getAllNodes', 'CytoscapeWindowClass',
 
    function (obj) {
      id = as.character (obj@window.id)
-     #count = xml.rpc (obj@uri, "Cytoscape.countNodes")
-     #if (count == 0)
-     #  return ()
+     count = xml.rpc (obj@uri, "Cytoscape.countNodes", id)
+     if (count == 0)
+       return ()
        # todo:  getting all nodes should be inherently a window-specific operation
-     #result = xml.rpc (obj@uri, "Cytoscape.getAllNodes", id, .convert=TRUE)
-     result = xml.rpc (obj@uri, "Cytoscape.getAllNodes", .convert=TRUE)
+     result = xml.rpc (obj@uri, "Cytoscape.getNodes", id, .convert=TRUE)
+     #result = xml.rpc (obj@uri, "Cytoscape.getAllNodes", .convert=TRUE)
      return (result)
      }) # getAllNodes
 
@@ -817,7 +830,8 @@ setMethod ('getAllEdges', 'CytoscapeWindowClass',
      count = xml.rpc (obj@uri, "Cytoscape.countEdges", id)
      if (count == 0)
        return ()
-     result = xml.rpc (obj@uri, "Cytoscape.getAllEdges", id, .convert=TRUE)
+     result = xml.rpc (obj@uri, "Cytoscape.getEdges", id, .convert=TRUE)
+     #result = xml.rpc (obj@uri, "Cytoscape.getAllEdges", .convert=TRUE)
      return (result)
      }) # getAllEdges
 

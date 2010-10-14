@@ -52,7 +52,7 @@ In addition to this package (RCytoscape), you will need:
       \url{http://www.omegahat.org/XMLRPC/}
   \item Cytoscape version 2.7, which can be downloaded from 
      \url{http://cytoscape.org}.
-  \item CytoscapeRPC, version 1.1.3 or later, a Cytoscape plugin which provides the Cytoscape end of the communication layer, can be downloaded from the Cytoscape plugins website:
+  \item CytoscapeRPC, version 1.2 or later, a Cytoscape plugin which provides the Cytoscape end of the communication layer, can be downloaded from the Cytoscape plugins website:
      \url{http://cytoscape.org/plugins.html}.
 \end{itemize}
 

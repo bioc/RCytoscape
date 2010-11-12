@@ -1089,7 +1089,6 @@ test.simpleGraph = function ()
 
   msg (cwe, 'test.simpleGraph')
 
-
 } # test.simpleGraph
 #------------------------------------------------------------------------------------------------------------------------
 test.setGraph = function ()

@@ -66,7 +66,7 @@ but briefly (and more simply), installation consists of copying the plugin's jar
 
 \section{A minimal example}
 
-Here we create a 3-node graphNEL in R, send it to Cytoscape for display and layout.  For the sake of simplicity, no node attributes, no edges, and no vizmapping is included; those topics are covered in subsequent examples.
+Here we create a 3-node graphNEL in R, send it to Cytoscape for display and layout.  For the sake of simplicity, no node attributes, no edges, and no vizmapping are included.  Those topics are covered in subsequent examples.
 
 <<g0>>=
   library(RCytoscape)

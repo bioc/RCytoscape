@@ -1,1 +1,3 @@
 (12 august 2010, pshannon):  first preliminary release
+(11 november 2010, pshannon): fixed incredibly slow sendEdges method
+

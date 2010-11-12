@@ -103,12 +103,12 @@ setGeneric ('sfn',                      signature='obj', function (obj) standard
 #------------------------------------------------------------------------------------------------------------------------
 setValidity ("CytoscapeWindowClass",
 
-  function (obj) {
-    if (length (obj@title) != 1) 
+  function (object) {
+    if (length (object@title) != 1) 
       "'title' is not a single string" 
-    else if (!nzchar (obj@title))
+    else if (!nzchar (object@title))
       "'title' is an empty string" 
-    validObject (obj@graph)
+    validObject (object@graph)
     })
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -283,8 +283,12 @@ setMethod ('getGraph', 'CytoscapeWindowClass',
 setMethod ('sendNodes', 'CytoscapeWindowClass',
 
   function (obj) {
-     if (length (nodes (obj@graph)) == 0)
-       write ('CytoscapeWindow.send, no nodes in graph.  returning', stderr ())
+
+     if (length (nodes (obj@graph)) == 0) {
+       write ('CytoscapeWindow.sendNodes, no nodes in graph.  returning', stderr ())
+       return ()
+       }
+
      invisible (xml.rpc (obj@uri, 'Cytoscape.createNodes', as.character (obj@window.id), nodes (obj@graph)))
      })
 
@@ -292,17 +296,21 @@ setMethod ('sendNodes', 'CytoscapeWindowClass',
 setMethod ('sendEdges', 'CytoscapeWindowClass',
 
   function (obj) {
-    for (source.node in names (edges (obj@graph))) {
-      for (target.node in edges (obj@graph)[[source.node]]) {
-        interaction = 'unknown'
-        if ('edgeType' %in% names (edgeDataDefaults (obj@graph)))
-          interaction = as.character (edgeData (obj@graph, source.node, target.node, 'edgeType'))
-        else if ('type' %in% names (edgeDataDefaults (obj@graph)))
-          interaction = as.character (edgeData (obj@graph, source.node, target.node, 'type'))
-        #printf ('creating edge  %s (%s) %s', source.node, interaction, target.node)     
-        xml.rpc (obj@uri, 'Cytoscape.createEdge', source.node, target.node, interaction, TRUE)
-        } # for target.node
-      } # for source.node
+
+    if (length (edgeNames (obj@graph)) == 0) {
+      write ('CytoscapeWindow.sendNodes, no edges in graph.  returning', stderr ())
+      return ()
+      }
+
+    tokens = strsplit (edgeNames (obj@graph), '~')
+    a = sapply (tokens, function (tok) tok [1])
+    b = sapply (tokens, function (tok) tok [2])
+    edge.type = as.character (eda (obj@graph, 'edgeType'))
+    if (length (edge.type) == 1 && is.na (edge.type))
+      edge.type = rep ('unspecified', length (tokens))
+    directed = rep (TRUE, length (tokens))
+    forgive.if.node.is.missing = TRUE
+    xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
     }) # sendEdges
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -948,7 +956,10 @@ noa = function (graph, node.attribute.name)
 #------------------------------------------------------------------------------------------------------------------------
 eda = function (graph, edge.attribute.name)
 {
-  unlist (sapply (names (edgeData (graph)), function (n) edgeData (graph)[[n]][[edge.attribute.name]]))
+  if (!edge.attribute.name %in% eda.names (graph))
+    return (NA)
+
+  return (unlist (edgeData (graph, attr=edge.attribute.name)))
 
 } # eda
 #------------------------------------------------------------------------------------------------------------------------
@@ -1033,9 +1044,10 @@ makeRandomGraph = function (node.count=12, seed = 123)
   #if (node.count > 26) node.count = 26
   node.names = as.character (1:node.count)
   g = randomGraph (node.names, M <- 1:2, p = 0.6)
-  attr (edgeDataDefaults (g, attr="weight"), "class") = "DOUBLE"
-  edgeDataDefaults (g, 'pmid') = '9988778899'
-  attr (edgeDataDefaults (g, attr="pmid"), "class") = "STRING"
+  g = initEdgeAttribute (g, 'edgeType', 'char', 'random')
+  g = initEdgeAttribute (g, 'weight', 'numeric', 0.0)
+  g = initEdgeAttribute (g, 'pmid',   'char', '9988778899')
+
   return (g)
 
 } # makeRandomGraph

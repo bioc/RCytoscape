@@ -32,7 +32,7 @@ None.
 }
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('sendNodeAttributes.test', graph=makeSimpleGraph())
   attribute.names = noa.names (cw@graph)
 
   for (attribute.name in attribute.names)

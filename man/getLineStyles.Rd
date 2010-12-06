@@ -1,6 +1,6 @@
 \name{getLineStyles}
 \alias{getLineStyles}
-\alias{getLineStyles,CytoscapeWindowClass-method}
+\alias{getLineStyles,CytoscapeConnectionClass-method}
 \title{getLineStyles}
 \description{
 Retrieve the names of the currently supported line types -- values which
@@ -10,7 +10,7 @@ can be used to render edges, and thus can be used in calls to 'setEdgeLineStyleR
 getLineStyles(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -19,8 +19,8 @@ A list of character strings, e.g., 'SOLID', 'DOT'
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  getLineStyles (cw)
+  cy <- CytoscapeConnection ()
+  getLineStyles (cy)
   #  [1] "SOLID" "LONG_DASH" "EQUAL_DASH" ...
 }
 

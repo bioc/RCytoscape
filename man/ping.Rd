@@ -1,6 +1,6 @@
 \name{ping}
 \alias{ping}
-\alias{ping,CytoscapeWindowClass-method}
+\alias{ping,CytoscapeConnectionClass-method}
 \title{ping}
 \description{
 Test the connection to Cytoscape.  
@@ -9,7 +9,7 @@ Test the connection to Cytoscape.
 ping(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -19,8 +19,8 @@ ping(obj)
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  ping (cw)
+  cy <- CytoscapeConnection ()
+  ping (cy)
     # "It works!"   
 }
 

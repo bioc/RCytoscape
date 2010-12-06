@@ -32,7 +32,7 @@ None.
 }
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('setNodeShapeRule.test', graph=makeSimpleGraph())
   shapes <- c ("trapezoid", "round_rect", "ellipse")
   molecule.types <- c ("kinase", "transcription factor", "glycoprotein")
   setNodeShapeRule (cw, node.attribute.name='type', molecule.types,  shapes)

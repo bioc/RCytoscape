@@ -1,6 +1,6 @@
 \name{version}
 \alias{version}
-\alias{version,CytoscapeWindowClass-method}
+\alias{version,CytoscapeConnectionClass-method}
 \title{version}
 \description{
 Test the connection to Cytoscape.  
@@ -9,7 +9,7 @@ Test the connection to Cytoscape.
 version(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -19,9 +19,9 @@ version(obj)
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  print (version (cw))
-    # e.g., "1.1.2 Paul"
+  cy <- CytoscapeConnection ()
+  print (version (cy))
+    # e.g., "1.3.2"
 }
 
 \keyword{graph}

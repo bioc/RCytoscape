@@ -30,7 +30,7 @@ None.
 
 \seealso{ \code{\link{getArrowShapes}}}
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('setEdgeTargetArrowRule.test', graph=makeSimpleGraph())
   arrows <- c ('Arrow', 'Diamond', 'Circle')
   edgeType.values <- c ('phosphorylates', 'synthetic lethal', 'undefined')
   setEdgeTargetArrowRule (cw, 'edgeType', edgeType.values, arrows)

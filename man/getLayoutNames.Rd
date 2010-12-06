@@ -1,6 +1,6 @@
 \name{getLayoutNames}
 \alias{getLayoutNames}
-\alias{getLayoutNames,CytoscapeWindowClass-method}
+\alias{getLayoutNames,CytoscapeConnectionClass-method}
 \title{getLayoutNames}
 \description{
 Retrieve the names of the currently supported layout algorithms.  These
@@ -12,7 +12,7 @@ run except from the user interface; their names do not appear here.
 getLayoutNames(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -22,8 +22,8 @@ A list of character strings, e.g., "jgraph-circle" "attribute-circle" "jgraph-an
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  getLayoutNames (cw)
+  cy <- CytoscapeConnection ()
+  getLayoutNames (cy)
    #  [1] "jgraph-circle" "attribute-circle" "jgraph-annealing"  ...
 
 }

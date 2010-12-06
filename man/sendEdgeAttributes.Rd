@@ -29,7 +29,7 @@ None.
 }
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('sendEdgeAttributes.test', graph=makeSimpleGraph())
   attribute.names = eda.names (cw@graph)
 
   for (attribute.name in attribute.names)

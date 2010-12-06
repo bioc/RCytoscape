@@ -1,16 +1,17 @@
 \name{destroyWindow}
 \alias{destroyWindow}
-\alias{destroyWindow,CytoscapeWindowClass-method}
+\alias{destroyWindow,CytoscapeConnectionClass-method}
 \title{destroyWindow}
 \description{
 Remove and delete Cytoscape's (copy of the) network and window for the
-specified CytoscapeWindowClass object.
+specified CytoscapeConnectionClass object.
 }
 \usage{
-destroyWindow(obj)
+destroyWindow(obj, windowTitle)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
+  \item{windowTitle}{a \code{character} string. }
 }
 
 \value{
@@ -18,8 +19,10 @@ Nothing.
 }
 \author{Paul Shannon}
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  destroyWindow (cw)
+  cy <- CytoscapeConnection ()
+  window.title <- 'demo destroyWindow'
+  cw <- CytoscapeWindow (window.title, graph=makeSimpleGraph())
+  destroyWindow (cw, window.title)
 }
 
 \keyword{graph}

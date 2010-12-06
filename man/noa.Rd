@@ -25,8 +25,8 @@ Paul Shannon
 noa.names
 }
 \examples{
-  cw <- CytoscapeWindow ('demo', graph=makeSimpleGraph(), create.window=FALSE)
-  noa (cw@graph, 'type')
+  g <- makeSimpleGraph ()
+  noa (g, 'type')
     #           A.A                    B.B                    C.C 
     #      "kinase" "transcription factor"         "glycoprotein" 
 

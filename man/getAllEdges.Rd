@@ -18,7 +18,7 @@ A list of character strings.
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- CytoscapeWindow ('getAllEdges.test', graph=makeSimpleGraph())
     # [1] "C (undefined) A"  "B (synthetic lethal) C" "A (phosphorylates) B"  
 }
 

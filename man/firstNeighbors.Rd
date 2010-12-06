@@ -22,7 +22,7 @@ A list of the names of nodes which share an edge with the supplied nodeName.
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- CytoscapeWindow ('firstNeighbors.test', graph=makeSimpleGraph())
   firstNeighbors (cw, 'A')
     # $right
     #  [1] "B"

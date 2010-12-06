@@ -25,7 +25,7 @@ None.
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('setPosition.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layout (cw)
   setPosition (cw, c ('A', 'B', 'C'), c (10.0, 20.0, 500), c (0.0,

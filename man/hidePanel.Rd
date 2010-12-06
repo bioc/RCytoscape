@@ -1,6 +1,6 @@
 \name{hidePanel}
 \alias{hidePanel}
-\alias{hidePanel,CytoscapeWindowClass-method}
+\alias{hidePanel,CytoscapeConnectionClass-method}
 \title{hidePanel}
 \description{
 The specified panel will be hidden, and no longer visible in the Cytoscape
@@ -13,7 +13,7 @@ characters in the actual panelName.  Thus, 'd' and 'DA' both identify 'Data Pane
 hidePanel(obj, panelName)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
   \item{panelName}{a character string, providing a partial or complete
     case-independent match to the start of the name of an actual panel. }
 }
@@ -30,12 +30,10 @@ Nothing.
 
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cy <- CytoscapeConnection ()
+  hidePanel (cy, 'Control Panel')
    # or
-  cw <- CytoscapeWindow ('headless', create.window=FALSE)
-  hidePanel (cw, 'Control Panel')
-   # or
-  hidePanel (cw, 'c')
+  hidePanel (cy, 'c')
 }
 
 

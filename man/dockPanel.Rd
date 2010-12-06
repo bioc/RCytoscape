@@ -1,6 +1,6 @@
 \name{dockPanel}
 \alias{dockPanel}
-\alias{dockPanel,CytoscapeWindowClass-method}
+\alias{dockPanel,CytoscapeConnectionClass-method}
 \title{dockPanel}
 \description{
 The specified panel is returned to its 'home' position in the Cytoscape
@@ -13,7 +13,7 @@ characters in the actual panelName.  Thus, 'd' and 'DA' both identify 'Data Pane
 dockPanel(obj, panelName)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
   \item{panelName}{a character string, providing a partial or complete
     case-independent match to the start of the name of an actual panel. }
 }
@@ -30,12 +30,10 @@ Nothing.
 }
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cy <- CytoscapeConnection ()
+  dockPanel (cy, 'Control Panel')
    # or
-  cw <- CytoscapeWindow ('headless', create.window=FALSE)
-  dockPanel (cw, 'Control Panel')
-   # or
-  dockPanel (cw, 'c')
+  dockPanel (cy, 'c')
 }
 
 \keyword{graph}

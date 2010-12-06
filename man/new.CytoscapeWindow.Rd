@@ -1,13 +1,13 @@
-\name{CytoscapeWindow}
-\alias{CytoscapeWindow}
+\name{new.CytoscapeWindow}
+\alias{new.CytoscapeWindow}
 \title{
-CytoscapeWindow
+new.CytoscapeWindow
 }
 \description{
 The constructor for the CytoscapeWindowClass
 }
 \usage{
-CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = "localhost", rpcPort = 9000, create.window = TRUE)
+new.CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = "localhost", rpcPort = 9000, create.window = TRUE)
 }
 
 \arguments{
@@ -27,8 +27,9 @@ CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = "loc
     server is listening.
 }
   \item{create.window}{
-     Defaults to TRUE, but if you wish to defer creating a window, set
-  this argument to FALSE.
+     Defaults to TRUE, but if you want a CytoscapeWindow just to call
+     what in Java we would call 'class methods' -- getWindowList () for
+     instance, a CytoscapeWindow without an actual window can be useful.
 }
 }
 \value{
@@ -39,12 +40,12 @@ CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = "loc
 }
 
 \seealso{
-  new.CytoscapeWindow
+  CytoscapeWindow
   existing.CytoscapeWindow
   }
 
 \examples{
-  cw <- CytoscapeWindow ('demo', new ('graphNEL'))
+  cw <- new.CytoscapeWindow ('demo', new ('graphNEL'))
 }
 
 \keyword{ graph }

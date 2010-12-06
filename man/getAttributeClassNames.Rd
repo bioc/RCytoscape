@@ -1,6 +1,6 @@
 \name{getAttributeClassNames}
 \alias{getAttributeClassNames}
-\alias{getAttributeClassNames,CytoscapeWindowClass-method}
+\alias{getAttributeClassNames,CytoscapeConnectionClass-method}
 \title{getAttributeClassNames}
 \description{
 Retrieve the names of the recognized and supported names for the class
@@ -12,7 +12,7 @@ seem natural to you, and RCytoscape will recognize them.
 getAttributeClassNames(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -22,8 +22,8 @@ A list of character strings group, e.g., "floating|numeric|double",
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  getAttributeClassNames (cw)
+  cy <- CytoscapeConnection ()
+  getAttributeClassNames (cy)
    # [1] "floating|numeric|double" "integer|int"             "string|char|character"  
 }
 

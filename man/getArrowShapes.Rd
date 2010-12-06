@@ -1,6 +1,6 @@
 \name{getArrowShapes}
 \alias{getArrowShapes}
-\alias{getArrowShapes,CytoscapeWindowClass-method}
+\alias{getArrowShapes,CytoscapeConnectionClass-method}
 \title{getArrowShapes}
 \description{
 Retrieve the names of the currently supported 'arrows' -- the
@@ -13,7 +13,7 @@ of strings.
 getArrowShapes(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -22,8 +22,8 @@ A list of character strings, e.g., 'WHITE_DIAMOND', 'BLACK_T'
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  getArrowShapes (cw)
+  cy <- CytoscapeConnection ()
+  getArrowShapes (cy)
     # [1] "No Arrow" "Diamond" "Delta" "Arrow" "T" "Circle" "Half Arrow Top"  "Half Arrow Bottom"
 }
 

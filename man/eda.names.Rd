@@ -27,8 +27,8 @@ Paul Shannon
  eda
 }
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  eda.names (cw@graph)
+  g <- makeSimpleGraph()
+  eda.names (g)
    # "edgeType" "score"    "misc"
 }
 

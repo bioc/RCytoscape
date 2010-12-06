@@ -27,8 +27,8 @@ Paul Shannon
  eda.names
 }
 \examples{
-cw <- CytoscapeWindow ('demo', graph=makeSimpleGraph(), create.window=FALSE)
-eda (cw@graph, 'edgeType')
+g  <- makeSimpleGraph()
+eda (g, 'edgeType')
 
 ## The function is currently defined as
 function (graph, edge.attribute.name)

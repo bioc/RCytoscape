@@ -1,6 +1,6 @@
 \name{clearMsg}
 \alias{clearMsg}
-\alias{clearMsg,CytoscapeWindowClass-method}
+\alias{clearMsg,CytoscapeConnectionClass-method}
 \title{clearMsg}
 \description{
 Clears any current message in the Cytoscape Desktop status bar.
@@ -9,7 +9,7 @@ Clears any current message in the Cytoscape Desktop status bar.
 clearMsg(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -24,9 +24,8 @@ Nothing.
 
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  displayGraph (cw)
-  clearMsg (cw)
+  cy <- CytoscapeConnection ()
+  clearMsg (cy)
 }
 
 

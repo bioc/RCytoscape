@@ -19,8 +19,12 @@ Nothing.
 }
 \author{Paul Shannon}
 
+\seealso{
+  getNodeShapes
+}
+
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('layout.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layout (cw, 'jgraph-spring')
   redraw (cw)  # applies default vizmap (rendering) rules, plus any you

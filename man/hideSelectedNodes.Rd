@@ -23,12 +23,12 @@ None.
 }
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('hideSelectedNodes.test', graph=makeSimpleGraph())
   selectNodes (cw, c ('A', 'B'))
   hideSelectedNodes (cw)
   unhideAll (cw)
    # alas, Cytoscape requires that you render these nodes, and redo the
-   # layout, no that they are visible again
+   # layout, so that they are visible again
   redraw (cw)
   layout (cw, 'jgraph-spring')
 }

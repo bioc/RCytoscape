@@ -1,6 +1,6 @@
 \name{getWindowList}
 \alias{getWindowList}
-\alias{getWindowList,CytoscapeWindowClass-method}
+\alias{getWindowList,CytoscapeConnectionClass-method}
 \title{getWindowList}
 \description{
 Returns a named list of windows in the current Cytoscape Desktop. 
@@ -9,7 +9,7 @@ Returns a named list of windows in the current Cytoscape Desktop.
 getWindowList(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -18,10 +18,8 @@ A named list,  in which the values are the titles of the windows; the names of t
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('toast', graph=makeSimpleGraph())
-  getWindowList (cw)   # assuming 'test' already exists, you will see:
-    #    39     38 
-    # "test" "toast" 
+  cy <- CytoscapeConnection ()
+  getWindowList (cy) 
 }
 
 \keyword{graph}

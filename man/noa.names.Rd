@@ -24,8 +24,8 @@ Paul Shannon
 }
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  noa.names (cw@graph)
+  g <- makeSimpleGraph()
+  noa.names (g)
     #  [1] "type"  "lfc"   "label" "count"
 }
 

@@ -25,7 +25,7 @@ Nothing.
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- CytoscapeWindow ('displayGraph.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layout (cw, 'jgraph-spring')
   redraw (cw)

@@ -40,7 +40,7 @@ None.
 }
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('sendEdgeAttributesDirect.test', graph=makeSimpleGraph())
   edge.names = as.character (cy2.edge.names (cw@graph))
   stopifnot (length (edge.names) == 3)
   edge.values = c ('alligator', 'hedgehog', 'anteater')

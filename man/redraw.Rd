@@ -23,7 +23,7 @@ None.
 }
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('redraw.test', graph=makeSimpleGraph())
   redraw (cw)
 }
 

@@ -1,6 +1,6 @@
 \name{getWindowCount}
 \alias{getWindowCount}
-\alias{getWindowCount,CytoscapeWindowClass-method}
+\alias{getWindowCount,CytoscapeConnectionClass-method}
 \title{getWindowCount}
 \description{
 Returns the number of windows which currently exist in the Cytoscape Desktop.
@@ -9,7 +9,7 @@ Returns the number of windows which currently exist in the Cytoscape Desktop.
 getWindowCount(obj)
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
 }
 
 \value{
@@ -18,11 +18,11 @@ An integer.
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
-  count.at.start = getWindowCount (cw)
-  cw2 <- CytoscapeWindow ('test1', graph=makeSimpleGraph())
-  cw3 <- CytoscapeWindow ('test2', graph=makeSimpleGraph())
-  getWindowCount (cw)
+  cy <- CytoscapeConnection ()
+  count.at.start = getWindowCount (cy)
+  cw2 <- CytoscapeWindow ('getWindowCount.test1', graph=makeSimpleGraph())
+  cw3 <- CytoscapeWindow ('getWindowCount.test2', graph=makeSimpleGraph())
+  getWindowCount (cy)
     # should be two greater than 'count.at.start'
 }
 

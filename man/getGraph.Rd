@@ -19,7 +19,7 @@ A graph object.
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw <- CytoscapeWindow ('getGraph.test', graph=makeSimpleGraph())
   print (getGraph (cw))
 }
 

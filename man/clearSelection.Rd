@@ -19,7 +19,7 @@ Nothing
 \author{Paul Shannon}
 
 \examples{
-  cw <- CytoscapeWindow ('test', graph=makeSimpleGraph())
+  cw<- CytoscapeWindow ('clearSelection.test', graph=makeSimpleGraph())
   displayGraph (cw)
   selectNodes (cw, 'A')
   print (getSelectedNodeCount (cw))   # should be 1

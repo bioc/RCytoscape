@@ -1,4 +1,4 @@
-exportClasses (CytoscapeWindowClass)
+exportClasses (CytoscapeWindowClass, CytoscapeConnectionClass)
 
 exportMethods (
    destroyWindow,
@@ -11,6 +11,7 @@ exportMethods (
    getNodeShapes,
    getAttributeClassNames,
    getWindowCount,
+   getWindowID,
    getWindowList,
    layout,
    setPosition,
@@ -22,6 +23,7 @@ exportMethods (
    sendNodeAttributesDirect,
    sendEdgeAttributes,
    sendEdgeAttributesDirect,
+   addGraphToGraph,
    dockPanel,
    floatPanel,
    hidePanel,
@@ -48,24 +50,30 @@ exportMethods (
    setEdgeTargetArrowColorRule,
    setEdgeSourceArrowColorRule,
    setEdgeColorRule,
+   getNodeCount,
+   getEdgeCount,
    getAllNodes,
    getAllEdges,
    clearSelection,
    selectNodes,
    getSelectedNodes,
    getSelectedNodeCount,
-   sfn,
+   cy.sfn,
    getGraph,
    setGraph,
    hideSelectedNodes,
    unhideAll,
    version,
    msg,
-   clearMsg
+   clearMsg,
+   getGraphFromCyWindow
    )
 
 export(
+   CytoscapeConnection,
+   new.CytoscapeWindow,
    CytoscapeWindow,
+   existing.CytoscapeWindow,
    noa.names,
    noa,
    eda.names,

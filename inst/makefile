@@ -24,3 +24,4 @@ sweave:
 
 pdf:  doc/RCytoscape.tex
 	(cd doc; rm *.pdf; /usr/texbin/latex --output-format=pdf  RCytoscape.tex; open RCytoscape.pdf)
+

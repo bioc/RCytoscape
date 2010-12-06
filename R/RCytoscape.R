@@ -4,15 +4,22 @@ library (methods)
 #------------------------------------------------------------------------------------------------------------------------
 printf = function (...) print (noquote (sprintf (...)))
 #------------------------------------------------------------------------------------------------------------------------
+setClass ("CytoscapeConnectionClass", 
+          representation = representation (uri="character"),
+          prototype = prototype (uri="http://localhost:9000")
+          )
+
+#------------------------------------------------------------------------------------------------------------------------
 setClass ("CytoscapeWindowClass", 
           representation = representation (title="character",
-                                           window.id='integer',
-                                           graph="graph", 
-                                           uri="character"),
+                                           window.id='character',
+                                           graph="graph"),
+          contains='CytoscapeConnectionClass',
           prototype = prototype (title="R graph", 
-                                 graph=new ("graphNEL", edgemode='directed'),
+                                 graph=new ("graphNEL", edgemode='directed'), 
                                  uri="http://localhost:9000")
           )
+
 
 #------------------------------------------------------------------------------------------------------------------------
 setGeneric ('ping',                     signature='obj', function (obj) standardGeneric ('ping'))
@@ -22,7 +29,7 @@ setGeneric ('clearMsg',                 signature='obj', function (obj) standard
 setGeneric ('createWindow',             signature='obj', function (obj) standardGeneric ('createWindow'))
 setGeneric ('getWindowCount',           signature='obj', function (obj) standardGeneric ('getWindowCount'))
 setGeneric ('getWindowList',            signature='obj', function (obj) standardGeneric ('getWindowList'))
-setGeneric ('destroyWindow',            signature='obj', function (obj) standardGeneric ('destroyWindow'))
+setGeneric ('destroyWindow',            signature='obj', function (obj, windowTitle) standardGeneric ('destroyWindow'))
 setGeneric ('destroyAllWindows',        signature='obj', function (obj) standardGeneric ('destroyAllWindows'))
 setGeneric ('getArrowShapes',           signature='obj', function (obj) standardGeneric ('getArrowShapes'))
 setGeneric ('getLayoutNames',           signature='obj', function (obj) standardGeneric ('getLayoutNames'))
@@ -33,6 +40,10 @@ setGeneric ('setGraph',                 signature='obj', function (obj, graph) s
 setGeneric ('getGraph',                 signature='obj', function (obj) standardGeneric ('getGraph'))
 setGeneric ('sendNodes',                signature='obj', function (obj) standardGeneric ('sendNodes'))
 setGeneric ('sendEdges',                signature='obj', function (obj) standardGeneric ('sendEdges'))
+
+setGeneric ('addNodes',                 signature='obj', function (obj, other.graph) standardGeneric ('addNodes'))
+setGeneric ('addEdges',                 signature='obj', function (obj, other.graph) standardGeneric ('addEdges'))
+setGeneric ('addGraphToGraph',          signature='obj', function (obj, other.graph) standardGeneric ('addGraphToGraph'))
 setGeneric ('sendNodeAttributes',       signature='obj', function (obj, attribute.name) standardGeneric ('sendNodeAttributes'))
 setGeneric ('sendNodeAttributesDirect', signature='obj', 
     function (obj, attribute.name, attribute.type, node.names, values) standardGeneric ('sendNodeAttributesDirect'))
@@ -88,10 +99,11 @@ setGeneric ('setEdgeSourceArrowColorRule',   signature='obj',
 setGeneric ('setEdgeColorRule',         signature='obj',
     function (obj, attribute.name, attribute.values, colors, default.color='#000000') standardGeneric ('setEdgeColorRule'))
 
+setGeneric ('getNodeCount',             signature='obj', function (obj) standardGeneric ('getNodeCount'))
+setGeneric ('getEdgeCount',             signature='obj', function (obj) standardGeneric ('getEdgeCount'))
 setGeneric ('getAllNodes',              signature='obj', function (obj) standardGeneric ('getAllNodes'))
 setGeneric ('getAllEdges',              signature='obj', function (obj) standardGeneric ('getAllEdges'))
 setGeneric ('selectNodes',              signature='obj', function (obj, node.names) standardGeneric ('selectNodes'))
-setGeneric ('sfn',                      signature='obj', function (obj) standardGeneric ('sfn'))
 setGeneric ('getSelectedNodes',         signature='obj', function (obj) standardGeneric ('getSelectedNodes'))
 setGeneric ('clearSelection',           signature='obj', function (obj) standardGeneric ('clearSelection'))
 setGeneric ('getSelectedNodeCount',     signature='obj', function (obj) standardGeneric ('getSelectedNodeCount'))
@@ -99,21 +111,38 @@ setGeneric ('hideSelectedNodes',        signature='obj', function (obj) standard
 setGeneric ('unhideAll',                signature='obj', function (obj) standardGeneric ('unhideAll'))
 
 setGeneric ('firstNeighbors',           signature='obj', function (obj, nodeName) standardGeneric ('firstNeighbors'))
-setGeneric ('sfn',                      signature='obj', function (obj) standardGeneric ('sfn'))
+setGeneric ('cy.sfn',                   signature='obj', function (obj) standardGeneric ('cy.sfn'))
+#-----------------------------------------------------------
+# mehtods related to transmitting data from Cytoscape to R
+#-----------------------------------------------------------
+setGeneric ('getWindowID',                   signature='obj', function (obj, window.title) standardGeneric ('getWindowID'))
+setGeneric ('haveNodeAttribute',             signature='obj', function (obj, node.names, attribute.name) standardGeneric ('haveNodeAttribute'))
+setGeneric ('haveEdgeAttribute',             signature='obj', function (obj, edge.names, attribute.name) standardGeneric ('haveEdgeAttribute'))
+setGeneric ('copyNodeAttributesFromCyGraph', signature='obj', function (obj, window.id, existing.graph) standardGeneric ('copyNodeAttributesFromCyGraph'))
+setGeneric ('copyEdgeAttributesFromCyGraph', signature='obj', function (obj, window.id, existing.graph) standardGeneric ('copyEdgeAttributesFromCyGraph'))
+setGeneric ('getGraphFromCyWindow',          signature='obj', function (obj, window.title) standardGeneric ('getGraphFromCyWindow'))
 #------------------------------------------------------------------------------------------------------------------------
 setValidity ("CytoscapeWindowClass",
 
-  function (obj) {
-    if (length (obj@title) != 1) 
+  function (object) {
+    if (length (object@title) != 1) 
       "'title' is not a single string" 
-    else if (!nzchar (obj@title))
+    else if (!nzchar (object@title))
       "'title' is an empty string" 
-    validObject (obj@graph)
+    validObject (object@graph)
     })
 
 #------------------------------------------------------------------------------------------------------------------------
-# the class constructor, defined as a simple function, with no formal link to the class
-CytoscapeWindow = function (title='default', graph=new('graphNEL', edgemode='directed'), host='localhost', rpcPort=9000, create.window=TRUE)
+CytoscapeConnection = function (host='localhost', rpcPort=9000)
+{
+  uri = sprintf ('http://%s:%s', host, rpcPort)
+  cc = new ('CytoscapeConnectionClass', uri=uri)
+  return (cc)
+
+} # CytoscapeConnection
+#------------------------------------------------------------------------------------------------------------------------
+# the 'new window' class constructor, defined as a simple function, with no formal link to the class
+new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'), host='localhost', rpcPort=9000, create.window=TRUE)
 {
   
   # this code is for the Bioconductor build system. You should never need to set or
@@ -121,20 +150,26 @@ CytoscapeWindow = function (title='default', graph=new('graphNEL', edgemode='dir
   if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
     host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
     rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
-  }
+    }
   
   uri = sprintf ('http://%s:%s', host, rpcPort)
+
+  cy.tmp = CytoscapeConnection (host, rpcPort)
+  check.cytoscape.plugin.version (cy.tmp)
+
+  if (!is.na (getWindowID (cy.tmp, title))) {
+    write (sprintf ('There is already a window in Cytoscape named "%s".  Please use a unique name.', title), stderr ())
+    return (NA)
+    }
 
     # add a label to each node if not already present.  default label is the node name, the node ID
   if (edgemode (graph) == 'undirected') 
     graph = remove.redundancies.in.undirected.graph (graph)
 
   if (! 'label' %in% noa.names (graph)) {
-    write ('nodes have no label attribute -- adding default labels', stderr ())
+    #write ('nodes have no label attribute -- adding default labels', stderr ())
     graph = initNodeAttribute (graph, 'label', 'char', '')
 
-    #nodeDataDefaults (graph, 'label') = ''
-    #attr (nodeDataDefaults (graph, attr = "label"), "class") = "STRING"
 
     if (length (nodes (graph) > 0))
       for (node in nodes (graph))
@@ -142,7 +177,54 @@ CytoscapeWindow = function (title='default', graph=new('graphNEL', edgemode='dir
     } # if no label node attribute
 
   cw = new ('CytoscapeWindowClass', title=title, graph=graph, uri=uri)
-  plugin.version.string = version (cw)
+
+  if (create.window)
+    cw@window.id = createWindow (cw)
+
+  return (cw)
+
+} # new.CytsoscapeWindow
+#------------------------------------------------------------------------------------------------------------------------
+CytoscapeWindow = new.CytoscapeWindow
+#------------------------------------------------------------------------------------------------------------------------
+# the 'existing window' class constructor, defined as a simple function, with no formal link to the class
+existing.CytoscapeWindow = function (title, host='localhost', rpcPort=9000, copy.graph.from.cytoscape.to.R=FALSE)
+{
+  
+  # this code is for the Bioconductor build system. You should never need to set or
+  # read these environment variables in ordinary use.
+  if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
+    host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
+    rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
+    }
+  
+  uri = sprintf ('http://%s:%s', host, rpcPort)
+
+  cy.tmp = CytoscapeConnection (host, rpcPort)     # create this (inexpensively) just to gain access tothe window list
+  check.cytoscape.plugin.version (cy.tmp)
+
+  existing.window.id = getWindowID (cy.tmp, title)
+
+  if (is.na (existing.window.id)) {
+    write (sprintf ('There is no window in Cytoscape named "%s".  Please choose from the following titles:.', title), stderr ())
+    write (as.character (getWindowList (cy.tmp)), stderr ())
+    return (NA)
+    }
+
+  cw = new ('CytoscapeWindowClass', title=title, window.id=existing.window.id, uri=uri)
+
+  if (copy.graph.from.cytoscape.to.R) {
+    g.cy = getGraphFromCyWindow (cw, title)
+    cw = setGraph (cw, g.cy)
+    }
+
+  return (cw)
+
+} # existing.CytsoscapeWindow
+#------------------------------------------------------------------------------------------------------------------------
+check.cytoscape.plugin.version = function (cyCon)
+{
+  plugin.version.string = version (cyCon)
   plugin.version = as.numeric ((strsplit (plugin.version.string,' ')[[1]][1]))
   
   expected.version = 1.2
@@ -154,73 +236,93 @@ CytoscapeWindow = function (title='default', graph=new('graphNEL', edgemode='dir
     write (' ', stderr ())
     stop ('Wrong CytoscapeRPC version.')
     }
-    
-  if (create.window)
-    cw@window.id = createWindow (cw)
-  return (cw)
 
-} # CytsoscapeWindow
+} # check.cytoscape.plugin.version
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('ping', 'CytoscapeWindowClass', 
+setMethod ('ping', signature = 'CytoscapeConnectionClass',
   function (obj) { 
     return (xml.rpc (obj@uri, 'Cytoscape.test'))
     })
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('version', 'CytoscapeWindowClass', 
+setMethod ('version', 'CytoscapeConnectionClass', 
   function (obj) { 
     return (xml.rpc (obj@uri, 'Cytoscape.version'))
     })
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('msg', 'CytoscapeWindowClass', 
+setMethod ('msg', 'CytoscapeConnectionClass', 
   function (obj, string) { 
     invisible (xml.rpc (obj@uri, 'Cytoscape.setStatusBarMessage', string))
     })
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('clearMsg', 'CytoscapeWindowClass', 
+setMethod ('clearMsg', 'CytoscapeConnectionClass', 
   function (obj) { 
     invisible (xml.rpc (obj@uri, 'Cytoscape.clearStatusBarMessage'))
     })
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('createWindow', 'CytoscapeWindowClass',
   function (obj) {
-    window.id = as.integer (xml.rpc (obj@uri, 'Cytoscape.createNetwork', obj@title, .convert=TRUE))
+       # window.ids are often character versions of integers.  but they can be character titles, as when an SBML
+       # file is imported from disk.
+    window.id = xml.rpc (obj@uri, 'Cytoscape.createNetwork', obj@title, .convert=TRUE)
     #write (sprintf ('createWindow, id = %d', window.id), stderr ()) 
     return (window.id)
   })
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('getWindowCount', 'CytoscapeWindowClass',
+setMethod ('getWindowCount', 'CytoscapeConnectionClass',
   function (obj) {
     return (as.integer (xml.rpc (obj@uri, 'Cytoscape.getNetworkCount')))
     })
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('getWindowList', 'CytoscapeWindowClass',
+setMethod ('getWindowID', 'CytoscapeConnectionClass',
+  function (obj, window.title) {
+    current.window.list = getWindowList (obj)
+     if (!window.title %in% as.character (current.window.list)) {
+       #write (sprintf ("No existing Cytoscape window named '%s'", window.title), stderr ())
+       return (NA)
+       } # if unrecognized window.title
+
+    window.entry = which (as.character (current.window.list) == window.title)
+    window.id =  as.character (names (current.window.list) [window.entry])
+    return (window.id)
+    })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getWindowCount', 'CytoscapeConnectionClass',
+  function (obj) {
+    return (as.integer (xml.rpc (obj@uri, 'Cytoscape.getNetworkCount')))
+    })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getWindowList', 'CytoscapeConnectionClass',
 
   function (obj) {
     if (getWindowCount (obj) == 0)
       return (c ())
 
-  result.raw = xml.rpc (obj@uri, 'Cytoscape.getNetworkList')
-  result = c ()
+    result.raw = xml.rpc (obj@uri, 'Cytoscape.getNetworkList')
+    result = c ()
 
-  for (i in 1:length (result.raw)) {
-    id = result.raw [[i]]$networkID
-    title = result.raw [[i]]$networktitle
-    result [[id]] = title
-    } # for i
+    for (i in 1:length (result.raw)) {
+      id = result.raw [[i]]$networkID
+      title = result.raw [[i]]$networktitle
+      result [[id]] = title
+      } # for i
 
   return (result)
 
   }) # getWindowList
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('destroyWindow',  'CytoscapeWindowClass',
+setMethod ('destroyWindow',  'CytoscapeConnectionClass',
 
-  function (obj) {
-    id = as.character (obj@window.id)
+  function (obj, windowTitle) {
+    id = getWindowID (obj, windowTitle)
+    if (is.na (id)) {
+      write (sprintf ('no CytoscapeWindow with title "%s"', windowTitle), stderr ())
+      return ()
+      }
     xml.rpc (obj@uri, 'Cytoscape.destroyNetwork', id)
     })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('destroyAllWindows',  'CytoscapeWindowClass',
+setMethod ('destroyAllWindows',  'CytoscapeConnectionClass',
 
   function (obj) {
     ids = names (getWindowList (obj))
@@ -228,35 +330,35 @@ setMethod ('destroyAllWindows',  'CytoscapeWindowClass',
     })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('getNodeShapes', 'CytoscapeWindowClass',
+setMethod ('getNodeShapes', 'CytoscapeConnectionClass',
 
   function (obj) {
      return (xml.rpc (obj@uri, 'Cytoscape.getNodeShapeNames'))
      })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('getAttributeClassNames', 'CytoscapeWindowClass',
+setMethod ('getAttributeClassNames', 'CytoscapeConnectionClass',
 
   function (obj) {
      return (c ('floating|numeric|double', 'integer|int', 'string|char|character'))
      })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('getLineStyles', 'CytoscapeWindowClass',
+setMethod ('getLineStyles', 'CytoscapeConnectionClass',
 
   function (obj) {
     return (xml.rpc (obj@uri, 'Cytoscape.getLineStyleNames'))
     })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('getArrowShapes', 'CytoscapeWindowClass',
+setMethod ('getArrowShapes', 'CytoscapeConnectionClass',
 
    function (obj) {
      return (xml.rpc (obj@uri, 'Cytoscape.getArrowShapeNames'))
      })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('getLayoutNames', 'CytoscapeWindowClass', 
+setMethod ('getLayoutNames', 'CytoscapeConnectionClass', 
 
    function (obj) {
      return (xml.rpc (obj@uri, 'Cytoscape.getLayoutNames'))
@@ -280,30 +382,276 @@ setMethod ('getGraph', 'CytoscapeWindowClass',
     })
 
 #------------------------------------------------------------------------------------------------------------------------
+# in Cytoscape, node attributes are administered on a global level.  In addition, and in contrast to R, not all nodes in a graph
+# will have a specific attribute define on it.  (In R, every node has every attribute)
+# this function returns a list of nodes for which the specified attribute has a value in the corresponding Cytoscape network
+
+setMethod ('haveNodeAttribute', 'CytoscapeConnectionClass',
+
+  function (obj, node.names, attribute.name) {
+    indices.of.nodes.with.attribute.value = which (xml.rpc (obj@uri, 'Cytoscape.nodesHaveAttribute', attribute.name, node.names))
+    if (length (indices.of.nodes.with.attribute.value) > 0)
+      return (node.names [indices.of.nodes.with.attribute.value])
+    else 
+      return (character(0))
+    })
+
+#------------------------------------------------------------------------------------------------------------------------
+# in Cytoscape, node attributes administered on a global level.  In addition, and in contrast to R, not all nodes in a graph
+# will have a specific attribute define on it.  (In R, every node has every attribute)
+# this function returns a list of nodes for which the specified attribute has a value in the corresponding Cytoscape network
+
+setMethod ('haveEdgeAttribute', 'CytoscapeConnectionClass',
+
+  function (obj, edge.names, attribute.name) {
+    indices.of.edges.with.attribute.value = which (xml.rpc (obj@uri, 'Cytoscape.edgesHaveAttribute', attribute.name, edge.names))
+    if (length (indices.of.edges.with.attribute.value) > 0)
+      return (edge.names [indices.of.edges.with.attribute.value])
+    else 
+      return (character(0))
+    })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('copyNodeAttributesFromCyGraph', 'CytoscapeConnectionClass',
+
+  function (obj, window.id, existing.graph) {
+    node.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getNodeAttributeNames', .convert=T)
+    for (attribute.name in node.attribute.names) {
+      known.node.names = xml.rpc (obj@uri, "Cytoscape.getNodes", window.id)
+      nodes.with.attribute = haveNodeAttribute (obj, known.node.names, attribute.name)
+      if (length (nodes.with.attribute) > 0) {
+        attribute.type = xml.rpc (obj@uri, 'Cytoscape.getNodeAttributeType', attribute.name, .convert=T)
+        write (sprintf ('retrieving %s "%s" attribute for %d nodes', attribute.type, attribute.name, length (nodes.with.attribute)), stderr ())
+        if (attribute.type == 'INTEGER') {
+          attribute.type = 'integer'
+          default.value = 0
+          }
+        else if (attribute.type == 'STRING') {
+          attribute.type = 'char'
+          default.value = 'unassigned'
+          }
+        else if (attribute.type == 'FLOATING') {
+          attribute.type = 'numeric'
+          default.value = as.numeric (0.0)
+          }
+        else {
+          write (sprintf ('RCytoscape::copyNodeAttributesFromCyGraph, no support yet for attributes of type %s', attribute.type), stderr ())
+          next ()
+          } 
+        existing.graph = initNodeAttribute (existing.graph, attribute.name, attribute.type, default.value)
+        attribute.values = xml.rpc (obj@uri, 'Cytoscape.getNodesAttributes', attribute.name, nodes.with.attribute)
+        nodeData (existing.graph, nodes.with.attribute, attribute.name) = attribute.values
+         } # if
+      } # for
+
+    return (existing.graph)
+    })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('copyEdgeAttributesFromCyGraph', 'CytoscapeConnectionClass',
+
+  function (obj, window.id, existing.graph) {
+    edge.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getEdgeAttributeNames', .convert=T)
+    write (sprintf ('creating %d cytoscape-style edge names', length (edgeNames (existing.graph))), stderr ())
+    cy2.edgenames = as.character (cy2.edge.names (existing.graph))   # < 2 seconds for > 9000 edges
+  
+    for (attribute.name in edge.attribute.names) {
+      edges.with.attribute = haveEdgeAttribute (obj, cy2.edgenames, attribute.name)
+      if (length (edges.with.attribute) > 0) {
+         attribute.type = xml.rpc (obj@uri, 'Cytoscape.getEdgeAttributeType', attribute.name, .convert=T)
+         write (sprintf ('retrieving %s "%s" attribute for %d edges', attribute.type, attribute.name, length (edges.with.attribute)), stderr ())
+         if (attribute.type == 'INTEGER') {
+           attribute.type = 'integer'
+           default.value = 0
+           }
+         else if (attribute.type == 'STRING') {
+           attribute.type = 'char'
+           default.value = 'unassigned'
+           }
+         else if (attribute.type == 'FLOATING') {
+           attribute.type = 'numeric'
+           default.value = as.numeric (0.0)
+           }
+        else {
+          write (sprintf ('RCytoscape::copyEdgeAttributesFromCyGraph, no support yet for attributes of type %s', attribute.type), stderr ())
+          next ()
+          } 
+         existing.graph = initEdgeAttribute (existing.graph, attribute.name, attribute.type, default.value)
+         eda.value = xml.rpc (obj@uri, 'Cytoscape.getEdgesAttributes', attribute.name, edges.with.attribute)
+         regex = ' *[\\(|\\)] *'
+         edges.tokens = strsplit (edges.with.attribute, regex)
+         source.nodes = unlist (lapply (edges.tokens, function (tokens) tokens [1]))
+         target.nodes = unlist (lapply (edges.tokens, function (tokens) tokens [3]))
+         edge.types =   unlist (lapply (edges.tokens, function (tokens) tokens [2]))
+         edgeData (existing.graph, source.nodes, target.nodes, attribute.name) = eda.value
+         } # if
+      } # for
+  
+     return (existing.graph)
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getGraphFromCyWindow', 'CytoscapeConnectionClass',
+
+  function (obj,  window.title) {
+    window.id = getWindowID (obj, window.title)
+    stopifnot (!is.na (window.id))
+  
+    all.node.names = xml.rpc (obj@uri, "Cytoscape.getNodes", window.id)
+    write (sprintf ('recevied %d nodes from %s', length (all.node.names), window.title), stderr ())
+    g = new ("graphNEL", edgemode='directed')
+    write (sprintf ('adding %d nodes to local graph', length (all.node.names)), stderr ())
+    g = graph::addNode (all.node.names, g)
+    
+    node.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getNodeAttributeNames', .convert=T)
+    g = initEdgeAttribute (g, 'edgeType', 'char', 'assoc')
+  
+
+    regex = ' *[\\(|\\)] *'
+    all.edge.names = xml.rpc (obj@uri, "Cytoscape.getEdges", window.id)
+    write (sprintf ('recevied %d edges from %s', length (all.edge.names), window.title), stderr ())
+    edges.tokens = strsplit (all.edge.names, regex)
+  
+    source.nodes = unlist (lapply (edges.tokens, function (tokens) tokens [1]))
+    target.nodes = unlist (lapply (edges.tokens, function (tokens) tokens [3]))
+    edge.types =   unlist (lapply (edges.tokens, function (tokens) tokens [2]))
+    write (sprintf ('adding %d edges to local graph', length (edges.tokens)), stderr ())
+    g = addEdge (source.nodes, target.nodes, g)
+    edgeData (g, source.nodes, target.nodes, 'edgeType') = edge.types
+    g = copyNodeAttributesFromCyGraph (obj, window.id, g)
+    g = copyEdgeAttributesFromCyGraph (obj, window.id, g)
+  
+    return (g)
+    })
+
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('sendNodes', 'CytoscapeWindowClass',
 
   function (obj) {
-     if (length (nodes (obj@graph)) == 0)
-       write ('CytoscapeWindow.send, no nodes in graph.  returning', stderr ())
+     if (length (nodes (obj@graph)) == 0) {
+       write ('CytoscapeWindow.sendNodes, no nodes in graph.  returning', stderr ())
+       return ()
+       }
      invisible (xml.rpc (obj@uri, 'Cytoscape.createNodes', as.character (obj@window.id), nodes (obj@graph)))
      })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('addNodes', signature (obj='CytoscapeWindowClass'),
+
+  function (obj, other.graph) {
+     if (length (nodes (other.graph)) == 0) {
+       write ('CytoscapeWindow.sendNodes, no nodes in other.graph.  returning', stderr ())
+       return ()
+       }
+     new.nodes = setdiff (nodes (other.graph), nodes (obj@graph))
+     invisible (xml.rpc (obj@uri, 'Cytoscape.createNodes', as.character (obj@window.id), new.nodes))
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('addEdges', signature (obj='CytoscapeWindowClass'),
+
+  function (obj, other.graph) {
+    if (length (edgeNames (other.graph)) == 0) {
+       write ('CytoscapeWindow.addEdges, no edges in graph.  returning', stderr ())
+       return ()
+       }
+                 
+       # extract and compare edge names
+    new.edgeNames = setdiff (edgeNames (other.graph), edgeNames (obj@graph))
+    printf ('---- new.edgeNames %d', length (new.edgeNames))
+    print (new.edgeNames)
+    new.edgeNames.withBar = gsub ('~','|', new.edgeNames)
+
+    tokens = strsplit (new.edgeNames, '~')
+    #tokens = strsplit (new.edgeNames, '~')
+    #tokens = strsplit (edgeNames (other.graph), '~')
+    a = sapply (tokens, function (tok) tok [1])
+    b = sapply (tokens, function (tok) tok [2])
+    edge.type = as.character (eda (other.graph, 'edgeType') [new.edgeNames.withBar])
+    printf ('edge.type:    ')
+    print (edge.type)
+
+    if (length (edge.type) == 1 && is.na (edge.type))
+      edge.type = rep ('unspecified', length (tokens))
+    directed = rep (TRUE, length (tokens))
+    forgive.if.node.is.missing = TRUE
+
+     # deferring this effiency (sending only new edges) for now.
+     # if ('edgeType' %in% eda.names (obj@graph) && 'edgeType' %in% eda.names (other.graph)) {
+     #   existing.edge.signatures = sort (paste (names (edgeNames (obj@graph)), as.character (eda (obj@graph, 'edgeType'))))
+     #   new.edge.signatures      = sort (paste (names (edgeNames (other.graph)), as.character (eda (other.graph, 'edgeType'))))
+     #   new.edges = 
+     #   } # if
+
+    printf ('---- about to xml.rpc call Cytoscape.createEdges')
+    print (a)
+    print (b)
+    print (edge.type)
+    xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
+    }) # sendEdges
+
+
+#------------------------------------------------------------------------------------------------------------------------
+# this method adds a new graph to an existing graph.  first the new nodes, then the new edges, then node attributes, then edge
+# attributes
+setMethod ('addGraphToGraph', 'CytoscapeWindowClass',
+
+  function (obj, other.graph) {
+    addNodes (obj, other.graph)  
+    addEdges (obj, other.graph)
+  
+    node.attribute.names = noa.names (other.graph)
+    for (attribute.name in node.attribute.names) {
+      printf ('sending noa %s', attribute.name)
+      .sendNodeAttributesForGraph (obj, other.graph, attr=attribute.name)
+      }
+  
+    node.attribute.names = noa.names (other.graph)
+    for (attribute.name in node.attribute.names) {
+      printf ('sending noa %s', attribute.name)
+      .sendNodeAttributesForGraph (obj, other.graph, attr=attribute.name)
+      }
+  
+    edge.attribute.names = eda.names (other.graph)
+    for (attribute.name in edge.attribute.names) {
+      printf ('sending eda %s', attribute.name)
+      .sendEdgeAttributesForGraph (obj, other.graph, attr=attribute.name)
+      }
+    }) # addGraphToGraph
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('sendEdges', 'CytoscapeWindowClass',
 
   function (obj) {
-    for (source.node in names (edges (obj@graph))) {
-      for (target.node in edges (obj@graph)[[source.node]]) {
-        interaction = 'unknown'
-        if ('edgeType' %in% names (edgeDataDefaults (obj@graph)))
-          interaction = as.character (edgeData (obj@graph, source.node, target.node, 'edgeType'))
-        else if ('type' %in% names (edgeDataDefaults (obj@graph)))
-          interaction = as.character (edgeData (obj@graph, source.node, target.node, 'type'))
-        #printf ('creating edge  %s (%s) %s', source.node, interaction, target.node)     
-        xml.rpc (obj@uri, 'Cytoscape.createEdge', source.node, target.node, interaction, TRUE)
-        } # for target.node
-      } # for source.node
+    if (length (edgeNames (obj@graph)) == 0) {
+       write ('CytoscapeWindow.sendEdges, no edges in graph.  returning', stderr ())
+       return ()
+       }
+                 
+    tokens = strsplit (edgeNames (obj@graph), '~')
+    a = sapply (tokens, function (tok) tok [1])
+    b = sapply (tokens, function (tok) tok [2])
+    edge.type = as.character (eda (obj@graph, 'edgeType'))
+    if (length (edge.type) == 1 && is.na (edge.type))
+      edge.type = rep ('unspecified', length (tokens))
+    directed = rep (TRUE, length (tokens))
+    forgive.if.node.is.missing = TRUE
+    xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
     }) # sendEdges
+
+
+   # for (source.node in names (edges (obj@graph))) {
+   #   for (target.node in edges (obj@graph)[[source.node]]) {
+   #     interaction = 'unknown'
+   #     if ('edgeType' %in% names (edgeDataDefaults (obj@graph)))
+   #       interaction = as.character (edgeData (obj@graph, source.node, target.node, 'edgeType'))
+   #     else if ('type' %in% names (edgeDataDefaults (obj@graph)))
+   #       interaction = as.character (edgeData (obj@graph, source.node, target.node, 'type'))
+   #     #printf ('creating edge  %s (%s) %s', source.node, interaction, target.node)     
+   #     xml.rpc (obj@uri, 'Cytoscape.createEdge', source.node, target.node, interaction, TRUE)
+   #     } # for target.node
+   #   } # for source.node
+   # }) # sendEdges
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('layout', 'CytoscapeWindowClass',
@@ -355,7 +703,6 @@ setMethod ('sendNodeAttributes', 'CytoscapeWindowClass',
        return (NA)
        }
 
-     caller.specified.attribute.class = caller.specified.attribute.class
      node.names = nodes (obj@graph)
      values = noa (obj@graph, attribute.name)
      invisible (sendNodeAttributesDirect (obj, attribute.name, caller.specified.attribute.class, node.names, values))
@@ -367,9 +714,12 @@ setMethod ('sendNodeAttributesDirect', 'CytoscapeWindowClass',
 
    function (obj, attribute.name, attribute.type, node.names, values) {
 
+     if (length (node.names) == 0)
+       return ()
+
      if (length (node.names) != length (values)) {
        write (sprintf ('RCytoscape::sendNodeAttributesDirect ERROR.'), stderr ())
-       write ('attribute name %s, edge.names %d, values %d', attribute.name, length (node.names), length (values), stderr ())
+       write (sprintf ('attribute name %s, edge.names %d, values %d', attribute.name, length (node.names), length (values)), stderr ())
        return ();
        }
 
@@ -424,6 +774,11 @@ setMethod ('sendEdgeAttributesDirect', 'CytoscapeWindowClass',
 
    function (obj, attribute.name, attribute.type, edge.names, values) {
 
+     write (sprintf ('entering sendEdgeAttributesDirect, with %d names and %d values', length (edge.names), length (values)), stderr ())
+
+     if (length (edge.names) == 0)
+       return ()
+
      if (length (values) == 2 * length (edge.names))
        values = values [1:length (edge.names)]
 
@@ -435,21 +790,24 @@ setMethod ('sendEdgeAttributesDirect', 'CytoscapeWindowClass',
      result = ''
 
      if (length (edge.names) != length (values)) {
-       write (sprintf ('RCytoscape::sendEdgeAttributesDirect ERROR.'), stderr ())
-       write ('attribute name %s, edge.names %d, values %d', attribute.name, length (edge.names), length (values), stderr ())
+       write (sprintf ('RCytoscape::sendEdgeAttributesDirect ERROR....'), stderr ())
+       write (sprintf ('attribute name %s, edge.names %d, values %d', attribute.name, length (edge.names), length (values)), stderr ())
        return ();
        }
 
      if (caller.specified.attribute.class %in% c ('floating', 'numeric', 'double')) {
        result = xml.rpc (obj@uri, 'Cytoscape.addDoubleEdgeAttributes', attribute.name, edge.names, as.numeric (values), .convert=TRUE)
+       write (sprintf ('result of addDoubleEdgeAttributes: %s', result), stderr ())
        write (result, stderr ())
        }
      else if (caller.specified.attribute.class %in% c ('integer', 'int')) {
        result = xml.rpc (obj@uri, 'Cytoscape.addIntegerEdgeAttributes', attribute.name, edge.names, as.integer (values), .convert=TRUE)
+       write (sprintf ('result of addIntegerEdgeAttributes: %s', result), stderr ())
        write (result, stderr ())
        }
      else if (caller.specified.attribute.class %in% c ('string', 'char', 'character')) {
        result = xml.rpc (obj@uri, 'Cytoscape.addStringEdgeAttributes', attribute.name, edge.names, as.character (values), .convert=TRUE)
+       write (sprintf ('result of addStringEdgeAttributes: %s', result), stderr ())
        write (result, stderr ())
        }
 
@@ -460,6 +818,12 @@ setMethod ('sendEdgeAttributesDirect', 'CytoscapeWindowClass',
 setMethod ('displayGraph', 'CytoscapeWindowClass',
 
    function (obj) {
+     write ('entering RCytoscape::displayGraph', stderr ())
+     if (length (nodes (obj@graph)) == 0) {
+       write ('RCytoscape::displayGraph, empty graph, returning', stderr ())
+       return ()
+       }
+
      write ('adding nodes...', stderr ())
      sendNodes (obj)
      write ('adding edges...', stderr ())
@@ -479,21 +843,21 @@ setMethod ('redraw', 'CytoscapeWindowClass',
      }) # redraw
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('hidePanel', 'CytoscapeWindowClass',
+setMethod ('hidePanel', 'CytoscapeConnectionClass',
 
    function (obj, panelName) {
      invisible (xml.rpc (obj@uri, 'Cytoscape.hidePanel', panelName))
      })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('dockPanel', 'CytoscapeWindowClass',
+setMethod ('dockPanel', 'CytoscapeConnectionClass',
 
    function (obj, panelName) {
      invisible (xml.rpc (obj@uri, 'Cytoscape.dockPanel', panelName))
      })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('floatPanel', 'CytoscapeWindowClass',
+setMethod ('floatPanel', 'CytoscapeConnectionClass',
 
    function (obj, panelName) {
      invisible (xml.rpc (obj@uri, 'Cytoscape.floatPanel', panelName))
@@ -817,6 +1181,20 @@ setMethod ('setEdgeSourceArrowColorRule', 'CytoscapeWindowClass',
      }) # setTargetArrowRule
 
 #------------------------------------------------------------------------------------------------------------------------
+setMethod ('getNodeCount', 'CytoscapeWindowClass',
+   function (obj) {
+     id = as.character (obj@window.id)
+     count = xml.rpc (obj@uri, "Cytoscape.countNodes", id)
+     return (count)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getEdgeCount', 'CytoscapeWindowClass',
+   function (obj) {
+     id = as.character (obj@window.id)
+     count = xml.rpc (obj@uri, "Cytoscape.countEdges", id)
+     return (count)
+     })
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('getAllNodes', 'CytoscapeWindowClass',
 
    function (obj) {
@@ -912,7 +1290,7 @@ setMethod ('firstNeighbors', 'CytoscapeWindowClass',
       })  # firstNeighbors
 
 #------------------------------------------------------------------------------------------
-setMethod ('sfn', 'CytoscapeWindowClass',
+setMethod ('cy.sfn', 'CytoscapeWindowClass',
 
    function (obj) {
      if (getSelectedNodeCount (obj) > 0) {
@@ -927,7 +1305,7 @@ setMethod ('sfn', 'CytoscapeWindowClass',
        if (length (neighbors) > 0)
          selectNodes (obj, neighbors)
        } # if any nodes are already selected
-     }) # sfn
+     }) # cy.sfn
 
 #------------------------------------------------------------------------------------------------------------------------
 noa.names = function (graph)
@@ -942,13 +1320,19 @@ eda.names = function (graph)
 #------------------------------------------------------------------------------------------------------------------------
 noa = function (graph, node.attribute.name)
 {
-  unlist (sapply (nodes (graph), function (x)  (nodeData (graph, x, node.attribute.name))))
+  if (!node.attribute.name %in% noa.names (graph))
+    return (NA)
 
-} # eda
+  return (unlist (nodeData (graph, attr=node.attribute.name)))
+
+} # noa
 #------------------------------------------------------------------------------------------------------------------------
 eda = function (graph, edge.attribute.name)
 {
-  unlist (sapply (names (edgeData (graph)), function (n) edgeData (graph)[[n]][[edge.attribute.name]]))
+  if (!edge.attribute.name %in% eda.names (graph))
+    return (NA)
+
+  return (unlist (edgeData (graph, attr=edge.attribute.name)))
 
 } # eda
 #------------------------------------------------------------------------------------------------------------------------
@@ -956,6 +1340,29 @@ eda = function (graph, edge.attribute.name)
 #  edgeNames (g) # "A~B" "B~C" "C~A"
 #  if there is no edge attribute named 'edgeType', then create edges (uninterestingly) named 'A (edge) B'
 cy2.edge.names = function (graph)
+{
+  #printf ('running new version of cy2.edge.names')
+  if (length (edges (graph)) == 0)
+    return (NA)
+
+  edgeType.attribute.present = TRUE
+  edge.type = 'unknown'
+  if ('edgeType' %in% names (edgeDataDefaults (graph))) {
+     edge.type = as.character (eda (graph, 'edgeType'))
+     }
+
+  tokens = strsplit (edgeNames (graph), '~')
+  a = sapply (tokens, function (tok) tok [1])
+  b = sapply (tokens, function (tok) tok [2])
+  edge.type = paste (' (', edge.type, ') ', sep='')
+  edge.names = paste (a, edge.type, b, sep='')
+
+  names (edge.names) = edgeNames (graph)
+  return (edge.names)
+
+} # cy2.edge.names
+#------------------------------------------------------------------------------------------------------------------------
+old.cy2.edge.names = function (graph)
 {
   edgeType.attribute.present = TRUE
   if (!'edgeType' %in% names (edgeDataDefaults (graph))) {
@@ -979,7 +1386,7 @@ cy2.edge.names = function (graph)
   names (edge.names) = edgeNames (graph)
   return (edge.names)
 
-} # cy2.edge.names
+} # old.cy2.edge.names
 #------------------------------------------------------------------------------------------------------------------------
 makeSimpleGraph = function ()
 {
@@ -1040,6 +1447,15 @@ makeRandomGraph = function (node.count=12, seed = 123)
 
 } # makeRandomGraph
 #------------------------------------------------------------------------------------------------------------------------
+# the bioconductor graph class stores undirected graph edge attributes redundantly.  bioc's nishant says (email, 2 sep 2010):
+#
+# The people who started the graph package decided to return duplicate edge attributes / weights for the undirected
+# case. ie if you have an edge a-b and the graph is undirected, methods such as edgeWeights, edgeData etc will end up
+# returning duplicate values for the attribute for a-b and b-a.  That was a design decision taken by the creators of the
+# package and I do not think it will be possible to change that now.  I guess the solution might be to create your own
+# edgeWeights and edgeData methods in your package that retrieve only the non-duplicated attributes for the undirected
+# case.
+#
 remove.redundancies.in.undirected.graph = function (gu)
 {
   if (length (nodes (gu)) == 0)
@@ -1121,4 +1537,77 @@ initEdgeAttribute = function (graph, attribute.name, attribute.type, default.val
   destroyAllWindows (cw.closer)
   
 } # .onUnload
+#------------------------------------------------------------------------------------------------------------------------
+# used when adding a new graph to an existing graph.  we assume (but do not yet here test) that before this method
+# is called, the Cytoscape graph has already been updated with new ones from 'other.graph'
+# there may be some overlap between the two graphs; care is taken to only send attributes for new nodes.
+# pre-existing attributes in the old graph are therefore not affected.
+# the strategy:  identify the new nodes, use the standard method 'sendNodeAttributesDirect' to send them to cytoscape
+# 
+.sendNodeAttributesForGraph = function (obj, other.graph, attribute.name)
+{
+  caller.specified.attribute.class = attr (nodeDataDefaults (other.graph, attribute.name), 'class')
+
+  if (is.null (caller.specified.attribute.class)) {
+    msg1 = sprintf ('Error!  RCytoscape:::.sendNodeAttributesForGraph. You must initialize the "%s" node attribute.', attribute.name)
+    msg2 = sprintf ('        example:  my.graph = initNodeAttribute (my.graph, attr="moleculeType", "char", "unspecified")')
+    write (msg1, stderr ())
+    write (msg2, stderr ())
+    return (NA)
+    }
+
+     # only add attributes for new nodes, unique to the new graph 'other.graph'
+   new.node.names = setdiff (nodes (other.graph), nodes (obj@graph))
+   values = noa (other.graph, attribute.name) [new.node.names]
+   invisible (sendNodeAttributesDirect (obj, attribute.name, caller.specified.attribute.class, new.node.names, values))
+
+} # .sendNodeAttributesForGraph 
+#------------------------------------------------------------------------------------------------------------------------
+# used when adding a new graph to an existing graph.  we assume (but do not yet here test) that before this method
+# is called, the Cytoscape graph has already been extended with all the new nodes and edges from 'other.graph'
+# there may be some overlap between the two graphs; care is taken to only send attributes for new edges
+# pre-existing attributes in the old graph are therefore not affected.
+# the strategy:  identify the new edges, use the standard method 'sendEdgeAttributesDirect' to send them to cytoscape
+# oddities: edge naming is a tricky business.  cytoscape lablels edges like this:
+#    <sourceNode> (interactionType) <targetNode>
+# RCytoscape provide a utility function for retrieving them from an R graph object,   cy2.edge.names (g)
+# which uses the edgeNames (g) method to get the R names
+# edgeNames (g2)  # [1] "A~E" "A~B" "D~E"
+# thus, R has a little inconsistency:  sometimes using the tilda, sometimes the vertical bar
+#                 A~E                 A~B                 D~E 
+#     "A (inferred) E" "A (unspecified) B"  "D (literature) E" 
+# names (edgeData (g2, attr='edgeType'))
+#    [1] "A|E" "A|B" "D|E"
+# for historical reasons, and maybe laziness, these two conventions are supported here, at the cost of calling gsub on the edge
+# names, so that A~E becomes A|E, setting the stage for calling 
+#   values = eda (g, attribute.name) [new.edge.names.with.bar.delimitor]
+# below, and thereby ensuring that only the attributes of new edges are sent to Cytoscape
+
+.sendEdgeAttributesForGraph = function (obj, other.graph, attribute.name)
+{
+  caller.specified.attribute.class = attr (edgeDataDefaults (other.graph, attribute.name), 'class')
+
+  if (is.null (caller.specified.attribute.class)) {
+    msg1 = sprintf ('Error!  RCytoscape:::.sendEdgeAttributesForGraph. You must initialize the "%s" edge attribute.', attribute.name)
+    msg2 = sprintf ('        example:  my.graph = initEdgeAttribute (my.graph, attr="edgeType", "char", "unspecified")')
+    write (msg1, stderr ())
+    write (msg2, stderr ())
+    return (NA)
+    }
+     # send only attributes for edges which are unique to other.graph; we assume that any existing edges already have their attributes
+
+   new.edge.names = setdiff (names (cy2.edge.names (other.graph)), names (cy2.edge.names (obj@graph)))
+   if (length (new.edge.names) == 0) 
+     return
+
+   new.edge.names.with.bar.delimitor = gsub ('~', '|', new.edge.names)
+   values = eda (other.graph, attribute.name) [new.edge.names.with.bar.delimitor]
+   write (sprintf ('sending edge attributes direct for attr %s', attribute.name), stderr ())
+   write (new.edge.names, stderr ())
+   write (new.edge.names.with.bar.delimitor, stderr ())
+   write (values, stderr ())
+
+   invisible (sendEdgeAttributesDirect (obj, attribute.name, caller.specified.attribute.class, new.edge.names.with.bar.delimitor, values))
+
+} # .sendEdgeAttributesForGraph 
 #------------------------------------------------------------------------------------------------------------------------

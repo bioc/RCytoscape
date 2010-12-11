@@ -12,11 +12,43 @@ reload.rcytoscape = function ()
 
 } # reload.rcytoscape
 #------------------------------------------------------------------------------------------------------------------------
-exper = function ()
+getVizMapList = function (cw)
 {
-  xml.rpc (cwe@uri, 'Cytoscape.discreteMapper', as.character (cwe@window.id), 'default', 'type', 'Node Color', '#FF0088', 
-           c ('kinase', 'transcription factor'), # , 'glycoprotein'),
-           c ('#0000FF', '#00FF00'))   # , '#8800FF'))
+  return (xml.rpc (cw@uri, 'Cytoscape.getVisualStyleNames'))
 
-} #  exper
+} # getVizMapList
 #------------------------------------------------------------------------------------------------------------------------
+current.vizmap = function (cw)
+{
+  return (xml.rpc (cw@uri, 'Cytoscape.getCurrentVisualStyle'))
+
+} #  vizmap.names
+#------------------------------------------------------------------------------------------------------------------------
+set.vizmap = function (cw, style.name)
+{
+  invisible (xml.rpc (cw@uri, 'Cytoscape.setVisualStyle', style.name))
+
+} # set.vizmap
+#------------------------------------------------------------------------------------------------------------------------
+copy.vizmap = function (cw, from.name, to.name)
+{
+  invisible (xml.rpc (cw@uri, 'Cytoscape.copyVisualStyle', from.name, to.name))
+
+} # copy.vizmap
+#------------------------------------------------------------------------------------------------------------------------
+set.nodeShape = function (cw)
+{
+  node.shapes = c ('triangle', 'rect', 'ellipse')
+  node.shapes = c ('diamond', 'triangle', 'rect')
+  node.shapes = c ('ellipse', 'trapezoid', 'triangle')
+
+  attribute.values = c ('kinase', 'glycoprotein', 'transcription factor')
+  window.id = cw@window.id
+  style.name = 'default'
+  style.name = 'newViz'
+
+  xml.rpc (cw@uri, "Cytoscape.setNodeShapeRule", window.id, style.name, 'type', 'ellipse', attribute.values, node.shapes, .convert=TRUE)
+
+}
+#------------------------------------------------------------------------------------------------------------------------
+

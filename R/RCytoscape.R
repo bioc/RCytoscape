@@ -55,6 +55,7 @@ setGeneric ('layout',                   signature='obj', function (obj, layout.n
 setGeneric ('setPosition',              signature='obj', function (obj, node.names, x.coords, y.coords) standardGeneric ('setPosition'))
 setGeneric ('redraw',                   signature='obj', function (obj) standardGeneric ('redraw'))
 setGeneric ('hidePanel',                signature='obj', function (obj, panelName) standardGeneric ('hidePanel'))
+setGeneric ('hideAllPanels',            signature='obj', function (obj, panelName) standardGeneric ('hideAllPanels'))
 setGeneric ('dockPanel',                signature='obj', function (obj, panelName) standardGeneric ('dockPanel'))
 setGeneric ('floatPanel',               signature='obj', function (obj, panelName) standardGeneric ('floatPanel'))
 
@@ -101,6 +102,12 @@ setGeneric ('setEdgeColorRule',         signature='obj',
 
 setGeneric ('getNodeCount',             signature='obj', function (obj) standardGeneric ('getNodeCount'))
 setGeneric ('getEdgeCount',             signature='obj', function (obj) standardGeneric ('getEdgeCount'))
+setGeneric ('getNodeAttribute',         signature='obj', function (obj, node.name, attribute.name) standardGeneric ('getNodeAttribute'))
+setGeneric ('getEdgeAttribute',         signature='obj', function (obj, edge.name, attribute.name) standardGeneric ('getEdgeAttribute'))
+setGeneric ('getNodeAttributeNames',    signature='obj', function (obj) standardGeneric ('getNodeAttributeNames'))
+setGeneric ('getEdgeAttributeNames',    signature='obj', function (obj) standardGeneric ('getEdgeAttributeNames'))
+setGeneric ('deleteNodeAttribute',      signature='obj', function (obj, attribute.name) standardGeneric ('deleteNodeAttribute'))
+setGeneric ('deleteEdgeAttribute',      signature='obj', function (obj, attribute.name) standardGeneric ('deleteEdgeAttribute'))
 setGeneric ('getAllNodes',              signature='obj', function (obj) standardGeneric ('getAllNodes'))
 setGeneric ('getAllEdges',              signature='obj', function (obj) standardGeneric ('getAllEdges'))
 setGeneric ('selectNodes',              signature='obj', function (obj, node.names) standardGeneric ('selectNodes'))
@@ -159,7 +166,7 @@ new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'
 
   if (!is.na (getWindowID (cy.tmp, title))) {
     write (sprintf ('There is already a window in Cytoscape named "%s".  Please use a unique name.', title), stderr ())
-    return (NA)
+    stop ()
     }
 
     # add a label to each node if not already present.  default label is the node name, the node ID
@@ -415,7 +422,8 @@ setMethod ('haveEdgeAttribute', 'CytoscapeConnectionClass',
 setMethod ('copyNodeAttributesFromCyGraph', 'CytoscapeConnectionClass',
 
   function (obj, window.id, existing.graph) {
-    node.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getNodeAttributeNames', .convert=T)
+    node.attribute.names = getNodeAttributeNames (obj)
+    #node.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getNodeAttributeNames', .convert=T)
     for (attribute.name in node.attribute.names) {
       known.node.names = xml.rpc (obj@uri, "Cytoscape.getNodes", window.id)
       nodes.with.attribute = haveNodeAttribute (obj, known.node.names, attribute.name)
@@ -451,7 +459,8 @@ setMethod ('copyNodeAttributesFromCyGraph', 'CytoscapeConnectionClass',
 setMethod ('copyEdgeAttributesFromCyGraph', 'CytoscapeConnectionClass',
 
   function (obj, window.id, existing.graph) {
-    edge.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getEdgeAttributeNames', .convert=T)
+    edge.attribute.names = getEdgeAttributeNames (obj)
+    #edge.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getEdgeAttributeNames', .convert=T)
     write (sprintf ('creating %d cytoscape-style edge names', length (edgeNames (existing.graph))), stderr ())
     cy2.edgenames = as.character (cy2.edge.names (existing.graph))   # < 2 seconds for > 9000 edges
   
@@ -503,7 +512,8 @@ setMethod ('getGraphFromCyWindow', 'CytoscapeConnectionClass',
     write (sprintf ('adding %d nodes to local graph', length (all.node.names)), stderr ())
     g = graph::addNode (all.node.names, g)
     
-    node.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getNodeAttributeNames', .convert=T)
+    node.attribute.names = getNodeAttributeNames (obj)
+    #node.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getNodeAttributeNames', .convert=T)
     g = initEdgeAttribute (g, 'edgeType', 'char', 'assoc')
   
 
@@ -588,7 +598,7 @@ setMethod ('addEdges', signature (obj='CytoscapeWindowClass'),
     print (b)
     print (edge.type)
     xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
-    }) # sendEdges
+    }) # addEdges
 
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -724,6 +734,16 @@ setMethod ('sendNodeAttributesDirect', 'CytoscapeWindowClass',
        }
 
 
+        # in sending arguments to CytoscapeRPC, lists of length one become scalars, and so fail to match
+        # java methods that expect lists.  to sidestep that problem, duplicate node.name and value, 
+        # creating silly but effective lists of length 2
+
+     if (length (node.names) == 1) {
+       node.names = rep (node.names, 2)
+       values = rep (values, 2)
+       }
+
+
      caller.specified.attribute.class = tolower (attribute.type)
      if (is.null (caller.specified.attribute.class) || length (caller.specified.attribute.class) == 0)   # NULL, or non-null but empty
        caller.specified.attribute.class = 'string'
@@ -752,7 +772,8 @@ setMethod ('sendEdgeAttributes', 'CytoscapeWindowClass',
    function (obj, attribute.name) {
 
      caller.specified.attribute.class = attr (edgeDataDefaults (obj@graph, attribute.name), 'class')
-     
+     #write (sprintf ('RCy::sendEdgeAttributes, eda name = %s', attribute.name), stderr ())
+
      if (is.null (caller.specified.attribute.class)) {
        msg1 = sprintf ('Error!  RCytoscape::sendEdgeAttributes. You must specify the class of the "%s" edge attribute.', attribute.name)
        msg2 = sprintf ('        example: attr (edgeDataDefaults (yourGraph, attr="%s"), "class") = "STRING|DOUBLE|INTEGER"', attribute.name)
@@ -774,13 +795,25 @@ setMethod ('sendEdgeAttributesDirect', 'CytoscapeWindowClass',
 
    function (obj, attribute.name, attribute.type, edge.names, values) {
 
-     write (sprintf ('entering sendEdgeAttributesDirect, with %d names and %d values', length (edge.names), length (values)), stderr ())
+     #write (sprintf ('entering sendEdgeAttributesDirect, with %d names and %d values', length (edge.names), length (values)), stderr ())
 
      if (length (edge.names) == 0)
        return ()
 
      if (length (values) == 2 * length (edge.names))
        values = values [1:length (edge.names)]
+
+        # in sending arguments to CytoscapeRPC, lists of length one become scalars, and so fail to match
+        # java methods that expect lists.  to sidestep that problem, duplicate edge.name and value, 
+        # creating silly but effective lists of length 2
+
+     #if (length (edge.names) == 1) {
+     #  edge.names = rep (edge.names, 2)
+     #  values = rep (values, 2)
+     #  }
+
+     #write (sprintf ('edge.names: %s', list.to.string (edge.names)), stderr ())
+     #write (sprintf ('    values: %s', list.to.string (values)), stderr ())
 
      caller.specified.attribute.class = tolower (attribute.type)
 
@@ -797,18 +830,21 @@ setMethod ('sendEdgeAttributesDirect', 'CytoscapeWindowClass',
 
      if (caller.specified.attribute.class %in% c ('floating', 'numeric', 'double')) {
        result = xml.rpc (obj@uri, 'Cytoscape.addDoubleEdgeAttributes', attribute.name, edge.names, as.numeric (values), .convert=TRUE)
-       write (sprintf ('result of addDoubleEdgeAttributes: %s', result), stderr ())
-       write (result, stderr ())
+       #write (sprintf ('result of addDoubleEdgeAttributes: %s', result), stderr ())
+       #write (result, stderr ())
        }
      else if (caller.specified.attribute.class %in% c ('integer', 'int')) {
        result = xml.rpc (obj@uri, 'Cytoscape.addIntegerEdgeAttributes', attribute.name, edge.names, as.integer (values), .convert=TRUE)
-       write (sprintf ('result of addIntegerEdgeAttributes: %s', result), stderr ())
-       write (result, stderr ())
+       #write (sprintf ('result of addIntegerEdgeAttributes: %s', result), stderr ())
+       #write (result, stderr ())
        }
      else if (caller.specified.attribute.class %in% c ('string', 'char', 'character')) {
-       result = xml.rpc (obj@uri, 'Cytoscape.addStringEdgeAttributes', attribute.name, edge.names, as.character (values), .convert=TRUE)
-       write (sprintf ('result of addStringEdgeAttributes: %s', result), stderr ())
-       write (result, stderr ())
+       if (length (edge.names) == 1)
+         result = xml.rpc (obj@uri, 'Cytoscape.addStringEdgeAttribute', attribute.name, edge.names, as.character (values), .convert=T)
+       else
+         result = xml.rpc (obj@uri, 'Cytoscape.addStringEdgeAttributes', attribute.name, edge.names, as.character (values), .convert=F) #TRUE)
+       #write (sprintf ('result of addStringEdgeAttribute/s: %s', result), stderr ())
+       #write (result, stderr ())
        }
 
      invisible (result)
@@ -848,6 +884,13 @@ setMethod ('hidePanel', 'CytoscapeConnectionClass',
    function (obj, panelName) {
      invisible (xml.rpc (obj@uri, 'Cytoscape.hidePanel', panelName))
      })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('hideAllPanels', 'CytoscapeConnectionClass',
+
+  function (obj, panelName) {
+    invisible (sapply (tolower (LETTERS), function (letter) hidePanel (obj, letter)))
+    })
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('dockPanel', 'CytoscapeConnectionClass',
@@ -1194,6 +1237,47 @@ setMethod ('getEdgeCount', 'CytoscapeWindowClass',
      count = xml.rpc (obj@uri, "Cytoscape.countEdges", id)
      return (count)
      })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getNodeAttribute', 'CytoscapeConnectionClass',
+
+   function (obj, node.name, attribute.name) {
+     return (xml.rpc (obj@uri, "Cytoscape.getNodeAttribute", node.name, attribute.name))
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getEdgeAttribute', 'CytoscapeConnectionClass',
+
+   function (obj, edge.name, attribute.name) {
+     return (xml.rpc (obj@uri, "Cytoscape.getEdgeAttribute", edge.name, attribute.name))
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getNodeAttributeNames', 'CytoscapeConnectionClass',
+
+   function (obj) {
+     return (xml.rpc (obj@uri, "Cytoscape.getNodeAttributeNames"))
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getEdgeAttributeNames', 'CytoscapeConnectionClass',
+
+   function (obj) {
+     return (xml.rpc (obj@uri, "Cytoscape.getEdgeAttributeNames"))
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('deleteNodeAttribute', 'CytoscapeConnectionClass',
+
+   function (obj, attribute.name) {
+     return (xml.rpc (obj@uri, "Cytoscape.deleteNodeAttribute", attribute.name))
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('deleteEdgeAttribute', 'CytoscapeConnectionClass',
+
+   function (obj, attribute.name) {
+     return (xml.rpc (obj@uri, "Cytoscape.deleteEdgeAttribute", attribute.name))
+     })
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('getAllNodes', 'CytoscapeWindowClass',
 
@@ -1596,18 +1680,22 @@ initEdgeAttribute = function (graph, attribute.name, attribute.type, default.val
     }
      # send only attributes for edges which are unique to other.graph; we assume that any existing edges already have their attributes
 
-   new.edge.names = setdiff (names (cy2.edge.names (other.graph)), names (cy2.edge.names (obj@graph)))
-   if (length (new.edge.names) == 0) 
+   new.edge.names.compact = setdiff (names (cy2.edge.names (other.graph)), names (cy2.edge.names (obj@graph)))
+   if (length (new.edge.names.compact) == 0) 
      return
 
-   new.edge.names.with.bar.delimitor = gsub ('~', '|', new.edge.names)
+   new.edge.names.cy2.style = setdiff (as.character (cy2.edge.names (other.graph)), as.character (cy2.edge.names (obj@graph)))
+
+   new.edge.names.with.bar.delimitor = gsub ('~', '|', new.edge.names.compact)
    values = eda (other.graph, attribute.name) [new.edge.names.with.bar.delimitor]
    write (sprintf ('sending edge attributes direct for attr %s', attribute.name), stderr ())
-   write (new.edge.names, stderr ())
+   write (new.edge.names.compact, stderr ())
    write (new.edge.names.with.bar.delimitor, stderr ())
+   write ('---- new.edge.names.cy2.style', stderr ())
+   write (new.edge.names.cy2.style, stderr ())
    write (values, stderr ())
 
-   invisible (sendEdgeAttributesDirect (obj, attribute.name, caller.specified.attribute.class, new.edge.names.with.bar.delimitor, values))
+   invisible (sendEdgeAttributesDirect (obj, attribute.name, caller.specified.attribute.class, new.edge.names.cy2.style, values))
 
 } # .sendEdgeAttributesForGraph 
 #------------------------------------------------------------------------------------------------------------------------

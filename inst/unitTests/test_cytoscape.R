@@ -44,6 +44,9 @@ run.tests = function ()
   test.setDefaultEdgeLineWidth ()
   test.setDefaultEdgeColor ()
 
+  test.addGetAndDeleteNodeAttributes ()
+  test.addGetAndDeleteEdgeAttributes ()
+
   test.setNodeLabelRule ()
   test.setNodeTooltipRule ()
   test.setEdgeTooltipRule ()
@@ -276,6 +279,20 @@ test.sendNodeAttributes = function ()
   redraw (cwb)
   msg (cwb, 'sendNodeAttributes')
 
+    # now call the direct method, which -- in contrast to the unmarked method (sendNodeAttributes) -- does not
+    # extract attributes from the graph; they are instead supplied separately, and thus are well suited to
+    # successive updates, as in a movie
+
+  result = sendNodeAttributesDirect (cwb, 'count', 'int', c ('A', 'B', 'C'), c (38, 105, 0))
+
+    # sending a single attribute to CytoscapeRPC runs into a problem:  xmlrpc maps these to scalars,
+    # rather than as lists of length 1, and no CytoscapeRPC method is matched.
+    # (10 dec 2010) RCytoscape::sendNodeAttributesDirect solves this inelegantly, but duplicating
+    # the node name and attribute values, making lists of length 2
+    # 
+  result = sendNodeAttributesDirect (cwb, 'count', 'int', 'A', 432)
+
+
 } # test.sendNodeAttributes
 #------------------------------------------------------------------------------------------------------------------------
 # depends on prior creation of cwe by test.sendEdges
@@ -296,7 +313,17 @@ test.sendEdgeAttributes = function ()
   checkEquals (length (edge.names), 3)
   edge.values = c ('alligator', 'hedgehog', 'anteater')
   result = sendEdgeAttributesDirect (cwe, 'misc', 'string', edge.names, edge.values)
+
+    # sending a single attribute to CytoscapeRPC runs into a problem:  xmlrpc maps these to scalars,
+    # rather than as lists of length 1, and no CytoscapeRPC method is matched.
+    # (10 dec 2010) RCytoscape::sendEdgeAttributesDirect solves this inelegantly, but duplicating
+    # the edge name and attribute values, making lists of length 2
+
+  result = sendEdgeAttributesDirect (cwe, 'misc', 'string', edge.names [1], edge.values [1])
+
   msg (cwe, 'sendEdgeAttributes')
+
+  
 
 } # test.sendEdgeAttributes
 #------------------------------------------------------------------------------------------------------------------------
@@ -608,7 +635,7 @@ test.setNodeTooltipRule = function ()
 {
   write ('test.setNodeTooltipRule', stderr ())
 
-  cwe = new.CytoscapeWindow ('test.setNodeTooltiprRule', graph=RCytoscape::makeSimpleGraph ())
+  cwe = new.CytoscapeWindow ('test.setNodeTooltipRule', graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
   layout (cwe, 'jgraph-spring')
   redraw (cwe)
@@ -627,7 +654,7 @@ test.setEdgeTooltipRule = function ()
 {
   write ('test.setEdgeTooltipRule', stderr ())
 
-  cwe = new.CytoscapeWindow ('test.setEdgeTooltiprRule', graph=RCytoscape::makeSimpleGraph ())
+  cwe = new.CytoscapeWindow ('test.setEdgeTooltipRule', graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
   layout (cwe, 'jgraph-spring')
   redraw (cwe)
@@ -1276,7 +1303,7 @@ test.copyNodeAttributesFromCyGraph = function ()
   g = new ('graphNEL', edgemode='directed')
   g = graph::addNode (c ('A', 'B', 'C'), g)
   g2 = RCytoscape:::copyNodeAttributesFromCyGraph (cyCon, getWindowID (cyCon, window.title), g)
-  checkEquals (sort (noa.names (g2)), c ("canonicalName", "count", "label", "lfc", "type"))
+  checkEquals (length (intersect (noa.names (g2), c ("canonicalName", "count", "label", "lfc", "type"))), 5)
   checkEquals (as.character (nodeData (g2, c ('A', 'B', 'C'), attr='canonicalName')), c ('A', 'B', 'C'))
   checkEquals (as.integer (nodeData (g2, c ('A', 'B', 'C'), attr='count')), c (2, 30, 100))
   checkEquals (as.numeric (nodeData (g2, c ('A', 'B', 'C'), attr='lfc')), c (-3,  0,  3))
@@ -1342,14 +1369,14 @@ test.getGraphFromCyWindow = function ()
 
   g3 = getGraphFromCyWindow (cyCon, 'test.getGraphFromCyWindow')
   checkEquals (sort (nodes (g3)), c ('A', 'B', 'C'))
-  checkEquals (sort (noa.names (g3)), c ("canonicalName", "count", "label", "lfc", "type"))
+  checkEquals (length (intersect (noa.names (g3), c ("canonicalName", "count", "label", "lfc", "type"))), 5)
   checkEquals (as.character (sort (noa (g3, 'canonicalName'))), c ('A', 'B', 'C'))
   checkEquals (as.integer   (sort (noa (g3, 'count'))),         c (2, 30, 100))
   checkEquals (as.character (sort (noa (g3, 'label'))),         c ('Gene A', 'Gene B', 'Gene C'))
   checkEquals (as.numeric (sort (noa (g3, 'lfc'))),             c (-3,  0,  3))
   checkEquals (as.character (sort (noa (g3, 'type'))),          c ("glycoprotein", "kinase", "transcription factor"))
 
-  checkEquals (sort (eda.names (g3)), c ("canonicalName", "edgeType", "interaction", "misc", "score"))
+  checkEquals (length (intersect (eda.names (g3), c ("canonicalName", "edgeType", "interaction", "misc", "score"))), 5)
 
   checkEquals (sort (names (cy2.edge.names (g3))),        c ('A~B',                   'B~C',                    'C~A'))
   checkEquals (sort (as.character (cy2.edge.names (g3))), c ("A (phosphorylates) B",  "B (synthetic lethal) C", "C (undefined) A"))
@@ -1398,15 +1425,24 @@ test.addGraphToGraph = function ()
   g2 <<- graph::addNode ('E', g2)
 
   g2 <<- initNodeAttribute (g2, "label", "char", "default node label")
+  g2 <<- initNodeAttribute (g2, "type", "char", "unspecified type")
+
+  g2 <<- initNodeAttribute (g2, "SCORE", "numeric", 0.0)
+
   g2 <<- initEdgeAttribute (g2, "edgeType", "char", "unspecified")
   g2 <<- initEdgeAttribute (g2, "probability", "numeric", 0.0)
 
   nodeData (g2, 'D', 'label') <<- 'Gene D'
   nodeData (g2, 'E', 'label') <<- 'Gene E'
+  nodeData (g2, 'D', 'type') <<- 'new and novel'
+  nodeData (g2, 'E', 'type') <<- 'new and credible'
+
+  nodeData (g2, 'D', 'SCORE') <<- 1001.01
+  nodeData (g2, 'E', 'SCORE') <<- 99.09
 
   g2 <<- graph::addEdge ('D', 'E', g2)
   g2 <<- graph::addEdge ('A', 'E', g2)
-  g2 <<- graph::addEdge ('A', 'B', g2)
+  #g2 <<- graph::addEdge ('A', 'B', g2)
 
   edgeData (g2, 'D', 'E', 'probability') <<- 0.95
   edgeData (g2, 'D', 'E', 'edgeType') <<- 'literature'
@@ -1424,10 +1460,10 @@ test.addGraphToGraph = function ()
   checkEquals (sort (edgeNames (cw.copy@graph)), c ("A~B", "A~E", "B~C", "C~A", "D~E"))
 
     # are all the expected node and edge attributes present?
-  checkEquals (sort (noa.names (cw.copy@graph)), c ("canonicalName", "count", "label", "lfc", "type"))
-    # the new node attribute, probability, is not returned.  BUG!
-  #checkEquals (sort (eda.names (cw.copy@graph)), c ("canonicalName", "edgeType", "interaction", "misc", "probability", "score"))
-  checkEquals (sort (eda.names (cw.copy@graph)), c ("canonicalName", "edgeType", "interaction", "misc", "score"))
+  checkEquals (length (intersect (noa.names (cw.copy@graph), c ("canonicalName", "count", "label", "lfc", "SCORE", "type"))), 6)
+
+    # edge attributes
+  checkEquals (length (intersect (eda.names (cw.copy@graph), c ("canonicalName", "edgeType", "interaction", "misc", "probability", "score"))), 6)
 
     # check the node label attributes
   checkEquals (nodeData (cw.copy@graph, attr='label')$A, 'Gene A')
@@ -1435,38 +1471,117 @@ test.addGraphToGraph = function ()
   checkEquals (nodeData (cw.copy@graph, attr='label')$C, 'Gene C')
   checkEquals (nodeData (cw.copy@graph, attr='label')$D, 'Gene D')
   checkEquals (nodeData (cw.copy@graph, attr='label')$E, 'Gene E')
-
-   # check the edgeType attributes
+  
+    # check the edgeType attributes
   checkEquals (edgeData (cw.copy@graph, 'A', 'B', attr='edgeType')[[1]], 'phosphorylates')
   checkEquals (edgeData (cw.copy@graph, 'A', 'E', attr='edgeType')[[1]], 'inferred')
   checkEquals (edgeData (cw.copy@graph, 'B', 'C', attr='edgeType')[[1]], 'synthetic lethal')
   checkEquals (edgeData (cw.copy@graph, 'C', 'A', attr='edgeType')[[1]], 'undefined')
   checkEquals (edgeData (cw.copy@graph, 'D', 'E', attr='edgeType')[[1]], 'literature')
 
+    # check the edge probability attributes
+  checkEquals (as.numeric (edgeData (cw.copy@graph, 'A', 'B', attr='probability')[[1]]), 0.0)
+  checkEquals (as.numeric (edgeData (cw.copy@graph, 'A', 'E', attr='probability')[[1]]), 0.0)
+  checkEquals (as.numeric (edgeData (cw.copy@graph, 'B', 'C', attr='probability')[[1]]), 0.0)
+  checkEquals (as.numeric (edgeData (cw.copy@graph, 'C', 'A', attr='probability')[[1]]), 0.0)
+  checkEquals (as.numeric (edgeData (cw.copy@graph, 'D', 'E', attr='probability')[[1]]), 0.95)
 
-#  addNodes (cw3, g2)  
-#  addEdges (cw3, g2)  
-#
-#  node.attribute.names = noa.names (g2)
-#  for (attribute.name in node.attribute.names) {
-#    printf ('sending noa %s', attribute.name)
-#    RCytoscape:::.sendNodeAttributesForGraph (cw3, g2, attr=attribute.name)
-#    }
-#
-#  node.attribute.names = noa.names (g2)
-#  for (attribute.name in node.attribute.names) {
-#    printf ('sending noa %s', attribute.name)
-#    RCytoscape:::.sendNodeAttributesForGraph (cw3, g2, attr=attribute.name)
-#    }
-#
-#  edge.attribute.names = eda.names (g2)
-#  for (attribute.name in edge.attribute.names) {
-#    #if (attribute.name == 'edgeType')
-#    #  next;   # is this handled automatically?
-#    printf ('sending eda %s', attribute.name)
-#    RCytoscape:::.sendEdgeAttributesForGraph (cw3, g2, attr=attribute.name)
-#    }
-
+  checkEquals (as.integer (edgeData (cw.copy@graph, 'A', 'B', attr='score')[[1]]), 35)
+  checkEquals (as.integer (edgeData (cw.copy@graph, 'A', 'E', attr='score')[[1]]), 0)
+  checkEquals (as.integer (edgeData (cw.copy@graph, 'B', 'C', attr='score')[[1]]), -12)
+  checkEquals (as.integer (edgeData (cw.copy@graph, 'C', 'A', attr='score')[[1]]), 0)
+  checkEquals (as.integer (edgeData (cw.copy@graph, 'D', 'E', attr='score')[[1]]), 0)
 
 } # test.addGraphToGraph
+#------------------------------------------------------------------------------------------------------------------------
+# can we create an edge attribute de novo?
+# can we set its value?  retrieve its value?
+test.getAttributeNames = function ()
+{
+  
+} # test.addEdgeAttribute
+#------------------------------------------------------------------------------------------------------------------------
+test.addGetAndDeleteEdgeAttributes = function ()
+{
+  print ('test.addGetAndDeleteEdgeAttributes')
+
+  cy = CytoscapeConnection ()
+
+     # in this test we add two new edge attributes, 'species' and 'ageInYears'
+     # if they are already defined, from a previous run of this test, start by deleting them.
+
+  novel.eda.to.delete = intersect (c ('ageInYears', 'treeSpecies'), getEdgeAttributeNames(cy))
+  for (eda.name in novel.eda.to.delete)
+    deleteEdgeAttribute (cy,eda.name)
+    
+  g  = makeSimpleGraph ()
+  cw = CytoscapeWindow ('eda test', graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+     # canonicalName and interaction are added by Cytoscape
+  checkEquals (length (intersect (getEdgeAttributeNames (cy), c ("canonicalName", "edgeType", "interaction", "misc", "score"))), 5)
+
+     # now add an attribute to two of the edges 
+  first.two.edges = as.character (cy2.edge.names (g)[1:2])
+  values = c ('hemlock', 'yew')
+  sendEdgeAttributesDirect (cw, 'treeSpecies', 'char', first.two.edges, values)
+
+    # now add an attribute to a single edge.  this exercises a different branch in RCytoscape:sendEdgeAttributesDirect
+  first.edge = as.character (cy2.edge.names (g)[1])
+  value = 'one century'
+  sendEdgeAttributesDirect (cw, 'ageInYears', 'char', first.edge, value)
+  checkTrue ('ageInYears' %in% getEdgeAttributeNames (cw))
+
+     # get names from cy2.edge.names (cw@graph)
+  checkEquals (getEdgeAttribute (cw, "B (synthetic lethal) C", 'treeSpecies'), "yew")
+  checkEquals (getEdgeAttribute (cw, "B (synthetic lethal) C", 'score'), -12)
+
+
+  deleteEdgeAttribute (cy, 'species')
+  deleteEdgeAttribute (cy, 'ageInYears')
+
+} #  test.addGetAndDeleteEdgeAttributes 
+#------------------------------------------------------------------------------------------------------------------------
+test.addGetAndDeleteNodeAttributes = function ()
+{
+  print ('test.addGetAndDeleteNodeAttributes')
+
+  cy = CytoscapeConnection ()
+
+     # in this test we add two new node attributes, 'species' and 'ageInYears'
+     # if they are already defined, from a previous run of this test, start by deleting them.
+
+  novel.noa.to.delete = intersect (c ('ageInYears', 'treeSpecies'), getNodeAttributeNames(cy))
+  for (noa.name in novel.noa.to.delete)
+    deleteNodeAttribute (cy, noa.name)
+    
+  g  = makeSimpleGraph ()
+  cw = CytoscapeWindow ('noa test', graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+     # canonicalName is added by Cytoscape
+  checkEquals (length (intersect (getNodeAttributeNames (cy), c ("canonicalName", "count", "hiddenLabel", "label", "lfc", "type"))), 6)
+
+     # now add an attribute to two of the nodes 
+  first.two.nodes = nodes (g) [1:2]
+  values = c ('cedar', 'ash')
+  sendNodeAttributesDirect (cw, 'treeSpecies', 'char', first.two.nodes, values)
+
+    # now add an attribute to a single node.  this exercises a different branch in RCytoscape:sendNodeAttributesDirect
+  first.node = nodes (g) [1]
+  value = 'one millenium'
+  sendNodeAttributesDirect (cw, 'ageInYears', 'char', first.node, value)
+  checkTrue ('ageInYears' %in% getNodeAttributeNames (cw))
+  checkEquals (getNodeAttribute (cw, 'B', 'type'), 'transcription factor')
+  checkEquals (getNodeAttribute (cw, 'A', 'ageInYears'), 'one millenium')
+  checkEquals (getNodeAttribute (cw, 'B', 'ageInYears'), '')
+
+  deleteNodeAttribute (cy, 'species')
+  deleteNodeAttribute (cy, 'ageInYears')
+
+} #  test.addGetAndDeleteNodeAttributes 
 #------------------------------------------------------------------------------------------------------------------------

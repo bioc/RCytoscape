@@ -710,6 +710,13 @@ setMethod ('sendEdges', 'CytoscapeWindowClass',
       edge.type = rep ('unspecified', length (tokens))
     directed = rep (TRUE, length (tokens))
     forgive.if.node.is.missing = TRUE
+  
+    #if (length (a) == 1) {
+    #  write ('doubling single edge...', stderr ())
+    #  a = rep (a, 2)
+    #  b = rep (b, 2)
+    #  }
+    
     xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
     }) # sendEdges
 
@@ -917,10 +924,10 @@ setMethod ('sendEdgeAttributesDirect', 'CytoscapeWindowClass',
         # java methods that expect lists.  to sidestep that problem, duplicate edge.name and value, 
         # creating silly but effective lists of length 2
 
-     #if (length (edge.names) == 1) {
-     #  edge.names = rep (edge.names, 2)
-     #  values = rep (values, 2)
-     #  }
+     if (length (edge.names) == 1) {
+       edge.names = rep (edge.names, 2)
+       values = rep (values, 2)
+       }
 
      #write (sprintf ('edge.names: %s', list.to.string (edge.names)), stderr ())
      #write (sprintf ('    values: %s', list.to.string (values)), stderr ())
@@ -971,9 +978,9 @@ setMethod ('displayGraph', 'CytoscapeWindowClass',
        return ()
        }
 
-     write ('adding nodes...', stderr ())
+     write (sprintf ('adding %d nodes...', length (nodes (obj@graph))),  stderr ())
      sendNodes (obj)
-     write ('adding edges...', stderr ())
+     write (sprintf ('adding %d edges...', length (edgeNames (obj@graph))), stderr ())
      sendEdges (obj)
      #chad.debug (obj, "just before adding node attributes")
      write ('adding node attributes...', stderr ())

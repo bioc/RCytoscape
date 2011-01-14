@@ -26,6 +26,7 @@ Nothing.
 \seealso{
   floatPanel
   dockPanel
+  hideAllPanels
 }
 
 

@@ -24,6 +24,10 @@ None.
 }
 \author{Paul Shannon}
 
+\seealso{
+  getPosition
+}
+
 \examples{
   cw <- new.CytoscapeWindow ('setPosition.test', graph=makeSimpleGraph())
   displayGraph (cw)

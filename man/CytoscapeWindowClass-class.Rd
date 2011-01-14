@@ -32,7 +32,7 @@
 
 \examples{
      # create a CytoscapeWindowClass object by calling the constructor
-  c2 <- CytoscapeWindow ('demo', makeSimpleGraph ())  
+  c2 <- CytoscapeWindow ('cwc demo', makeSimpleGraph ())  
 
 }
 \keyword{graphs}

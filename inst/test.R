@@ -51,4 +51,21 @@ set.nodeShape = function (cw)
 
 }
 #------------------------------------------------------------------------------------------------------------------------
+# temporary (25 dec 2010)
+parse.pos = function (position.strings)
+{
+  tokens = strsplit (position.strings, ":")
+  result = list ()
+  for (token in tokens) {
+     name = token [1]
+     xy.tokens = strsplit (token [2], ",")
+     x = as.integer (xy.tokens[[1]][1])
+     y = as.integer (xy.tokens[[1]][2])
+     printf ('%s:  %d, %d', name, x, y)
+     result [[name]] = list (x=x, y=y)
+    } # for token
 
+  return (result)
+  
+} # parse.pos
+#------------------------------------------------------------------------------------------------------------------------

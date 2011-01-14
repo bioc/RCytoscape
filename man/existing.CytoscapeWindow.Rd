@@ -39,9 +39,9 @@ existing.CytoscapeWindow (title, host='localhost', rpcPort=9000, copy.graph.from
 
 \examples{
   cy <- CytoscapeConnection ()
-  cw <- new.CytoscapeWindow ('demo', graph=makeSimpleGraph ())
+  cw <- new.CytoscapeWindow ('demo.existing', graph=makeSimpleGraph ())
   displayGraph (cw)
-  cw2 <- existing.CytoscapeWindow ('demo',  copy.graph.from.cytoscape.to.R=TRUE)
+  cw2 <- existing.CytoscapeWindow ('demo.existing',  copy.graph.from.cytoscape.to.R=TRUE)
 
 }
 

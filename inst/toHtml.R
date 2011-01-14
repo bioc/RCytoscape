@@ -8,7 +8,8 @@ run = function (levels, trace=FALSE)
   if (0 %in% levels) {
     if (trace) print ('')
     else {
-      man.directory <<- '~/s/src/R/bioc/RCytoscape/man'
+      #man.directory <<- '~/s/src/R/bioc/RCytoscape/man'
+      man.directory <<- '~/s/src/R/bioc/rcy-devel/RCytoscape/man'
       setwd (man.directory)
       rd.files <<-list.files ('.', pattern='Rd')
       } # else
@@ -18,7 +19,7 @@ run = function (levels, trace=FALSE)
     if (trace) print ('')
     else {
       for (file in rd.files) {
-        target.dir <<- '~/s/src/R/bioc/RCytoscape/inst/html'
+        target.dir <<- '~/s/src/R/bioc/rcy-devel/RCytoscape/inst/html'
         input <<- paste (man.directory, file, sep='/')
         basename = strsplit (file, '\\.Rd')[[1]][1]
         output <<- paste (target.dir, "/",  basename, '.html', sep='')
@@ -145,7 +146,7 @@ run = function (levels, trace=FALSE)
 
 } # run
 #------------------------------------------------------------------------------------------------------------------------
-run (0)
-run (1)
+#run (0)
+#run (1)
 
 

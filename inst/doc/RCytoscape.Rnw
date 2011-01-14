@@ -243,7 +243,7 @@ Let us now try some simple back-and-forth between Cytoscape and R.  In Cytoscape
 Now we wish to extend the selected nodes to include the first neighbors of the already-selected node 'B'.  This is a common operation: for instance, after selecting one or more nodes based on experimental data or annotation, you may want to explore these in the context of interaction partners (in a protein-protein network) or in relation to upstream and downstream partners in a signaling or metabolic network.  Type:
 
 <<g9>>=
-  sfn (cw)
+  cy.sfn (cw)
 @ 
 
 You will see that all three nodes are now selected.  Get their identifers back to R:

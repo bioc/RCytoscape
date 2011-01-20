@@ -198,6 +198,15 @@ setValidity ("CytoscapeWindowClass",
 #------------------------------------------------------------------------------------------------------------------------
 CytoscapeConnection = function (host='localhost', rpcPort=9000)
 {
+  
+  # this code is for the Bioconductor build system. You should never need to set or
+  # read these environment variables in ordinary use.
+  if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
+    host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
+    rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
+    }
+  
+  
   uri = sprintf ('http://%s:%s', host, rpcPort)
   cc = new ('CytoscapeConnectionClass', uri=uri)
   return (cc)

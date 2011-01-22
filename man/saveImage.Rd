@@ -33,7 +33,7 @@ None.
   displayGraph (cw)
   layout (cw, 'jgraph-spring')
   redraw (cw)
-  filename = paste (getwd (), 'saveImageTest.jpg', sep='/')
+  filename = tempfile () # paste (getwd (), 'saveImageTest.jpg', sep='/')
   saveImage (cw, filename, 'jpeg', 2.0)
 }
 

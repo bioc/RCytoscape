@@ -71,6 +71,8 @@ exportMethods (
    removeSelectedNodes,
    getSelectedNodes,
    getSelectedNodeCount,
+   selectEdge,
+   selectEdges,
    getSelectedEdges,
    getSelectedEdgeCount,
    hideSelectedEdges, 

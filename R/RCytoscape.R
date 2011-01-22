@@ -155,7 +155,8 @@ setGeneric ('hideSelectedNodes',        signature='obj', function (obj) standard
 setGeneric ('invertNodeSelection',      signature='obj', function (obj) standardGeneric ('invertNodeSelection'))
 setGeneric ('removeSelectedNodes',      signature='obj', function (obj, remove.from.root.graph.also=TRUE) standardGeneric ('removeSelectedNodes'))
 
-#setGeneric ('selectEdges',             signature='obj', function (obj, edge.names) standardGeneric ('selectEdges'))
+setGeneric ('selectEdge',               signature='obj', function (obj, edge.name) standardGeneric ('selectEdge'))
+setGeneric ('selectEdges',              signature='obj', function (obj, edge.names) standardGeneric ('selectEdges'))
 setGeneric ('invertEdgeSelection',      signature='obj', function (obj) standardGeneric ('invertEdgeSelection'))
 setGeneric ('removeSelectedEdges',      signature='obj', function (obj, remove.from.root.graph.also=TRUE) standardGeneric ('removeSelectedEdges'))
 
@@ -1585,7 +1586,9 @@ setMethod ('invertNodeSelection', 'CytoscapeWindowClass',
 
    function (obj) {
      id = as.character (obj@window.id)
-     invisible (xml.rpc (obj@uri, 'Cytoscape.invertNodeSelection', id, .convert=TRUE))
+     result = xml.rpc (obj@uri, 'Cytoscape.invertNodeSelection', id, .convert=TRUE)
+     redraw (obj)
+     invisible (result)
      }) # invertNodeSelection
  
 #------------------------------------------------------------------------------------------------------------------------
@@ -1597,11 +1600,33 @@ setMethod ('removeSelectedNodes', 'CytoscapeWindowClass',
      }) # removeSelectedNodes
    
 #------------------------------------------------------------------------------------------------------------------------
+setMethod ('selectEdge', 'CytoscapeWindowClass',
+
+   function (obj, edge.name) {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, 'Cytoscape.selectEdge', id, edge.name, .convert=TRUE)
+     redraw (obj)
+     invisible (result)
+     }) # selectEdge
+ 
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('selectEdges', 'CytoscapeWindowClass',
+
+   function (obj, edge.names) {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, 'Cytoscape.selectEdges', id, edge.names, .convert=TRUE)
+     redraw (obj)
+     invisible (result)
+     }) # selectEdges
+ 
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('invertEdgeSelection', 'CytoscapeWindowClass',
 
    function (obj) {
      id = as.character (obj@window.id)
-     invisible (xml.rpc (obj@uri, 'Cytoscape.invertEdgeSelection', id, .convert=TRUE))
+     result = xml.rpc (obj@uri, 'Cytoscape.invertEdgeSelection', id, .convert=TRUE)
+     redraw (obj)
+     invisible (result)
      }) # invertEdgeSelection
  
 #------------------------------------------------------------------------------------------------------------------------
@@ -1646,7 +1671,9 @@ setMethod ('unhideAll', 'CytoscapeWindowClass',
 
    function (obj) {
      id = as.character (obj@window.id)
-     invisible (xml.rpc (obj@uri, 'Cytoscape.unhideAll', id, .convert=TRUE))
+     result = xml.rpc (obj@uri, 'Cytoscape.unhideAll', id, .convert=TRUE)
+     redraw (obj)
+     invisible (result)
      }) # unhideAll
    
 #------------------------------------------------------------------------------------------------------------------------

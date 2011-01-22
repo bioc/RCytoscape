@@ -1219,8 +1219,9 @@ test.selectEdges = function ()
   clearSelection (cwe)
   checkEquals (getSelectedEdgeCount (cwe), 0)
     # not yet possible to select edges through CytoscapeRPCCallHandler
-    # selectEdges (cwe, "A (phosphorylates) B")
-    # checkEquals (getSelectedEdgeCount (cwe), 1)
+  selectEdge (cwe, "A (phosphorylates) B")
+  checkEquals (getSelectedEdgeCount (cwe), 1)
+  system ('sleep 1')
   clearSelection (cwe)
   checkEquals (getSelectedEdgeCount (cwe), 0)
 

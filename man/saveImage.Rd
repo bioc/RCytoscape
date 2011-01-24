@@ -34,7 +34,7 @@ None.
   layout (cw, 'jgraph-spring')
   redraw (cw)
   filename = tempfile () # paste (getwd (), 'saveImageTest.jpg', sep='/')
-  saveImage (cw, filename, 'jpeg', 2.0)
+  # saveImage (cw, filename, 'jpeg', 2.0)   # doesn't work reliably at bioc
 }
 
 

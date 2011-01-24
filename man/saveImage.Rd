@@ -4,7 +4,9 @@
 \title{saveImage}
 \description{
 Write an image of the specified type to the specified file, at the
-specified scaling factor.  
+specified scaling factor.  Note:  the file is written to the file system
+of the computer upon which Cytoscape is running, not R -- in those cases
+where they are different.
 }
 \usage{
 saveImage(obj, file.name, image.type, scale)
@@ -34,7 +36,7 @@ None.
   layout (cw, 'jgraph-spring')
   redraw (cw)
   filename = tempfile () # paste (getwd (), 'saveImageTest.jpg', sep='/')
-  # saveImage (cw, filename, 'jpeg', 2.0)   # doesn't work reliably at bioc
+  # saveImage (cw, filename, 'jpeg', 2.0)   # doesn't yet work reliably at bioc
 }
 
 

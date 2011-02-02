@@ -35,6 +35,8 @@ setGeneric ('getArrowShapes',           signature='obj', function (obj) standard
 setGeneric ('getLayoutNames',           signature='obj', function (obj) standardGeneric ('getLayoutNames'))
 setGeneric ('getLineStyles',            signature='obj', function (obj) standardGeneric ('getLineStyles'))
 setGeneric ('getNodeShapes',            signature='obj', function (obj) standardGeneric ('getNodeShapes'))
+setGeneric ('getDirectlyModifiableVisualProperties', 
+                                        signature='obj', function (obj) standardGeneric ('getDirectlyModifiableVisualProperties'))
 setGeneric ('getAttributeClassNames',   signature='obj', function (obj) standardGeneric ('getAttributeClassNames'))
 setGeneric ('setGraph',                 signature='obj', function (obj, graph) standardGeneric ('setGraph'))
 setGeneric ('getGraph',                 signature='obj', function (obj) standardGeneric ('getGraph'))
@@ -55,6 +57,8 @@ setGeneric ('layout',                   signature='obj', function (obj, layout.n
 setGeneric ('setPosition',              signature='obj', function (obj, node.names, x.coords, y.coords) standardGeneric ('setPosition'))
 setGeneric ('getPosition',              signature='obj', function (obj, node.names) standardGeneric ('getPosition'))
 setGeneric ('redraw',                   signature='obj', function (obj) standardGeneric ('redraw'))
+setGeneric ('raiseWindow',              signature='obj', function (obj) standardGeneric ('raiseWindow'))
+setGeneric ('resizeWindow',             signature='obj', function (obj, width, height) standardGeneric ('resizeWindow'))
 setGeneric ('hidePanel',                signature='obj', function (obj, panelName) standardGeneric ('hidePanel'))
 setGeneric ('hideAllPanels',            signature='obj', function (obj) standardGeneric ('hideAllPanels'))
 setGeneric ('dockPanel',                signature='obj', function (obj, panelName) standardGeneric ('dockPanel'))
@@ -118,6 +122,12 @@ setGeneric ('setNodeShapeRule',         signature='obj',
 setGeneric ('setNodeSizeRule',          signature='obj', 
     function (obj, node.attribute.name, control.points, node.sizes, mode='interpolate', default.size=40) standardGeneric ('setNodeSizeRule'))
 
+setGeneric ('setNodeSize',              signature='obj', function (obj, node.name, new.size) standardGeneric ('setNodeSize'))
+setGeneric ('setNodeWidth',             signature='obj', function (obj, node.name, new.width) standardGeneric ('setNodeWidth'))
+setGeneric ('setNodeHeight',            signature='obj', function (obj, node.name, new.height) standardGeneric ('setNodeHeight'))
+setGeneric ('setNodeShape',             signature='obj', function (obj, node.name, new.shape) standardGeneric ('setNodeShape'))
+setGeneric ('setNodeOpacity',           signature='obj', function (obj, node.name, new.value) standardGeneric ('setNodeOpacity'))
+
 setGeneric ('setEdgeLineStyleRule',     signature='obj', 
     function (obj, edge.attribute.name, attribute.values, line.styles, default.style='SOLID') standardGeneric ('setEdgeLineStyleRule'))
 
@@ -135,7 +145,7 @@ setGeneric ('setEdgeSourceArrowColorRule',   signature='obj',
     function (obj, edge.attribute.name, attribute.values, colors, default.color='#000000') standardGeneric ('setEdgeSourceArrowColorRule'))
 
 setGeneric ('setEdgeColorRule',         signature='obj',
-    function (obj, attribute.name, attribute.values, colors, default.color='#000000') standardGeneric ('setEdgeColorRule'))
+    function (obj, edge.attribute.name, control.points, colors, mode='interpolate', default.color='#FFFFFF') standardGeneric ('setEdgeColorRule'))
 
 setGeneric ('getNodeCount',             signature='obj', function (obj) standardGeneric ('getNodeCount'))
 setGeneric ('getEdgeCount',             signature='obj', function (obj) standardGeneric ('getEdgeCount'))
@@ -182,9 +192,10 @@ setGeneric ('getGraphFromCyWindow',          signature='obj', function (obj, win
 #-----------------------------------------------------------
 # methods related to visual styles
 #-----------------------------------------------------------
-setGeneric ('getVisualStyleNames', signature='obj', function (obj) standardGeneric ('getVisualStyleNames'))
-setGeneric ('copyVisualStyle',     signature='obj', function (obj, from.style, to.style) standardGeneric ('copyVisualStyle'))
-setGeneric ('setVisualStyle',      signature='obj', function (obj, new.style.name) standardGeneric ('setVisualStyle'))
+setGeneric ('getVisualStyleNames',    signature='obj', function (obj) standardGeneric ('getVisualStyleNames'))
+setGeneric ('copyVisualStyle',        signature='obj', function (obj, from.style, to.style) standardGeneric ('copyVisualStyle'))
+setGeneric ('setVisualStyle',         signature='obj', function (obj, new.style.name) standardGeneric ('setVisualStyle'))
+setGeneric ('lockNodeDimensions',     signature='obj', function (obj, visual.style.name, new.state) standardGeneric ('lockNodeDimensions'))
 #------------------------------------------------------------------------------------------------------------------------
 setValidity ("CytoscapeWindowClass",
 
@@ -411,6 +422,13 @@ setMethod ('getNodeShapes', 'CytoscapeConnectionClass',
 
   function (obj) {
      return (xml.rpc (obj@uri, 'Cytoscape.getNodeShapeNames'))
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getDirectlyModifiableVisualProperties', 'CytoscapeConnectionClass',
+
+  function (obj) {
+     return (xml.rpc (obj@uri, 'Cytoscape.getVisualStyleModifiables'))
      })
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -667,10 +685,10 @@ setMethod ('addEdges', signature (obj='CytoscapeWindowClass'),
      #   new.edges = 
      #   } # if
 
-    printf ('---- about to xml.rpc call Cytoscape.createEdges')
-    print (a)
-    print (b)
-    print (edge.type)
+    write ('---- about to xml.rpc call Cytoscape.createEdges', stderr ())
+    write (a, stderr ())
+    write (b, stderr ())
+    write (edge.type, stderr ())
     xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
     }) # addEdges
 
@@ -721,11 +739,11 @@ setMethod ('sendEdges', 'CytoscapeWindowClass',
     directed = rep (TRUE, length (tokens))
     forgive.if.node.is.missing = TRUE
   
-    #if (length (a) == 1) {
-    #  write ('doubling single edge...', stderr ())
-    #  a = rep (a, 2)
-    #  b = rep (b, 2)
-    #  }
+    if (length (edge.type) > length (a)) { # sign of pathological graph, probably has edges going both ways between two nodes
+      write (sprintf ('RCytoscape::sendEdges error, probably a pathological graph, with edges going both ways between pair or pairs of nodes.'), stderr ())
+      write (sprintf ('length of a: %d   length of b: %d   length of edge.type: %d', length (a), length (b), length (edge.type)), stderr ())
+      stop ()
+      } # pathological graph
     
     xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
     }) # sendEdges
@@ -1005,6 +1023,22 @@ setMethod ('redraw', 'CytoscapeWindowClass',
    function (obj) {
      id = as.character (obj@window.id)
      invisible (xml.rpc (obj@uri, 'Cytoscape.redraw', id))
+     }) # redraw
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('resizeWindow', 'CytoscapeWindowClass',
+
+   function (obj, width, height) {
+     id = as.character (obj@window.id)
+     invisible (xml.rpc (obj@uri, 'Cytoscape.resizeNetworkView', id, as.integer (width), as.integer (height)))
+     }) # redraw
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('raiseWindow', 'CytoscapeWindowClass',
+
+   function (obj) {
+     id = as.character (obj@window.id)
+     invisible (xml.rpc (obj@uri, 'Cytoscape.raiseNetworkView', id))
      }) # redraw
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -1340,21 +1374,83 @@ setMethod ('setNodeSizeRule', 'CytoscapeWindowClass',
 
 
 #------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setEdgeColorRule', 'CytoscapeWindowClass',
+#
+# function (obj, attribute.name, attribute.values, colors, default.color='#000000') {
+#     if (length (attribute.values) == 1) {  # hack: list of length 1 treated as scalar, failing method match -- double into a list
+#       attribute.values = rep (attribute.values, 2)
+#       colors = rep (colors, 2)
+#       }
+#     setDefaultEdgeColor (obj, default.color)
+#     id = as.character (obj@window.id)
+#     default.color = '#000000'
+#     result = xml.rpc (obj@uri, "Cytoscape.setEdgeColorRule", id, attribute.name, default.color, attribute.values, colors, .convert=TRUE)
+#     invisible (result)
+#     }) # setEdgeColorRule
+#
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('setEdgeColorRule', 'CytoscapeWindowClass',
 
- function (obj, attribute.name, attribute.values, colors, default.color='#000000') {
-     if (length (attribute.values) == 1) {  # hack: list of length 1 treated as scalar, failing method match -- double into a list
-       attribute.values = rep (attribute.values, 2)
-       colors = rep (colors, 2)
+   function (obj, edge.attribute.name, control.points, colors, mode='interpolate', default.color='#FFFFFF') {
+
+     if (!mode %in% c ('interpolate', 'lookup')) {
+       write ("Error! RCytoscape:setEdgeColorRule.  mode must be 'interpolate' (the default) or 'lookup'.", stderr ())
+       return ()
        }
+
      setDefaultEdgeColor (obj, default.color)
-     id = as.character (obj@window.id)
-     default.color = '#000000'
-     result = xml.rpc (obj@uri, "Cytoscape.setEdgeColorRule", id, attribute.name, default.color, attribute.values, colors, .convert=TRUE)
-     invisible (result)
+     if (mode=='interpolate') {  # need a 'below' color and an 'above' color.  so there should be two more colors than control.points 
+       if (length (control.points) == length (colors)) { # called did not supply 'below' and 'above' values; manufacture them
+         colors = c (colors [1], colors, colors [length (colors)])
+         #write ("RCytoscape::setEdgeColorRule, no 'below' or 'above' colors specified.  Inferred from supplied colors.", stderr ());
+         } # 
+
+       good.args = length (control.points) == (length (colors) - 2)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (colors)), stderr ())
+         write ("Error! RCytoscape:setEdgeColorRule, interpolate mode.", stderr ())
+         write ("Expecting 1 color for each control.point, one for 'above' color, one for 'below' color.", stderr ())
+         return ()
+         }
+       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousEdgeVisualStyle', edge.attribute.name, 'Edge Color', control.points, colors)
+       invisible (result)
+       } # if mode==interpolate
+
+     else { # use a discrete rule, with no interpolation
+       good.args = length (control.points) == length (colors)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (colors)), stderr ())
+         write ("Error! RCytoscape:setEdgeColorRule.  Expecting exactly as many colors as control.points in lookup mode.", stderr ())
+         return ()
+         }
+
+       default.style = 'default'
+       if (length (control.points) == 1) {   # code around the requirement that one-element lists are turned into scalars
+         control.points = rep (control.points, 2)
+         colors = rep (colors, 2)
+         } 
+       result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', as.character (obj@window.id), default.style, 
+                         edge.attribute.name, 'Edge Color', default.color, control.points, colors)
+       invisible (result)
+       } # else: !interpolate
      }) # setEdgeColorRule
 
 #------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
 setMethod ('setEdgeLineStyleRule', 'CytoscapeWindowClass',
 
    function (obj, edge.attribute.name, attribute.values, line.styles, default.style='SOLID') {
@@ -1450,6 +1546,48 @@ setMethod ('setEdgeSourceArrowColorRule', 'CytoscapeWindowClass',
      invisible (result)
      }) # setTargetArrowRule
 
+#------------------------------------------------------------------------------------------------------------------------
+# only works if node dimensions are locked (that is, tied together).  see lockNodeDimensions (T/F)
+setMethod ('setNodeSize', 'CytoscapeWindowClass',
+   function (obj, node.name, new.size) {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Size', as.character (new.size))
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+# only works if node dimensions are not locked (that is, tied together).  see lockNodeDimensions (T/F)
+setMethod ('setNodeWidth', 'CytoscapeWindowClass',
+   function (obj, node.name, new.width) {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Width', as.character (new.width))
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+# only works if node dimensions are not locked (that is, tied together).  see lockNodeDimensions (T/F)
+setMethod ('setNodeHeight', 'CytoscapeWindowClass',
+   function (obj, node.name, new.height) {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Height', as.character (new.height))
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeShape', 'CytoscapeWindowClass',
+   function (obj, node.name, new.shape) {
+     id = as.character (obj@window.id)
+     if (! new.shape %in% getNodeShapes (obj)) {
+       write (sprintf ('error in RCytoscape::setNodeShape.  new shape ("%s") is not recognized.  see getNodeShapes (cy)', new.shape), stderr ())
+       return ()
+       } 
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Shape', as.character (new.shape))
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeOpacity', 'CytoscapeWindowClass',
+   function (obj, node.name, new.value) {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Opacity', as.character (new.value))
+     invisible (result)
+     })
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('getNodeCount', 'CytoscapeWindowClass',
    function (obj) {
@@ -2038,6 +2176,18 @@ setMethod ('setVisualStyle', 'CytoscapeConnectionClass',
       stop (sprintf ('Cannot call setVisualStyle on a non-existent visual style (%s)', new.style.name))
     xml.rpc (obj@uri, 'Cytoscape.setVisualStyle', new.style.name)
     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('lockNodeDimensions', 'CytoscapeConnectionClass',
+
+   function (obj, visual.style.name, new.state) {
+     id = as.character (obj@window.id)
+     if (! visual.style.name %in% getVisualStyleNames (obj)) {
+       write (sprintf ('Error in RCytoscape::lockNodeDimensions.  No visual style named "%s"', visual.style.name), stderr ())
+       return ()
+       }
+     invisible (xml.rpc (obj@uri, 'Cytoscape.setNodeSizeLocked', visual.style.name, new.state))
+     }) # lockNodeDimensions
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('getDefaultBackgroundColor',  'CytoscapeConnectionClass',
 

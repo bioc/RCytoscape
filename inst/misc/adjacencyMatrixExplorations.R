@@ -9,19 +9,33 @@ run = function (levels, trace=FALSE)
     else {
       adj.matrix <<- create.random.adjacency.matrix (dimension=3, node.names = LETTERS [1:3])
       g3 <<- new ("graphAM", adjMat = adj.matrix, edgemode="undirected")
-
       } # else
     } # 0
 
   if (1 %in% levels) {
-    if (trace) print ('')
+    if (trace) print ('following the example in ?graphBAM, try graphBAM and RCy')
     else {
+      source.nodes  <- c("a", "a", "b", "c", "d")
+      target.nodes  <- c("b", "c", "c", "d", "a")
+      weights <- c(2.3, 2.3, 4.3, 1.0, 3.0)
+      df <- data.frame(from=source.nodes, to=target.nodes, weight=weights)
+      g.bam <<- graphBAM (df)
+      g.bam <<- initEdgeAttribute (g.bam, 'weight', 'numeric', 0.0)
       } # else
     } # 1
 
   if (2 %in% levels) {
-    if (trace) print ('')
+    if (trace) print ('create the cy window')
     else {
+      if (!exists ('cy'))
+        cy <<- CytoscapeConnection ()
+      window.title <<- 'graphBAM'
+      if (window.title %in% as.character (getWindowList (cy)))
+         destroyWindow (cy, window.title)
+      cw <<- new.CytoscapeWindow (window.title, g=g.bam)
+      displayGraph (cw)
+      layout (cw)
+      redraw (cw)
       } # else
     } # 2
 
@@ -190,7 +204,7 @@ test.extract.weights = function ()
 {
   print ('test.extract.weights')
   x <<- test.create.random.AM.undirected.graph (3)
-  y <<- extract.weights (
+  y <<- extract.weights ()
 
 } # test.extract.weights
 #------------------------------------------------------------------------------------------------------------------------

@@ -1298,11 +1298,20 @@ test.setEdgeColorRule = function ()
 
   edgeType.values = c ('phosphorylates', 'synthetic lethal', 'undefined')
   colors = c ('#FF0000', '#FFFF00', '#00FF00')
-  setEdgeColorRule (cwe, 'edgeType',  edgeType.values, colors)
+  setEdgeColorRule (cwe, 'edgeType',  edgeType.values, colors, mode='lookup')
   system ('sleep 1')
 
   all.white  = c ('#FFFFFF', '#FFFFFF', '#FFFFFF')
-  setEdgeColorRule (cwe, 'edgeType',  edgeType.values [2], '#000000')
+  setEdgeColorRule (cwe, 'edgeType',  edgeType.values [2], mode='lookup', '#000000')
+
+    # now create a continuous ('interpolate') mode rule, using the score edge attribute
+  score.values = c (-15, 0, 40);
+  colors = c ('#00FF00', '#FFFFFF', '#FF0000')
+  setEdgeColorRule (cwe, 'score',  score.values, colors, mode='interpolate')
+
+    # now swap the colors
+  colors = c ('#FF0000', '#000000', '#00FF00')
+  setEdgeColorRule (cwe, 'score',  score.values, colors, mode='interpolate')
 
   msg (cwe, 'test.setEdgeColorRule')
 
@@ -2206,4 +2215,122 @@ test.defaultColors = function ()
   setDefaultNodeSelectionColor (cy, green)
 
 } # test.defaultColors
+#------------------------------------------------------------------------------------------------------------------------
+test.resizeWindowRaiseWindow = function ()
+{
+  title = 'test.resizeWindowRaiseWindow'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  raiseWindow (cw)
+
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+  for (i in 1:10) {
+    resizeWindow (cw, 10, 10)
+    resizeWindow (cw, 300, 400)
+    } # for i
+  
+} # test.resizeWindowRaiseWindow
+#------------------------------------------------------------------------------------------------------------------------
+test.setNodeSize = function ()
+{ 
+  title = 'test.setNodeSize'
+  window.prep (title)
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+  
+  lockNodeDimensions (cw, 'default', TRUE)
+
+  small = 30
+  large = 300
+  for (i in 1:10) {
+    setNodeSize (cw, 'A', small); 
+    redraw (cw)
+    setNodeSize (cw, 'A', large); 
+    redraw (cw)
+    } # for i
+
+  invisible (cw)
+
+} # test.setNodeSize
+#------------------------------------------------------------------------------------------------------------------------
+test.setNodeWidthAndHeight = function ()
+{ 
+  title = 'test.setNodeWidthAndHeight'
+  window.prep (title)
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+
+  lockNodeDimensions (cw, 'default', FALSE)
+  
+  small = 30
+  large = 300
+
+  for (i in 1:10) {
+    setNodeWidth (cw, 'A', small); 
+    setNodeHeight (cw, 'A', large); 
+    redraw (cw)
+    setNodeWidth (cw, 'A', large); 
+    setNodeHeight (cw, 'A', small); 
+    redraw (cw)
+    } # for i
+
+  invisible (cw)
+
+} # test.setNodeWidthAndHeight
+#------------------------------------------------------------------------------------------------------------------------
+test.setNodeShape = function ()
+{ 
+  title = 'test.setNodeShape'
+  window.prep (title)
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+
+  lockNodeDimensions (cw, 'default', TRUE)
+  setNodeSize (cw, 'A', 100)
+
+  for (new.shape in getNodeShapes (cw)) {
+    setNodeShape (cw, 'A', new.shape)
+    redraw (cw)
+    } # for new.shape
+
+  invisible (cw)
+
+} # test.setNodeShape
+#------------------------------------------------------------------------------------------------------------------------
+test.graphBAM = function ()
+{ 
+  title = 'test.graphBAM'
+  window.prep (title)
+
+    # example is taken from Nishant's man page
+  source.nodes  <- c ("a", "a", "b", "c", "d")
+  target.nodes  <- c ("b", "c", "c", "d", "a")
+  weights <- c(2.3, 2.3, 4.3, 1.0, 3.0)
+  df <- data.frame (from=source.nodes, to=target.nodes, weight=weights)
+  g.bam <- graphBAM (df)
+  g.bam <- initEdgeAttribute (g.bam, 'weight', 'numeric', 0.0)
+
+  cw = new.CytoscapeWindow (title, graph=g.bam)
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+
+    # paint the edges shades of red as function of weight
+  setDefaultEdgeLineWidth (cw, 5)
+  setEdgeColorRule (cw, 'weight',  c (0, 5), c ('#FFFFFF', '#FF0000'),  mode='interpolate')
+
+  invisible (cw)
+
+} # test.graphBAM
+#------------------------------------------------------------------------------------------------------------------------
+#test.
 #------------------------------------------------------------------------------------------------------------------------

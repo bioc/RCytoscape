@@ -9,6 +9,7 @@ exportMethods (
    getLayoutNames,
    getLineStyles,
    getNodeShapes,
+   getDirectlyModifiableVisualProperties,
    getAttributeClassNames,
    getWindowCount,
    getWindowID,
@@ -18,6 +19,8 @@ exportMethods (
    getPosition,
    ping,
    redraw,
+   raiseWindow,
+   resizeWindow,
    sendNodes,
    sendEdges,
    sendNodeAttributes,
@@ -55,6 +58,13 @@ exportMethods (
    setEdgeTargetArrowColorRule,
    setEdgeSourceArrowColorRule,
    setEdgeColorRule,
+
+   setNodeSize,
+   setNodeWidth,
+   setNodeHeight,
+   setNodeShape,
+   setNodeOpacity,
+               
    getNodeCount,
    getEdgeCount,
    getNodeAttribute,
@@ -91,6 +101,7 @@ exportMethods (
    getVisualStyleNames,
    copyVisualStyle,
    setVisualStyle,
+   lockNodeDimensions, 
 
    getDefaultBackgroundColor,
    setDefaultBackgroundColor,

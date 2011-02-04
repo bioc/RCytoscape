@@ -1,7 +1,7 @@
 Package: RCytoscape
 Type: Package
 Title: Display and manipulate graphs in Cytoscape
-Version: 1.1.31
+Version: 1.1.32
 Date: 2011-02-02
 Author: Paul Shannon
 Maintainer: Paul Shannon <pshannon@systemsbiology.org>
@@ -10,6 +10,6 @@ Depends: R (>= 2.12.1), graph (>= 1.28.0), XMLRPC (>= 0.2.4)
 Imports: methods, XMLRPC
 Suggests: RUnit
 Description:  Interactvive viewing and exploration of graphs, connecting R to Cytoscape.
-License: GPL
+License: GPL-2
 URL: http://db.systemsbiology.net:8080/cytoscape/RCytoscape/
 LazyLoad: yes

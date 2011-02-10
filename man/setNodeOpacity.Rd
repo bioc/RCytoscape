@@ -11,7 +11,7 @@ setNodeOpacity(obj, node.name, new.value)
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
   \item{node.name}{a \code{String} object.}
-  \item{new.value}{a \code{numeric} object, ranging from 0 to 1.0.}
+  \item{new.value}{a \code{numeric} object, ranging from 0 to 255.}
 }
 
 \value{
@@ -25,7 +25,7 @@ None.
   displayGraph (cw)
   redraw (cw)
   layout (cw, 'jgraph-spring')
-  setNodeOpacity (cw, 'A', 0.9)
+  setNodeOpacity (cw, 'A', 220)
   redraw (cw)
 }
 

@@ -68,6 +68,7 @@ exportMethods (
    getNodeCount,
    getEdgeCount,
    getNodeAttribute,
+   getAllNodeAttributes,
    getEdgeAttribute,
    getNodeAttributeNames,
    getEdgeAttributeNames,

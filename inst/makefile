@@ -28,7 +28,7 @@ check:
 #
 
 checkfull:
-	(cd ../..; R CMD check RCytoscape)
+	(cd ../..; R --vanilla CMD check RCytoscape)
 
 
 # --- codoc

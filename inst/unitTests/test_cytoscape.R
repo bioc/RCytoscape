@@ -81,6 +81,10 @@ run.tests = function ()
   test.copyNodeAttributesFromCyGraph ()
   test.copyEdgeAttributesFromCyGraph ()
   test.getGraphFromCyWindow ()
+  test.existing.CytoscapeWindow ()
+  test.existing.CytoscapeWindow.noEdges ()
+  test.existing.CytoscapeWindow.emptyGraph ()
+
   test.sendDegenerateGraphs ()
     #test.sendGraphWithSingleEdge ()
   test.sendBigGraph ()
@@ -2033,6 +2037,67 @@ test.addGraphToGraph = function ()
 
 } # test.addGraphToGraph
 #------------------------------------------------------------------------------------------------------------------------
+test.existing.CytoscapeWindow = function ()
+{
+  title = 'test.existing.CytoscapeWindow'
+  window.prep (title)
+
+    #----------------------------------------------------------
+    # first, try our standard 3-node, 3-edge testing graph
+    #----------------------------------------------------------
+
+  cw <<- new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+
+  cw2 <<- existing.CytoscapeWindow (title, copy=TRUE)
+  g2 <<- cw2@graph
+  checkEquals (sort (nodes (g2)), c ('A', 'B', 'C'))
+  checkEquals (sort (edgeNames (g2)), c ("A~B", "B~C", "C~A"))
+
+} # test.existingCytoscapeWindow
+#------------------------------------------------------------------------------------------------------------------------
+test.existing.CytoscapeWindow.noEdges = function ()
+{
+  window.title = 'test.existing.CytoscapeWindow.noEdges'
+  window.prep (window.title)
+ 
+  g.edgeless = new ('graphNEL', edgemode='directed')
+  g.edgeless = addNode ('X', g.edgeless)
+  g.edgeless = addNode ('Y', g.edgeless)
+  g.edgeless = addNode ('Z', g.edgeless)
+  cw.edgeless = new.CytoscapeWindow (window.title, graph=g.edgeless)
+  displayGraph (cw.edgeless)
+  redraw (cw.edgeless)
+  layout (cw.edgeless)
+
+  cw3 = existing.CytoscapeWindow (window.title, copy=TRUE)
+  g3 = cw3@graph
+  checkEquals (sort (nodes (g3)), c ('X', 'Y', 'Z'))
+  checkEquals (length (edgeNames (g3)), 0)
+  
+  invisible (cw3)
+
+} # test.existingCytoscapeWindow.noEdges 
+#------------------------------------------------------------------------------------------------------------------------
+test.existing.CytoscapeWindow.emptyGraph = function ()
+{
+  window.title = 'test.existing.CytoscapeWindow.emptyGraph'
+  window.prep (window.title)
+  cw.empty = new.CytoscapeWindow (window.title)
+  checkEquals (length (nodes (cw.empty@graph)), 0)
+  displayGraph (cw.empty)
+  redraw (cw.empty)
+  layout (cw.empty)
+
+  cw3 <<- existing.CytoscapeWindow (window.title, copy=TRUE)
+  g3 <<- cw3@graph
+  checkEquals (length (nodes (g3)), 0)
+  checkEquals (length (edges(g3)), 0)
+
+} # test.existingCytoscapeWindow.emptyGraph
+#------------------------------------------------------------------------------------------------------------------------
 # can we create an edge attribute de novo?
 # can we set its value?  retrieve its value?
 test.getAttributeNames = function ()
@@ -2128,6 +2193,24 @@ test.addGetAndDeleteNodeAttributes = function ()
   invisible (cw)
 
 } #  test.addGetAndDeleteNodeAttributes 
+#------------------------------------------------------------------------------------------------------------------------
+test.getAllNodeAttributes = function ()
+{
+  title = 'test.addGetAllNodeAttributes'
+  window.prep (title)
+  
+  cw =  new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+
+  cwc = existing.CytoscapeWindow (title, copy=T)
+  tbl.noa <<- getAllNodeAttributes (cwc)
+  checkEquals (dim (tbl.noa), c (3, 5))
+  checkEquals (sort (colnames (tbl.noa)), c ("canonicalName", "count", "label", "lfc", "type"))
+  checkEquals (sort (rownames (tbl.noa)), c ("A", "B", "C"))
+
+} # test.getAllNodeAttributes
 #------------------------------------------------------------------------------------------------------------------------
 test.getVisualStyleNames = function ()
 {

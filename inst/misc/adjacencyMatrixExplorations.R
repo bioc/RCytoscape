@@ -42,6 +42,7 @@ run = function (levels, trace=FALSE)
   if (3 %in% levels) {
     if (trace) print ('')
     else {
+      setEdgeColorRule (cw, 'weight',  c (0, 5), c ('#FFFFFF', '#FF0000'),  mode='interpolate')
       } # else
     } # 3
 

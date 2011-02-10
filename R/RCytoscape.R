@@ -150,6 +150,7 @@ setGeneric ('setEdgeColorRule',         signature='obj',
 setGeneric ('getNodeCount',             signature='obj', function (obj) standardGeneric ('getNodeCount'))
 setGeneric ('getEdgeCount',             signature='obj', function (obj) standardGeneric ('getEdgeCount'))
 setGeneric ('getNodeAttribute',         signature='obj', function (obj, node.name, attribute.name) standardGeneric ('getNodeAttribute'))
+setGeneric ('getAllNodeAttributes',     signature='obj', function (obj, onlySelectedNodes=FALSE) standardGeneric ('getAllNodeAttributes'))
 setGeneric ('getEdgeAttribute',         signature='obj', function (obj, edge.name, attribute.name) standardGeneric ('getEdgeAttribute'))
 setGeneric ('getNodeAttributeNames',    signature='obj', function (obj) standardGeneric ('getNodeAttributeNames'))
 setGeneric ('getEdgeAttributeNames',    signature='obj', function (obj) standardGeneric ('getEdgeAttributeNames'))
@@ -598,6 +599,10 @@ setMethod ('getGraphFromCyWindow', 'CytoscapeConnectionClass',
     window.id = getWindowID (obj, window.title)
     stopifnot (!is.na (window.id))
   
+    node.count = xml.rpc (obj@uri, "Cytoscape.countNodes", window.id)
+    if (node.count == 0)
+      return (new ('graphNEL', edgemode='directed'))
+      
     all.node.names = xml.rpc (obj@uri, "Cytoscape.getNodes", window.id)
     write (sprintf ('received %d nodes from %s', length (all.node.names), window.title), stderr ())
     g = new ("graphNEL", edgemode='directed')
@@ -607,21 +612,23 @@ setMethod ('getGraphFromCyWindow', 'CytoscapeConnectionClass',
     node.attribute.names = getNodeAttributeNames (obj)
     #node.attribute.names = xml.rpc (obj@uri, 'Cytoscape.getNodeAttributeNames', .convert=T)
     g = initEdgeAttribute (g, 'edgeType', 'char', 'assoc')
-  
 
-    regex = ' *[\\(|\\)] *'
-    all.edge.names = xml.rpc (obj@uri, "Cytoscape.getEdges", window.id)
-    write (sprintf ('received %d edges from %s', length (all.edge.names), window.title), stderr ())
-    edges.tokens = strsplit (all.edge.names, regex)
+    edge.count = xml.rpc (obj@uri, "Cytoscape.countEdges", window.id)
   
-    source.nodes = unlist (lapply (edges.tokens, function (tokens) tokens [1]))
-    target.nodes = unlist (lapply (edges.tokens, function (tokens) tokens [3]))
-    edge.types =   unlist (lapply (edges.tokens, function (tokens) tokens [2]))
-    write (sprintf ('adding %d edges to local graph', length (edges.tokens)), stderr ())
-    g = addEdge (source.nodes, target.nodes, g)
-    edgeData (g, source.nodes, target.nodes, 'edgeType') = edge.types
-    g = copyNodeAttributesFromCyGraph (obj, window.id, g)
-    g = copyEdgeAttributesFromCyGraph (obj, window.id, g)
+    if (edge.count > 0) {
+      regex = ' *[\\(|\\)] *'
+      all.edge.names = xml.rpc (obj@uri, "Cytoscape.getEdges", window.id)
+      write (sprintf ('received %d edges from %s', length (all.edge.names), window.title), stderr ())
+      edges.tokens = strsplit (all.edge.names, regex)
+      source.nodes = unlist (lapply (edges.tokens, function (tokens) tokens [1]))
+      target.nodes = unlist (lapply (edges.tokens, function (tokens) tokens [3]))
+      edge.types =   unlist (lapply (edges.tokens, function (tokens) tokens [2]))
+      write (sprintf ('adding %d edges to local graph', length (edges.tokens)), stderr ())
+      g = addEdge (source.nodes, target.nodes, g)
+      edgeData (g, source.nodes, target.nodes, 'edgeType') = edge.types
+      g = copyNodeAttributesFromCyGraph (obj, window.id, g)
+      g = copyEdgeAttributesFromCyGraph (obj, window.id, g)
+      } # if edgeCount > 0
   
     return (g)
     })
@@ -1610,6 +1617,43 @@ setMethod ('getNodeAttribute', 'CytoscapeConnectionClass',
      })
 
 #------------------------------------------------------------------------------------------------------------------------
+setMethod ('getAllNodeAttributes', 'CytoscapeWindowClass',
+
+  function (obj, onlySelectedNodes=FALSE) {
+    g = obj@graph
+    attribute.names = names (nodeDataDefaults (g))
+    nodes.of.interest = nodes (g)
+    if (onlySelectedNodes) {
+      if (getSelectedNodeCount (obj) == 0)
+        return (NA)
+      nodes.of.interest = getSelectedNodes (obj)
+      }
+  
+    result = cbind (unlist (nodeData (g, nodes.of.interest, attr=attribute.names [1])))
+    for (name in attribute.names [2:length (attribute.names)]) {
+      new.column = unlist (nodeData (g, nodes.of.interest, attr=name))
+      result = cbind (result, new.column)
+      }
+  
+    colnames (result) = attribute.names
+    result = as.data.frame (result)
+  
+    for (name in attribute.names) {
+      attribute.class = attr (nodeDataDefaults (obj@graph, name), 'class')
+      if (attribute.class == 'FLOATING')
+        result [, name] = as.numeric (result [, name])
+      else if (attribute.class == 'STRING')
+        result [, name] = as.character (result [, name])
+      else if (attribute.class == 'INTEGER')
+        result [, name] = as.integer (result [, name])
+      } # for name
+  
+    return (result)
+
+    }) # getAllNodeAttributes
+
+#------------------------------------------------------------------------------------------------------------------------
+
 setMethod ('getEdgeAttribute', 'CytoscapeConnectionClass',
 
    function (obj, edge.name, attribute.name) {

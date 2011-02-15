@@ -59,17 +59,22 @@ exportMethods (
    setEdgeSourceArrowColorRule,
    setEdgeColorRule,
 
-   setNodeSize,
-   setNodeWidth,
-   setNodeHeight,
-   setNodeShape,
-   setNodeOpacity,
+   setNodeSizeDirect,
+   setNodeWidthDirect,
+   setNodeHeightDirect,
+   setNodeShapeDirect,
+   setNodeColorDirect,
+   setNodeOpacityDirect,
+   setNodeFillOpacityDirect,
+   setNodeBorderOpacityDirect,
+   setNodeLabelOpacityDirect,
                
    getNodeCount,
    getEdgeCount,
    getNodeAttribute,
    getAllNodeAttributes,
    getEdgeAttribute,
+   getAllEdgeAttributes,
    getNodeAttributeNames,
    getEdgeAttributeNames,
    deleteNodeAttribute,
@@ -92,6 +97,8 @@ exportMethods (
    cy.sfn,
    getGraph,
    setGraph,
+   hideNodes,
+   unhideNodes,
    hideSelectedNodes,
    unhideAll,
    version,
@@ -131,7 +138,6 @@ export(
    makeRandomGraph,
    initNodeAttribute,
    initEdgeAttribute
-
    )
 
 importClassesFrom(graph, graph)

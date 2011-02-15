@@ -1,6 +1,5 @@
 \name{cy2.edge.names}
 \alias{cy2.edge.names}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 cy2.edge.names
 }

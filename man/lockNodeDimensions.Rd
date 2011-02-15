@@ -21,9 +21,9 @@ None.
 \author{Paul Shannon}
 
 \seealso{
-  setNodeSize
-  setNodeWidth
-  setNodeHeight
+  setNodeSizeDirect
+  setNodeWidthDirect
+  setNodeHeightDirect
 }
 
 \examples{
@@ -32,8 +32,8 @@ None.
   layout (cw)
   redraw (cw)
   lockNodeDimensions (cw, 'default', FALSE)
-  setNodeWidth (cw, 'A', 100)
-  setNodeHeight (cw, 'A', 50)
+  setNodeWidthDirect (cw, 'A', 100)
+  setNodeHeightDirect (cw, 'A', 50)
 
 }
 

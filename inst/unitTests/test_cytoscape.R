@@ -26,6 +26,10 @@ run.tests = function ()
   test.getArrowShapes ()
   test.getLineStyles ()
   test.getLayoutNames ()
+
+  
+  test.hexColorToInt ()
+
   test.sendNodes ()
   test.sendEdges ()
   test.sendNodeAttributes ()
@@ -52,6 +56,13 @@ run.tests = function ()
   test.setNodeBorderWidthRule ()
   test.setNodeSizeRule ()
   test.setNodeShapeRule ()
+
+  test.setNodeOpacityDirect ()
+  test.setNodeSizeDirect ()
+  test.setNodeWidthAndHeightDirect ()
+  test.setNodeShapeDirect ()
+  test.setVizAttributesDirect ()
+
   test.countNodes ()
   test.countEdges ()
   test.countNodesAndEdgesInEmptyGraph ()
@@ -92,6 +103,8 @@ run.tests = function ()
   test.getAttributeNames ()
   test.addGetAndDeleteEdgeAttributes ()
   test.addGetAndDeleteNodeAttributes ()
+  test.getAllNodeAttributes ()
+  test.getAllEdgeAttributes ()
   test.getVisualStyleNames ()
   test.copyVisualStyle ()
   test.setVisualStyle ()
@@ -1006,6 +1019,54 @@ test.setNodeShapeRule = function ()
   invisible (cwe)
 
 } # test.setNodeShapeRule
+#------------------------------------------------------------------------------------------------------------------------
+test.setVizAttributesDirect = function ()
+{
+  title = 'test.setVizAttributesDirect'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  setNodeColorDirect (cw, 'A', '#AA0088')
+  system ('sleep 1')
+  setNodeColorDirect (cw, 'A', '#AA4488')
+  system ('sleep 1')
+  setNodeColorDirect (cw, 'A', '#AA8888')
+  system ('sleep 1')
+
+  setNodeColorDirect (cw, c ('A', 'B'), '#448844')
+
+  invisible (cw)
+
+} # test.setVizAttributesDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setNodeOpacityDirect = function ()
+{
+  title = 'test.setNodeOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  g = addNode ('D', g)
+  nodeData (g, 'D', 'label') = 'blink'
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  setNodeFillOpacityDirect (cw, 'A', 0); redraw (cw);
+  setNodeLabelOpacityDirect (cw, 'B', 0); redraw (cw);
+  setNodeBorderOpacityDirect (cw, 'C', 0); redraw (cw);
+  for (i in 1:5) {
+    setNodeOpacityDirect (cw, 'D', 0); redraw (cw);
+    system ('sleep 1')
+    setNodeOpacityDirect (cw, 'D', 255); redraw (cw);
+    system ('sleep 1')
+    } # for i
+
+} # test.setNodeOpacityDirect
 #------------------------------------------------------------------------------------------------------------------------
 test.countNodes = function ()
 {
@@ -2199,16 +2260,36 @@ test.getAllNodeAttributes = function ()
   title = 'test.addGetAllNodeAttributes'
   window.prep (title)
   
-  cw =  new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
   layout (cw)
 
   cwc = existing.CytoscapeWindow (title, copy=T)
   tbl.noa <<- getAllNodeAttributes (cwc)
-  checkEquals (dim (tbl.noa), c (3, 5))
-  checkEquals (sort (colnames (tbl.noa)), c ("canonicalName", "count", "label", "lfc", "type"))
+  checkEquals (nrow (tbl.noa), 3)
+  checkTrue (ncol (tbl.noa) >= 5)
+  expected.colnames =  c ("canonicalName", "count", "label", "lfc", "type")  # created here
+  checkEquals (length (intersect (colnames (tbl.noa), expected.colnames)), 5)
   checkEquals (sort (rownames (tbl.noa)), c ("A", "B", "C"))
+
+} # test.getAllNodeAttributes
+#------------------------------------------------------------------------------------------------------------------------
+test.getAllEdgeAttributes = function ()
+{
+  title = 'test.getAllEdgeAttributes'
+  window.prep (title)
+  
+  cw =  new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+  tbl.eda <<- getAllEdgeAttributes (cw)
+  checkEquals (class (tbl.eda), 'data.frame')
+  checkEquals (dim (tbl.eda), c (3, 5))
+  checkEquals (sort (rownames (tbl.eda)), c ("A|B", "B|C", "C|A"))
+  checkEquals (sort (colnames (tbl.eda)), c ("edgeType", "misc", "score", "source", "target"))
+  checkEquals (class (tbl.eda$score), 'numeric')
 
 } # test.getAllNodeAttributes
 #------------------------------------------------------------------------------------------------------------------------
@@ -2317,9 +2398,9 @@ test.resizeWindowRaiseWindow = function ()
   
 } # test.resizeWindowRaiseWindow
 #------------------------------------------------------------------------------------------------------------------------
-test.setNodeSize = function ()
+test.setNodeSizeDirect = function ()
 { 
-  title = 'test.setNodeSize'
+  title = 'test.setNodeSizeDirect'
   window.prep (title)
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
@@ -2331,19 +2412,19 @@ test.setNodeSize = function ()
   small = 30
   large = 300
   for (i in 1:10) {
-    setNodeSize (cw, 'A', small); 
+    setNodeSizeDirect (cw, 'A', small); 
     redraw (cw)
-    setNodeSize (cw, 'A', large); 
+    setNodeSizeDirect (cw, 'A', large); 
     redraw (cw)
     } # for i
 
   invisible (cw)
 
-} # test.setNodeSize
+} # test.setNodeSizeDirect
 #------------------------------------------------------------------------------------------------------------------------
-test.setNodeWidthAndHeight = function ()
+test.setNodeWidthAndHeightDirect = function ()
 { 
-  title = 'test.setNodeWidthAndHeight'
+  title = 'test.setNodeWidthAndHeightDirect'
   window.prep (title)
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
@@ -2356,21 +2437,21 @@ test.setNodeWidthAndHeight = function ()
   large = 300
 
   for (i in 1:10) {
-    setNodeWidth (cw, 'A', small); 
-    setNodeHeight (cw, 'A', large); 
+    setNodeWidthDirect (cw, 'A', small); 
+    setNodeHeightDirect (cw, 'A', large); 
     redraw (cw)
-    setNodeWidth (cw, 'A', large); 
-    setNodeHeight (cw, 'A', small); 
+    setNodeWidthDirect (cw, 'A', large); 
+    setNodeHeightDirect (cw, 'A', small); 
     redraw (cw)
     } # for i
 
   invisible (cw)
 
-} # test.setNodeWidthAndHeight
+} # test.setNodeWidthAndHeightDirect
 #------------------------------------------------------------------------------------------------------------------------
-test.setNodeShape = function ()
+test.setNodeShapeDirect = function ()
 { 
-  title = 'test.setNodeShape'
+  title = 'test.setNodeShapeDirect'
   window.prep (title)
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
@@ -2378,16 +2459,16 @@ test.setNodeShape = function ()
   layout (cw)
 
   lockNodeDimensions (cw, 'default', TRUE)
-  setNodeSize (cw, 'A', 100)
+  setNodeSizeDirect (cw, 'A', 100)
 
   for (new.shape in getNodeShapes (cw)) {
-    setNodeShape (cw, 'A', new.shape)
+    setNodeShapeDirect (cw, 'A', new.shape)
     redraw (cw)
     } # for new.shape
 
   invisible (cw)
 
-} # test.setNodeShape
+} # test.setNodeShapeDirect
 #------------------------------------------------------------------------------------------------------------------------
 test.graphBAM = function ()
 { 
@@ -2415,5 +2496,23 @@ test.graphBAM = function ()
 
 } # test.graphBAM
 #------------------------------------------------------------------------------------------------------------------------
-#test.
+test.hexColorToInt = function ()
+{
+  print ('test.hexColorToInt')
+  x = RCytoscape:::hexColorToInt ('#80FF00')
+  checkEquals (x$red, 128)
+  checkEquals (x$green, 255)
+  checkEquals (x$blue, 0)
+
+  y = RCytoscape:::hexColorToInt ('FFFFFF')
+  checkEquals (y$red, 255)
+  checkEquals (y$green, 255)
+  checkEquals (y$blue, 255)
+
+  z = RCytoscape:::hexColorToInt ('#44A713')
+  checkEquals (z$red, 68)
+  checkEquals (z$green, 167)
+  checkEquals (z$blue, 19)
+
+} # test.hexColorToInt
 #------------------------------------------------------------------------------------------------------------------------

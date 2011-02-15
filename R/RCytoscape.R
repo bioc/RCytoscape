@@ -122,11 +122,16 @@ setGeneric ('setNodeShapeRule',         signature='obj',
 setGeneric ('setNodeSizeRule',          signature='obj', 
     function (obj, node.attribute.name, control.points, node.sizes, mode='interpolate', default.size=40) standardGeneric ('setNodeSizeRule'))
 
-setGeneric ('setNodeSize',              signature='obj', function (obj, node.name, new.size) standardGeneric ('setNodeSize'))
-setGeneric ('setNodeWidth',             signature='obj', function (obj, node.name, new.width) standardGeneric ('setNodeWidth'))
-setGeneric ('setNodeHeight',            signature='obj', function (obj, node.name, new.height) standardGeneric ('setNodeHeight'))
-setGeneric ('setNodeShape',             signature='obj', function (obj, node.name, new.shape) standardGeneric ('setNodeShape'))
-setGeneric ('setNodeOpacity',           signature='obj', function (obj, node.name, new.value) standardGeneric ('setNodeOpacity'))
+setGeneric ('setNodeSizeDirect',          signature='obj', function (obj, node.name, new.size) standardGeneric ('setNodeSizeDirect'))
+setGeneric ('setNodeWidthDirect',         signature='obj', function (obj, node.name, new.width) standardGeneric ('setNodeWidthDirect'))
+setGeneric ('setNodeHeightDirect',        signature='obj', function (obj, node.name, new.height) standardGeneric ('setNodeHeightDirect'))
+setGeneric ('setNodeShapeDirect',         signature='obj', function (obj, node.name, new.shape) standardGeneric ('setNodeShapeDirect'))
+setGeneric ('setNodeColorDirect',         signature='obj', function (obj, node.names, new.color) standardGeneric ('setNodeColorDirect'))
+
+setGeneric ('setNodeOpacityDirect',       signature='obj', function (obj, node.name, new.value) standardGeneric ('setNodeOpacityDirect'))
+setGeneric ('setNodeFillOpacityDirect',   signature='obj', function (obj, node.name, new.value) standardGeneric ('setNodeFillOpacityDirect'))
+setGeneric ('setNodeLabelOpacityDirect',  signature='obj', function (obj, node.name, new.value) standardGeneric ('setNodeLabelOpacityDirect'))
+setGeneric ('setNodeBorderOpacityDirect', signature='obj', function (obj, node.name, new.value) standardGeneric ('setNodeBorderOpacityDirect'))
 
 setGeneric ('setEdgeLineStyleRule',     signature='obj', 
     function (obj, edge.attribute.name, attribute.values, line.styles, default.style='SOLID') standardGeneric ('setEdgeLineStyleRule'))
@@ -152,6 +157,7 @@ setGeneric ('getEdgeCount',             signature='obj', function (obj) standard
 setGeneric ('getNodeAttribute',         signature='obj', function (obj, node.name, attribute.name) standardGeneric ('getNodeAttribute'))
 setGeneric ('getAllNodeAttributes',     signature='obj', function (obj, onlySelectedNodes=FALSE) standardGeneric ('getAllNodeAttributes'))
 setGeneric ('getEdgeAttribute',         signature='obj', function (obj, edge.name, attribute.name) standardGeneric ('getEdgeAttribute'))
+setGeneric ('getAllEdgeAttributes',     signature='obj', function (obj, onlySelectedEdges=FALSE) standardGeneric ('getAllEdgeAttributes'))
 setGeneric ('getNodeAttributeNames',    signature='obj', function (obj) standardGeneric ('getNodeAttributeNames'))
 setGeneric ('getEdgeAttributeNames',    signature='obj', function (obj) standardGeneric ('getEdgeAttributeNames'))
 setGeneric ('deleteNodeAttribute',      signature='obj', function (obj, attribute.name) standardGeneric ('deleteNodeAttribute'))
@@ -162,6 +168,8 @@ setGeneric ('selectNodes',              signature='obj', function (obj, node.nam
 setGeneric ('getSelectedNodes',         signature='obj', function (obj) standardGeneric ('getSelectedNodes'))
 setGeneric ('clearSelection',           signature='obj', function (obj) standardGeneric ('clearSelection'))
 setGeneric ('getSelectedNodeCount',     signature='obj', function (obj) standardGeneric ('getSelectedNodeCount'))
+setGeneric ('hideNodes',                signature='obj', function (obj, node.names) standardGeneric ('hideNodes'))
+setGeneric ('unhideNodes',              signature='obj', function (obj, node.names) standardGeneric ('unhideNodes'))
 setGeneric ('hideSelectedNodes',        signature='obj', function (obj) standardGeneric ('hideSelectedNodes'))
 setGeneric ('invertNodeSelection',      signature='obj', function (obj) standardGeneric ('invertNodeSelection'))
 setGeneric ('removeSelectedNodes',      signature='obj', function (obj, remove.from.root.graph.also=TRUE) standardGeneric ('removeSelectedNodes'))
@@ -1555,7 +1563,7 @@ setMethod ('setEdgeSourceArrowColorRule', 'CytoscapeWindowClass',
 
 #------------------------------------------------------------------------------------------------------------------------
 # only works if node dimensions are locked (that is, tied together).  see lockNodeDimensions (T/F)
-setMethod ('setNodeSize', 'CytoscapeWindowClass',
+setMethod ('setNodeSizeDirect', 'CytoscapeWindowClass',
    function (obj, node.name, new.size) {
      id = as.character (obj@window.id)
      result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Size', as.character (new.size))
@@ -1563,7 +1571,7 @@ setMethod ('setNodeSize', 'CytoscapeWindowClass',
      })
 #------------------------------------------------------------------------------------------------------------------------
 # only works if node dimensions are not locked (that is, tied together).  see lockNodeDimensions (T/F)
-setMethod ('setNodeWidth', 'CytoscapeWindowClass',
+setMethod ('setNodeWidthDirect', 'CytoscapeWindowClass',
    function (obj, node.name, new.width) {
      id = as.character (obj@window.id)
      result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Width', as.character (new.width))
@@ -1571,14 +1579,14 @@ setMethod ('setNodeWidth', 'CytoscapeWindowClass',
      })
 #------------------------------------------------------------------------------------------------------------------------
 # only works if node dimensions are not locked (that is, tied together).  see lockNodeDimensions (T/F)
-setMethod ('setNodeHeight', 'CytoscapeWindowClass',
+setMethod ('setNodeHeightDirect', 'CytoscapeWindowClass',
    function (obj, node.name, new.height) {
      id = as.character (obj@window.id)
      result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Height', as.character (new.height))
      invisible (result)
      })
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('setNodeShape', 'CytoscapeWindowClass',
+setMethod ('setNodeShapeDirect', 'CytoscapeWindowClass',
    function (obj, node.name, new.shape) {
      id = as.character (obj@window.id)
      if (! new.shape %in% getNodeShapes (obj)) {
@@ -1589,10 +1597,48 @@ setMethod ('setNodeShape', 'CytoscapeWindowClass',
      invisible (result)
      })
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('setNodeOpacity', 'CytoscapeWindowClass',
+setMethod ('setNodeOpacityDirect', 'CytoscapeWindowClass',
+   function (obj, node.name, new.value) {
+     id = as.character (obj@window.id)
+     result = setNodeFillOpacityDirect (obj, node.name, new.value)
+     result = setNodeLabelOpacityDirect (obj, node.name, new.value)
+     result = setNodeBorderOpacityDirect (obj, node.name, new.value)
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeFillOpacityDirect', 'CytoscapeWindowClass',
    function (obj, node.name, new.value) {
      id = as.character (obj@window.id)
      result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Opacity', as.character (new.value))
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeBorderOpacityDirect', 'CytoscapeWindowClass',
+   function (obj, node.name, new.value) {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Border Opacity', as.character (new.value))
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeLabelOpacityDirect', 'CytoscapeWindowClass',
+   function (obj, node.name, new.value) {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Label Opacity', as.character (new.value))
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeColorDirect', 'CytoscapeWindowClass',
+   function (obj, node.names, new.color) {
+     id = as.character (obj@window.id)
+     if (length (node.names) == 1)
+       node.names = rep (node.names, 2)
+     converted.color = hexColorToInt (new.color)
+     if (length (converted.color) == 1 && is.na (converted.color)) {
+       write (sprintf ('illegal color string "%s" in RCytoscape::setNodeColorDirect'), stderr ())
+       return ()
+       }
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeFillColor", id, node.names,
+                       converted.color$red, converted.color$green, converted.color$blue)
      invisible (result)
      })
 #------------------------------------------------------------------------------------------------------------------------
@@ -1653,12 +1699,65 @@ setMethod ('getAllNodeAttributes', 'CytoscapeWindowClass',
     }) # getAllNodeAttributes
 
 #------------------------------------------------------------------------------------------------------------------------
-
 setMethod ('getEdgeAttribute', 'CytoscapeConnectionClass',
 
    function (obj, edge.name, attribute.name) {
      return (xml.rpc (obj@uri, "Cytoscape.getEdgeAttribute", edge.name, attribute.name))
      })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('getAllEdgeAttributes', 'CytoscapeWindowClass',
+
+  function (obj, onlySelectedEdges=FALSE) {
+
+    g = obj@graph
+    attribute.names = names (edgeDataDefaults (g))
+    edges.of.interest = edgeNames (g)
+    if (onlySelectedEdges) {
+      if (getSelectedEdgeCount (obj) == 0)
+        return (NA)
+      edges.of.interest = getSelectedEdges (obj)
+      } # if onlySelectedEdges
+
+    source.and.target.nodes = unlist (strsplit (edges.of.interest, '~'))
+    node.count = length (source.and.target.nodes)
+    source = source.and.target.nodes [seq (1, node.count, 2)]
+    target = source.and.target.nodes [seq (2, node.count, 2)]
+
+    #printf ('source nodes: %s', list.to.string (source))
+    #printf ('target nodes: %s', list.to.string (target))
+    #printf ('attribute names: %s', list.to.string (attribute.names))
+
+    result = cbind (unlist (edgeData (g, source, target, attr=attribute.names [1])))
+    result = cbind (result, source)
+    result = cbind (result, target)
+
+    for (name in attribute.names [2:length (attribute.names)]) {
+      new.column = unlist (edgeData (g, source, target, attr=name))
+      result = cbind (result, new.column)
+      }
+    
+    #print (result)
+    #x <<- result
+    colnames (result) = c (attribute.names [1], 'source', 'target', attribute.names [2:length(attribute.names)])
+    result = as.data.frame (result)
+    
+       # we had a matrix of character strings, now a data.frame of character strings
+       # use the embedded type information (created by initEdgeAttribute) to correct to the proper types
+       # must be a more direct way to do this in the calls to cbind on a data.frame.
+    
+    for (name in attribute.names) {
+      attribute.class = attr (edgeDataDefaults (obj@graph, name), 'class')
+      if (attribute.class == 'FLOATING')
+        result [, name] = as.numeric (result [, name])
+      else if (attribute.class == 'STRING')
+        result [, name] = as.character (result [, name])
+      else if (attribute.class == 'INTEGER')
+        result [, name] = as.integer (result [, name])
+      } # for name
+    
+    return (result)
+    })
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('getNodeAttributeNames', 'CytoscapeConnectionClass',
@@ -1762,6 +1861,24 @@ setMethod ('hideSelectedNodes', 'CytoscapeWindowClass',
      id = as.character (obj@window.id)
      invisible (xml.rpc (obj@uri, 'Cytoscape.hideSelectedNodes', id, .convert=TRUE))
      }) # hideSelectedNodes
+   
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('hideNodes', 'CytoscapeWindowClass',
+
+   function (obj, node.names) {
+     id = as.character (obj@window.id)
+     for (node in node.names)
+       invisible (xml.rpc (obj@uri, 'Cytoscape.hideNode', id, node, .convert=TRUE))
+     }) # hideNodes
+   
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('unhideNodes', 'CytoscapeWindowClass',
+
+   function (obj, node.names) {
+     id = as.character (obj@window.id)
+     for (node in node.names)
+       invisible (xml.rpc (obj@uri, 'Cytoscape.unhideNode', id, node, .convert=TRUE))
+     }) # unhideNodes
    
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('invertNodeSelection', 'CytoscapeWindowClass',
@@ -2316,4 +2433,25 @@ chad.debug = function (obj, msg)
      }
 
 } # chad.debug
+#------------------------------------------------------------------------------------------------------------------------
+hexColorToInt = function (hex.string)
+{
+  if (substr (hex.string, 1, 1) == '#') {
+    base.index = 2
+    if (nchar (hex.string) != 7)
+      return (NA)
+    }
+  else {
+    base.index = 1
+    if (nchar (hex.string) != 6)
+      return (NA)
+    }
+
+  red =   strtoi (substr (hex.string, base.index, base.index+1),   base=16)
+  green = strtoi (substr (hex.string, base.index+2, base.index+3), base=16)
+  blue =  strtoi (substr (hex.string, base.index+4, base.index+5), base=16)
+
+  return (list (red=red, green=green, blue=blue))
+
+} # hexColorToInt
 #------------------------------------------------------------------------------------------------------------------------

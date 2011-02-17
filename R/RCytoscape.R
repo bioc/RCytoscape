@@ -1676,10 +1676,12 @@ setMethod ('getAllNodeAttributes', 'CytoscapeWindowClass',
       }
   
     result = cbind (unlist (nodeData (g, nodes.of.interest, attr=attribute.names [1])))
-    for (name in attribute.names [2:length (attribute.names)]) {
-      new.column = unlist (nodeData (g, nodes.of.interest, attr=name))
-      result = cbind (result, new.column)
-      }
+    if (length (attribute.names) > 1) {
+      for (name in attribute.names [2:length (attribute.names)]) {
+        new.column = unlist (nodeData (g, nodes.of.interest, attr=name))
+        result = cbind (result, new.column)
+        } # for name
+      } # if length > 1
   
     colnames (result) = attribute.names
     result = as.data.frame (result)
@@ -1732,14 +1734,18 @@ setMethod ('getAllEdgeAttributes', 'CytoscapeWindowClass',
     result = cbind (result, source)
     result = cbind (result, target)
 
-    for (name in attribute.names [2:length (attribute.names)]) {
-      new.column = unlist (edgeData (g, source, target, attr=name))
-      result = cbind (result, new.column)
-      }
+    if (length (attribute.names) > 1) {
+      for (name in attribute.names [2:length (attribute.names)]) {
+        new.column = unlist (edgeData (g, source, target, attr=name))
+        result = cbind (result, new.column)
+        } # for name
+      } # if > 1
     
-    #print (result)
-    #x <<- result
-    colnames (result) = c (attribute.names [1], 'source', 'target', attribute.names [2:length(attribute.names)])
+    column.names = c (attribute.names [1], 'source', 'target')
+    if (length (attribute.names) > 1)
+      column.names = c (column.names, attribute.names [2:length(attribute.names)])
+
+    colnames (result) = column.names
     result = as.data.frame (result)
     
        # we had a matrix of character strings, now a data.frame of character strings

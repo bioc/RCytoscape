@@ -2273,6 +2273,25 @@ test.getAllNodeAttributes = function ()
   checkEquals (length (intersect (colnames (tbl.noa), expected.colnames)), 5)
   checkEquals (sort (rownames (tbl.noa)), c ("A", "B", "C"))
 
+   # now try a graph with only one node attribute.  this case used to fail (pshannon, 16 feb 2011)
+
+  g2 = new ('graphNEL', edgemode='directed')
+  g2 = initNodeAttribute (g2, 'label', 'char', 'NA')
+  g2 = addNode ('A', g2)
+  nodeData (g2, 'A', 'label') = 'a label for A'
+  window.title = 'single node attribute test'
+  if (window.title %in% as.character (getWindowList (cw)))
+     destroyWindow (cw, window.title)
+  cw2 = new.CytoscapeWindow (window.title, graph=g2)
+  tbl.noa = getAllNodeAttributes (cw2)
+  checkEquals (ncol (tbl.noa), 1)
+  checkEquals (nrow (tbl.noa), 1)
+  checkEquals (colnames (tbl.noa), 'label')
+  checkEquals (rownames (tbl.noa), 'A')
+  
+  invisible (tbl.noa)
+  
+  
 } # test.getAllNodeAttributes
 #------------------------------------------------------------------------------------------------------------------------
 test.getAllEdgeAttributes = function ()
@@ -2284,14 +2303,39 @@ test.getAllEdgeAttributes = function ()
   displayGraph (cw)
   redraw (cw)
   layout (cw)
-  tbl.eda <<- getAllEdgeAttributes (cw)
+  tbl.eda = getAllEdgeAttributes (cw)
   checkEquals (class (tbl.eda), 'data.frame')
   checkEquals (dim (tbl.eda), c (3, 5))
   checkEquals (sort (rownames (tbl.eda)), c ("A|B", "B|C", "C|A"))
   checkEquals (sort (colnames (tbl.eda)), c ("edgeType", "misc", "score", "source", "target"))
   checkEquals (class (tbl.eda$score), 'numeric')
 
-} # test.getAllNodeAttributes
+    # now try a graph with one edge, and just one edge attribute, to make sure that this edge case is handled properly
+
+  g2 = new ('graphNEL', edgemode='directed')
+  g2 = initEdgeAttribute (g2, 'edgeType', 'char', 'unspecified')
+  g2 = addNode ('A', g2)
+  g2 = addNode ('B', g2)
+  g2 = addEdge ('A', 'B', g2)
+
+  edgeData (g2, 'A', 'B', 'edgeType') = 'phosphorylates'
+
+  cy = CytoscapeConnection ()
+
+  window.title = 'edge attribute test, one attribute only'
+  if (window.title %in% as.character (getWindowList (cy)))
+    destroyWindow (cy, window.title)
+
+  cw2 = new.CytoscapeWindow (window.title, graph=g2, create.window=FALSE)
+  tbl.eda2 = getAllEdgeAttributes (cw2)
+
+  checkEquals (ncol (tbl.eda2), 3)
+  checkEquals (nrow (tbl.eda2), 1)
+  checkEquals (sort (colnames (tbl.eda2)), c ('edgeType', 'source', 'target'))
+
+  invisible (tbl.eda2)
+
+} # test.getAllEdgeAttributes
 #------------------------------------------------------------------------------------------------------------------------
 test.getVisualStyleNames = function ()
 {
@@ -2323,7 +2367,7 @@ test.copyVisualStyle = function ()
 
     # code around a very weird bug, which I do not understand at all (pshannon, 26 dec 2010)
   unique.name = FALSE;
-  new.style.name <<-  sprintf ("tmp.%s", runif (1, 1, 1000))
+  new.style.name = sprintf ("tmp.%s", runif (1, 1, 1000))
   copyVisualStyle (cw4, 'default', new.style.name)
   new.names = getVisualStyleNames (cw4)
   checkEquals (setdiff (new.names, current.names), new.style.name)

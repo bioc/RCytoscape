@@ -36,7 +36,8 @@ run.tests = function ()
   test.sendEdgeAttributes ()
   test.noa ()
   test.eda ()
-  test.cy2.edge.names ()
+  test.rcy.edgeNames ();    # replaces the graph edgeNames function, adding reciprocal edges
+  test.cy2.edge.names ()    # maps between rcy.edgeNames and  "A (relationship) B" cy2-style edgenames
   test.panelOperations ()
   test.setDefaultNodeShape ()
   test.setDefaultNodeColor ()
@@ -84,6 +85,7 @@ run.tests = function ()
   test.remove.redundancies.in.undirected.graph ()
   test.randomUndirectedGraph ()
   test.simpleGraph ()
+  test.simpleGraphWithReciprocalEdge ()
   test.setGraph ()
   test.setPosition ()
   test.getPosition ()
@@ -99,6 +101,8 @@ run.tests = function ()
   test.sendDegenerateGraphs ()
     #test.sendGraphWithSingleEdge ()
   test.sendBigGraph ()
+
+  test.addEdge ()
   test.addGraphToGraph ()
   test.getAttributeNames ()
   test.addGetAndDeleteEdgeAttributes ()
@@ -479,6 +483,20 @@ test.cy2.edge.names = function ()
   g3 = new ('graphNEL', edgemode='directed')
   edge.names.should.be.empty = cy2.edge.names (g3)
   checkTrue (is.na (edge.names.should.be.empty))
+
+
+   #  now create a directed graphNEL with one reciprocal edge.  do we get the cy2 edge names properly?
+  g.recip <<- RCytoscape::makeSimpleGraph ()
+  g.recip <<- graph::addEdge ('C', 'B', g.recip)
+  edgeData (g.recip, 'C', 'B', attr='edgeType') <<- 'synthetic rescue'
+  edgeData (g.recip, 'C', 'B', attr='score') <<- 42
+  edgeData (g.recip, 'C', 'B', attr='misc') <<- 'ellany'
+  
+  g.recip.cy2.edge.names <<- cy2.edge.names (g.recip)
+  checkEquals (length (g.recip.cy2.edge.names), 4)
+  checkEquals (sort (names (g.recip.cy2.edge.names)), c ("A~B", "B~C", "C~A", "C~B"))
+  checkEquals (sort (as.character (g.recip.cy2.edge.names)), 
+               c ("A (phosphorylates) B", "B (synthetic lethal) C", "C (synthetic rescue) B", "C (undefined) A"))
 
   invisible (g3)
 
@@ -1693,6 +1711,49 @@ test.simpleGraph = function ()
 
 } # test.simpleGraph
 #------------------------------------------------------------------------------------------------------------------------
+test.simpleGraphWithReciprocalEdge = function ()
+{
+  title = 'test.simpleGraphWithReciprocalEdge'
+  window.prep (title)
+
+  g.simple = RCytoscape::makeSimpleGraph ()
+  g.simple = graph::addEdge ('C', 'B', g.simple)
+  edgeData (g.simple, 'C', 'B', attr='edgeType') = 'synthetic rescue'
+  edgeData (g.simple, 'C', 'B', attr='score') = 42
+  edgeData (g.simple, 'C', 'B', attr='misc') = 'ellany'
+  g <<- g.simple
+
+  print (g.simple)
+  cws = new.CytoscapeWindow (title, g.simple)
+  cws.x <<- cws
+
+  displayGraph (cws)
+  layout (cws, 'jgraph-spring')
+  setNodeLabelRule (cws, 'label')
+  node.attribute.values = c ("kinase",  "transcription factor")
+  colors =                c ('#A0AA00', '#FF0000')
+  setDefaultNodeBorderWidth (cws, 5)
+  setNodeBorderColorRule (cws, 'type', node.attribute.values, colors, mode='lookup', default.color='#88FF22')
+  count.control.points = c (2, 30, 100)
+  sizes                = c (20, 50, 100)
+  setNodeSizeRule (cws, 'count', count.control.points, sizes)
+  setNodeColorRule (cws, 'lfc', c (-3.0, 0.0, 3.0), c ('#00FF00', '#FFFFFF', '#FF0000'))
+  arrows = c ('Arrow', 'Arrow', 'Arrow', 'None')
+  edgeType.values <- c ('phosphorylates', 'synthetic lethal', 'synthetic rescue', 'undefined')
+  setEdgeTargetArrowRule (cws, 'edgeType', edgeType.values, arrows)
+
+  edgeType.values = c ('phosphorylates', 'synthetic lethal', 'synthetic rescue', 'undefined')
+  edgeColors = c ('#0000AA', '#000000', '#00AA00', '#FFFFFF')
+  setEdgeColorRule (cws, 'edgeType',  edgeType.values, edgeColors, mode='lookup')
+
+  redraw (cws)
+
+  msg (cws, title)
+
+  invisible (cws)
+
+} # test.simpleGraphWithReciprocalEdge
+#------------------------------------------------------------------------------------------------------------------------
 test.setGraph = function ()
 {
   title = 'test.setGraph'
@@ -2559,4 +2620,120 @@ test.hexColorToInt = function ()
   checkEquals (z$blue, 19)
 
 } # test.hexColorToInt
+#------------------------------------------------------------------------------------------------------------------------
+# add a node to an existing graph.
+# questions:  
+#  1) what edge attribute values are assigned to this new edge?  
+#  2) can we assign new values to those attributes?  use sendEdgeAttributesDirect
+test.addCyNode = function ()
+{ 
+  title = 'test.addCyNode'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw, 'grid')
+  checkEquals (getNodeCount (cw), 3)
+  addCyNode (cw, 'NEW')
+  layout (cw, 'grid')
+  checkEquals (getNodeCount (cw), 4)
+  invisible (cw)
+
+} # test.addCyNode
+#------------------------------------------------------------------------------------------------------------------------
+# add an edge to an existing graph.
+# questions:  
+#  1) what edge attribute values are assigned to this new edge?  
+#  2) can we assign new values to those attributes?  use sendEdgeAttributesDirect
+test.addCyEdge = function ()
+{ 
+  title = 'test.addCyEdge'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+  checkEquals (getEdgeCount (cw), 3)
+
+  directed.edge = TRUE
+  addCyEdge (cw, 'A', 'B', 'synthetic rescue', directed.edge)
+  redraw (cw)
+  layout (cw)
+  checkEquals (getEdgeCount (cw), 4)
+  invisible (cw)
+    
+} # test.addCyEdge
+#------------------------------------------------------------------------------------------------------------------------
+test.twoGraphsDoubleEdges = function ()
+{ 
+  title = 'test.twoGraphsDoubleEdges'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+
+  g2 = new ('graphNEL', edgemode='directed')
+  g2 = initEdgeAttribute (g2, 'edgeType', 'char', 'unspecified')
+
+  g2 = addNode ('A', g2)
+  g2 = addNode ('B', g2)
+  g2 = addEdge ('A', 'B', g2)
+
+  edgeData (g2, 'A', 'B', 'edgeType') = 'synthetic rescue'
+
+
+  # fails:  addGraphToGraph (cw, g2)
+  xml.rpc (cw@uri, 'Cytoscape.createEdge', cw@window.id, 'A', 'B', 'synthetic rescue', T)
+  redraw (cw)
+  layout (cw)
+    
+} # test.twoGraphsoubleEdges
+#------------------------------------------------------------------------------------------------------------------------
+test.graphToNodePairTable = function ()
+{
+  print ('test.graphToNodePairTable')
+
+    # first, our standard demo graph, directed, no reciprocal edges
+
+  g = makeSimpleGraph ()
+  tbl.g = RCytoscape:::.graphToNodePairTable (g)
+  checkEquals (dim (tbl.g), c (3, 3))
+  checkEquals (colnames (tbl.g), c ("source", "target", "edgeType"))
+  checkEquals (tbl.g$edgeType, c ("phosphorylates", "synthetic lethal", "undefined"))
+  checkEquals (tbl.g$source, c ("A", "B", "C"))
+  checkEquals (tbl.g$target, c ("B", "C", "A"))
+
+    # now extend the standard demo graph by adding an edge between C and B, making B & C reciprocally related nodes
+
+  gx = makeSimpleGraph ()
+  gx = graph::addEdge ('C', 'B', gx)
+  edgeData (gx, 'C', 'B', attr='edgeType') = 'synthetic rescue'
+  tbl.egx = RCytoscape:::.graphToNodePairTable (gx)
+  checkEquals (dim (tbl.egx), c (4, 3))
+  checkEquals (colnames (tbl.egx), c ("source", "target", "edgeType"))
+  checkEquals (tbl.egx$edgeType, c ("phosphorylates", "synthetic lethal", "undefined", "synthetic rescue"))
+  checkEquals (tbl.egx$source, c ("A", "B", "C", "C"))
+  checkEquals (tbl.egx$target, c ("B", "C", "A", "B"))
+
+} # test.graphToNodePairTable 
+#------------------------------------------------------------------------------------------------------------------------
+test.rcy.edgeNames = function ()
+{
+  print ('test.rcy.edgeNames')
+  g = makeSimpleGraph ()
+  checkEquals (sort (RCytoscape:::.rcyEdgeNames (g)), c ("A~B", "B~C", "C~A"))
+  
+
+    # now extend the standard demo graph by adding an edge between C and B, making B & C reciprocally related nodes
+
+  gx = makeSimpleGraph ()
+  gx = graph::addEdge ('C', 'B', gx)
+  edgeData (gx, 'C', 'B', attr='edgeType') = 'synthetic rescue'
+  checkEquals (sort (RCytoscape:::.rcyEdgeNames (gx)), c ("A~B", "B~C", "C~A", "C~B"))
+
+} # test.rcy.edgeNames
 #------------------------------------------------------------------------------------------------------------------------

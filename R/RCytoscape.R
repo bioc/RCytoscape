@@ -43,9 +43,10 @@ setGeneric ('getGraph',                 signature='obj', function (obj) standard
 setGeneric ('sendNodes',                signature='obj', function (obj) standardGeneric ('sendNodes'))
 setGeneric ('sendEdges',                signature='obj', function (obj) standardGeneric ('sendEdges'))
 
-setGeneric ('addNodes',                 signature='obj', function (obj, other.graph) standardGeneric ('addNodes'))
-setGeneric ('addEdges',                 signature='obj', function (obj, other.graph) standardGeneric ('addEdges'))
+setGeneric ('addCyNode',                signature='obj', function (obj, nodeName) standardGeneric ('addCyNode'))
+setGeneric ('addCyEdge',                signature='obj', function (obj, sourceNode, targetNode, edgeType, directed) standardGeneric ('addCyEdge'))
 setGeneric ('addGraphToGraph',          signature='obj', function (obj, other.graph) standardGeneric ('addGraphToGraph'))
+
 setGeneric ('sendNodeAttributes',       signature='obj', function (obj, attribute.name) standardGeneric ('sendNodeAttributes'))
 setGeneric ('sendNodeAttributesDirect', signature='obj', 
     function (obj, attribute.name, attribute.type, node.names, values) standardGeneric ('sendNodeAttributesDirect'))
@@ -205,6 +206,13 @@ setGeneric ('getVisualStyleNames',    signature='obj', function (obj) standardGe
 setGeneric ('copyVisualStyle',        signature='obj', function (obj, from.style, to.style) standardGeneric ('copyVisualStyle'))
 setGeneric ('setVisualStyle',         signature='obj', function (obj, new.style.name) standardGeneric ('setVisualStyle'))
 setGeneric ('lockNodeDimensions',     signature='obj', function (obj, visual.style.name, new.state) standardGeneric ('lockNodeDimensions'))
+
+#-----------------------------------------------------------
+# private methods, for internal use only
+#-----------------------------------------------------------
+setGeneric ('.addNodes',                 signature='obj', function (obj, other.graph) standardGeneric ('.addNodes'))
+setGeneric ('.addEdges',                 signature='obj', function (obj, other.graph) standardGeneric ('.addEdges'))
+
 #------------------------------------------------------------------------------------------------------------------------
 setValidity ("CytoscapeWindowClass",
 
@@ -649,11 +657,12 @@ setMethod ('sendNodes', 'CytoscapeWindowClass',
        write ('CytoscapeWindow.sendNodes, no nodes in graph.  returning', stderr ())
        return ()
        }
+     write (sprintf ('sending %d nodes', length (nodes (obj@graph)), stderr ()))
      invisible (xml.rpc (obj@uri, 'Cytoscape.createNodes', as.character (obj@window.id), nodes (obj@graph)))
      })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('addNodes', signature (obj='CytoscapeWindowClass'),
+setMethod ('.addNodes', signature (obj='CytoscapeWindowClass'),
 
   function (obj, other.graph) {
      if (length (nodes (other.graph)) == 0) {
@@ -665,11 +674,11 @@ setMethod ('addNodes', signature (obj='CytoscapeWindowClass'),
      })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('addEdges', signature (obj='CytoscapeWindowClass'),
+setMethod ('.addEdges', signature (obj='CytoscapeWindowClass'),
 
   function (obj, other.graph) {
     if (length (edgeNames (other.graph)) == 0) {
-       write ('CytoscapeWindow.addEdges, no edges in graph.  returning', stderr ())
+       write ('CytoscapeWindow::.addEdges, no edges in graph.  returning', stderr ())
        return ()
        }
                  
@@ -705,8 +714,35 @@ setMethod ('addEdges', signature (obj='CytoscapeWindowClass'),
     write (b, stderr ())
     write (edge.type, stderr ())
     xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
-    }) # addEdges
+    }) # .addEdges
 
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('addCyNode', 'CytoscapeWindowClass',
+
+  function (obj, nodeName) {
+    if (nodeName %in% getAllNodes (obj))
+      write (sprintf ('RCytoscape::addNode, %s node already present in Cytoscape graph', nodeName), stderr ())
+    invisible (xml.rpc (obj@uri, 'Cytoscape.createNode', obj@window.id, nodeName))
+    })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('addCyEdge', 'CytoscapeWindowClass',
+
+  function (obj, sourceNode, targetNode, edgeType, directed) {
+    good.args = TRUE
+    if (!sourceNode %in% getAllNodes (obj)) {
+      good.args = FALSE
+      write (sprintf ('RCytoscape::addEdge, %s node not in Cytoscape graph', sourceNode), stderr ())
+      }
+    if (!targetNode %in% getAllNodes (obj)) {
+      good.args = FALSE
+      write (sprintf ('RCytoscape::addEdge, %s node not in Cytoscape graph', targetNode), stderr ())
+      }
+    if (!good.args)
+      return (NA)
+    invisible (xml.rpc (obj@uri, 'Cytoscape.createEdge', obj@window.id, sourceNode, targetNode, edgeType, directed))
+    })
 
 #------------------------------------------------------------------------------------------------------------------------
 # this method adds a new graph to an existing graph.  first the new nodes, then the new edges, then node attributes, then edge
@@ -714,8 +750,8 @@ setMethod ('addEdges', signature (obj='CytoscapeWindowClass'),
 setMethod ('addGraphToGraph', 'CytoscapeWindowClass',
 
   function (obj, other.graph) {
-    addNodes (obj, other.graph)  
-    addEdges (obj, other.graph)
+    .addNodes (obj, other.graph)  
+    .addEdges (obj, other.graph)
   
     node.attribute.names = noa.names (other.graph)
     for (attribute.name in node.attribute.names) {
@@ -745,25 +781,46 @@ setMethod ('sendEdges', 'CytoscapeWindowClass',
        return ()
        }
                  
-    tokens = strsplit (edgeNames (obj@graph), '~')
-    a = sapply (tokens, function (tok) tok [1])
-    b = sapply (tokens, function (tok) tok [2])
-    edge.type = as.character (eda (obj@graph, 'edgeType'))
-    if (length (edge.type) == 1 && is.na (edge.type))
-      edge.type = rep ('unspecified', length (tokens))
-    directed = rep (TRUE, length (tokens))
+    tbl.edges = .graphToNodePairTable (obj@graph)
+    write (sprintf ('sending %d edges', nrow (tbl.edges), stderr ()))
+    a = tbl.edges$source
+    b = tbl.edges$target
+    edge.type = tbl.edges$edgeType
+    directed = rep (TRUE, length (a))
     forgive.if.node.is.missing = TRUE
-  
-    if (length (edge.type) > length (a)) { # sign of pathological graph, probably has edges going both ways between two nodes
-      write (sprintf ('RCytoscape::sendEdges error, probably a pathological graph, with edges going both ways between pair or pairs of nodes.'), stderr ())
-      write (sprintf ('length of a: %d   length of b: %d   length of edge.type: %d', length (a), length (b), length (edge.type)), stderr ())
-      stop ()
-      } # pathological graph
-    
+      
     xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
     }) # sendEdges
 
 
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('sendEdges', 'CytoscapeWindowClass',
+#
+#  function (obj) {
+#    if (length (edgeNames (obj@graph)) == 0) {
+#       write ('CytoscapeWindow.sendEdges, no edges in graph.  returning', stderr ())
+#       return ()
+#       }
+#                 
+#    tokens = strsplit (edgeNames (obj@graph), '~')
+#    a = sapply (tokens, function (tok) tok [1])
+#    b = sapply (tokens, function (tok) tok [2])
+#    edge.type = as.character (eda (obj@graph, 'edgeType'))
+#    if (length (edge.type) == 1 && is.na (edge.type))
+#      edge.type = rep ('unspecified', length (tokens))
+#    directed = rep (TRUE, length (tokens))
+#    forgive.if.node.is.missing = TRUE
+#  
+#    if (length (edge.type) > length (a)) { # sign of pathological graph, probably has edges going both ways between two nodes
+#      write (sprintf ('RCytoscape::sendEdges error, probably a pathological graph, with edges going both ways between pair or pairs of nodes.'), stderr ())
+#      write (sprintf ('length of a: %d   length of b: %d   length of edge.type: %d', length (a), length (b), length (edge.type)), stderr ())
+#      #stop ()
+#      } # pathological graph
+#    
+#    xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
+#    }) # sendEdges
+#
+#
    # for (source.node in names (edges (obj@graph))) {
    #   for (target.node in edges (obj@graph)[[source.node]]) {
    #     interaction = 'unknown'
@@ -955,7 +1012,7 @@ setMethod ('sendEdgeAttributesDirect', 'CytoscapeWindowClass',
 
    function (obj, attribute.name, attribute.type, edge.names, values) {
 
-     #write (sprintf ('entering sendEdgeAttributesDirect, with %d names and %d values', length (edge.names), length (values)), stderr ())
+     write (sprintf ('entering sendEdgeAttributesDirect, %s, with %d names and %d values', attribute.name, length (edge.names), length (values)), stderr ())
 
      if (length (edge.names) == 0)
        return ()
@@ -1015,15 +1072,14 @@ setMethod ('displayGraph', 'CytoscapeWindowClass',
 
    function (obj) {
      write ('entering RCytoscape::displayGraph', stderr ())
-     #chad.debug (obj, "starting displayGraph")     
      if (length (nodes (obj@graph)) == 0) {
        write ('RCytoscape::displayGraph, empty graph, returning', stderr ())
        return ()
        }
 
-     write (sprintf ('adding %d nodes...', length (nodes (obj@graph))),  stderr ())
+     #write (sprintf ('adding %d nodes...', length (nodes (obj@graph))),  stderr ())
      sendNodes (obj)
-     write (sprintf ('adding %d edges...', length (edgeNames (obj@graph))), stderr ())
+     #write (sprintf ('adding %d edges...', length (edgeNames (obj@graph))), stderr ())
      sendEdges (obj)
      #chad.debug (obj, "just before adding node attributes")
      write ('adding node attributes...', stderr ())
@@ -1800,9 +1856,7 @@ setMethod ('getAllNodes', 'CytoscapeWindowClass',
      count = xml.rpc (obj@uri, "Cytoscape.countNodes", id)
      if (count == 0)
        return ()
-       # todo:  getting all nodes should be inherently a window-specific operation
      result = xml.rpc (obj@uri, "Cytoscape.getNodes", id, .convert=TRUE)
-     #result = xml.rpc (obj@uri, "Cytoscape.getAllNodes", .convert=TRUE)
      return (result)
      }) # getAllNodes
 
@@ -2051,16 +2105,16 @@ cy2.edge.names = function (graph)
   edgeType.attribute.present = TRUE
   edge.type = 'unspecified'
   if ('edgeType' %in% names (edgeDataDefaults (graph))) {
-     edge.type = as.character (eda (graph, 'edgeType'))
-     }
+    edge.type = as.character (eda (graph, 'edgeType'))
+    }
 
-  tokens = strsplit (edgeNames (graph), '~')
+  tokens = strsplit (.rcyEdgeNames (graph), '~')
   a = sapply (tokens, function (tok) tok [1])
   b = sapply (tokens, function (tok) tok [2])
   edge.type = paste (' (', edge.type, ') ', sep='')
   edge.names = paste (a, edge.type, b, sep='')
 
-  names (edge.names) = edgeNames (graph)
+  names (edge.names) = .rcyEdgeNames (graph)
   return (edge.names)
 
 } # cy2.edge.names
@@ -2460,4 +2514,64 @@ hexColorToInt = function (hex.string)
   return (list (red=red, green=green, blue=blue))
 
 } # hexColorToInt
+#-----------------------------------------------------------------------------------------------------------------------
+# edges are stored variously and confusingly in graphNELs, maybe in other graph classes also
+# this function takes a native bioc graph object, and returns a data frame with 3 columns:  A, B, and edgeType
+.graphToNodePairTable = function (g)
+{
+  nodes.list = edges (g)   # one named entry per node, each containing 0 or more partner (target) nodes
+
+  edge.attribute.names = names (edgeDataDefaults (g))
+
+  edgeType.supplied = TRUE
+
+  if (!'edgeType' %in% edge.attribute.names) {
+    edgeType.supplied = FALSE
+    edgeType.default.value = 'unspecified'
+    }
+  else {
+    edgeType.supplied = TRUE
+    edgeTypes = edgeData (g, attr='edgeType')
+    }
+
+  template = list (source='', target='', edgeType='')
+  tbl = data.frame (template, stringsAsFactors=F)
+  for (source.node in names (nodes.list)) {
+    target.nodes = nodes.list [[source.node]]
+    if (length (target.nodes) == 0)
+      next;
+    for (target.node in target.nodes) {
+      barred.edge.name = sprintf ('%s|%s', source.node, target.node)      
+      if (edgeType.supplied)
+        e.type = edgeTypes [[barred.edge.name]]
+      else
+        e.type = edgeType.default.value
+      new.row = list (source=source.node, target=target.node, edgeType=e.type)
+      tbl = rbind (tbl, new.row)
+      } # for target.node
+    } # for source.node
+
+  return (tbl [-1,])
+
+} # .graphToNodePairTable
+#------------------------------------------------------------------------------------------------------------------------
+# the bioc graph 'edgeNames' function does not detect, distinguish or report reciprocal edges.
+# this is fixed here.
+.rcyEdgeNames = function (g)
+{
+  nodes.list = edges (g)
+  result = c ()
+  for (source.node in names (nodes.list)) {
+    target.nodes = nodes.list [[source.node]]
+    if (length (target.nodes) == 0)
+      next;
+    for (target.node in target.nodes) {
+      tilde.edge.name = sprintf ('%s~%s', source.node, target.node)      
+      result = c (result, tilde.edge.name)
+      } # for target.node
+    } # for source.node
+
+  return (result)
+
+} # rcyEdgeNames
 #------------------------------------------------------------------------------------------------------------------------

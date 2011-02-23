@@ -3,7 +3,7 @@
 \alias{removeSelectedNodes,CytoscapeWindowClass-method}
 \title{removeSelectedNodes}
 \description{
-Select the specified nodes.
+Remove (destroy, delete) the currently selected nodes.
 }
 \usage{
 removeSelectedNodes(obj, remove.from.root.graph.also=TRUE)

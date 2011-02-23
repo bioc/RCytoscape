@@ -27,7 +27,11 @@ exportMethods (
    sendNodeAttributesDirect,
    sendEdgeAttributes,
    sendEdgeAttributesDirect,
+
+   addCyNode,
+   addCyEdge,
    addGraphToGraph,
+
    dockPanel,
    floatPanel,
    hidePanel,

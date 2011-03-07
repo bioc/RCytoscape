@@ -6,11 +6,12 @@
 Select the specified nodes.
 }
 \usage{
-selectNodes(obj, node.names)
+selectNodes(obj, node.names, preserve.current.selection=TRUE)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
   \item{node.names}{a \code{list} of strings, the names of nodes to select. }
+  \item{preserve.current.selection}{a \code{logical} object. }
 }
 
 \value{
@@ -26,7 +27,7 @@ None.
 }
 
 \examples{
-  cw <- new.CytoscapeWindow ('selecNodes.test', graph=makeSimpleGraph())
+  cw <- new.CytoscapeWindow ('selectNodes.test', graph=makeSimpleGraph())
   clearSelection (cw)
   selectNodes (cw, c ('A', 'B'))
   getSelectedNodes (cw)

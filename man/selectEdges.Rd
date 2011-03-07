@@ -6,11 +6,12 @@
 Select the specified edges.
 }
 \usage{
-selectEdges(obj, edge.names)
+selectEdges(obj, edge.names, preserve.current.selection=TRUE)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
   \item{edge.names}{a \code{list} of strings, the names of edges to select. }
+  \item{preserve.current.selection}{a \code{logical} object. }
 }
 
 \value{

@@ -21,6 +21,16 @@ A list of character strings, e.g., "jgraph-circle" "attribute-circle" "jgraph-an
 
 \author{Paul Shannon}
 
+
+\seealso{
+  getLayoutNameMapping
+  getLayoutNames
+  getLayoutPropertyNames
+  getLayoutPropertyType
+  getLayoutPropertyValue
+  setLayoutProperties
+ }
+
 \examples{
   cy <- CytoscapeConnection ()
   getLayoutNames (cy)

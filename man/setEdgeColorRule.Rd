@@ -7,7 +7,7 @@ Specify how data attributes -- for the specified named attribute -- is
 mapped to edge color.}
 
 \usage{
-setEdgeColorRule(obj, edge.attribute.name, control.points, colors, mode='interpolate', default.color='#FFFFFF')
+setEdgeColorRule(obj, edge.attribute.name, control.points, colors, mode, default.color='#FFFFFF')
 }
 
 \arguments{

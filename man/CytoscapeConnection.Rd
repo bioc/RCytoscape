@@ -8,7 +8,7 @@ The constructor for the CytoscapeConnectionClass.  This class is both
 the base class for CytoscapeWindow objects, and quite usefully, and
 instantiable object in its own right.   It is very useful for calling
 the many RCytoscape methods which do not address a single window in
-particular:  getWindowList, getWindowCount, destroyWindow,
+particular:  getWindowList, getWindowCount, deleteWindow,
 getNodeShapes, etc.
 }
 \usage{
@@ -41,8 +41,8 @@ CytoscapeConnection (host = "localhost", rpcPort = 9000)
   getWindowID
   getWindowCount
   getWindowList
-  destroyWindow
-  destroyAllWindows
+  deleteWindow
+  deleteAllWindows
   getNodeShapes
   getAttributeClassNames
   getLineStyles
@@ -59,7 +59,7 @@ CytoscapeConnection (host = "localhost", rpcPort = 9000)
 
 \examples{
   cy <- CytoscapeConnection ()
-  destroyAllWindows (cy)
+  deleteAllWindows (cy)
   getNodeShapes (cy)
   hidePanel (cy, 'Control')
 }

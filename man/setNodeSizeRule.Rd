@@ -6,7 +6,7 @@
 Specify how data attributes how the specified node attribute values
 determine the node size.}
 \usage{
-setNodeSizeRule (obj, node.attribute.name, control.points, node.sizes,mode='interpolate', default.size=40)
+setNodeSizeRule (obj, node.attribute.name, control.points, node.sizes,mode, default.size=40)
 }
 
 \arguments{

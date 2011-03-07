@@ -26,7 +26,7 @@ dark red.
 }
 
 \usage{
-setNodeColorRule(obj, node.attribute.name, control.points, colors, mode='interpolate', default.color='#FFFFFF')
+setNodeColorRule(obj, node.attribute.name, control.points, colors, mode, default.color='#FFFFFF')
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }

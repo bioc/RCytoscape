@@ -1,3 +1,4 @@
+default: build
 
 help:
 	egrep "^#" makefile | sed "s/^#//"
@@ -57,5 +58,8 @@ pdf:  doc/RCytoscape.tex
 # --- vanillaTest
 # run all the unit tests, in a clean context
 #
-vanillaTest:
+vanillaTest:  build
 	R --vanilla < vanillaTest.R > vanillaTest.out 2>&1
+
+vt: vanillaTest
+

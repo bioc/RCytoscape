@@ -2326,13 +2326,13 @@ makeSimpleGraph = function ()
   nodeData (g, 'B', 'type') = 'transcription factor'
   nodeData (g, 'C', 'type') = 'glycoprotein'
 
-  nodeData (g, 'A', 'lfc') = '-3.0'
-  nodeData (g, 'B', 'lfc') = '0.0'
-  nodeData (g, 'C', 'lfc') = '3.0'
+  nodeData (g, 'A', 'lfc') = -3.0
+  nodeData (g, 'B', 'lfc') = 0.0
+  nodeData (g, 'C', 'lfc') = 3.0
 
-  nodeData (g, 'A', 'count') = '2'
-  nodeData (g, 'B', 'count') = '30'
-  nodeData (g, 'C', 'count') = '100'
+  nodeData (g, 'A', 'count') = 2
+  nodeData (g, 'B', 'count') = 30
+  nodeData (g, 'C', 'count') = 100
 
   nodeData (g, 'A', 'label') = 'Gene A'
   nodeData (g, 'B', 'label') = 'Gene B'

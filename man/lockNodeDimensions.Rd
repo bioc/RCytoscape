@@ -6,13 +6,13 @@
 Select the specified nodes.
 }
 \usage{
-lockNodeDimensions(obj, visual.style.name, new.state)
+lockNodeDimensions(obj, new.state, visual.style.name='default')
 }
 \arguments{
   \item{obj}{a \code{CytoscapeConnectionClass} object. }
-  \item{visual.style.name}{a \code{string} object, naming the visual
-    style whose 'locked' you wish to change}
   \item{new.state}{a \code{boolean} object, TRUE or FALSE}
+  \item{visual.style.name}{a \code{string} object, naming the visual
+    style whose 'locked' you wish to change. Defaults to 'default'}
 }
 
 \value{
@@ -31,7 +31,7 @@ None.
   displayGraph (cw)
   layout (cw)
   redraw (cw)
-  lockNodeDimensions (cw, 'default', FALSE)
+  lockNodeDimensions (cw, FALSE)
   setNodeWidthDirect (cw, 'A', 100)
   setNodeHeightDirect (cw, 'A', 50)
 

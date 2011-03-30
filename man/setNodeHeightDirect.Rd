@@ -9,11 +9,11 @@ this to work.  If they ARE locked, then node and height change together,
 as specified by a node size rule, or the setNodeSizeDirect method
 }
 \usage{
-setNodeHeightDirect(obj, node.name, new.height)
+setNodeHeightDirect(obj, node.names, new.height)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
-  \item{node.name}{a \code{String} object.}
+  \item{node.names}{one ore more \code{String} objects.}
   \item{new.height}{an \code{integer}, in pixel units.}
 }
 

@@ -3,13 +3,12 @@
 \alias{addGraphToGraph,CytoscapeWindowClass-method}
 \title{addGraphToGraph}
 \description{
-Given a CytoscapeWindow containing a graph, this method provides the
-means to add new nodes, edges, and their attributes.  Thus, it is the
-way to extend a graph -- to merge a new graph with an existing one.  A
-typical use would be to add a second KEGG pathway to a CytoscapeWindow
-upon discovering that the two KEGG pathways overlap, sharing some
-enzymes and some reactions.  No existing attributes are written over.
-
+Given a CytoscapeWindow containing a graph, this method adds new nodes,
+edges, and their attributes.  Thus, it is the way to extend a graph --
+to merge a new graph with an existing one.  A typical use would be to
+add a second KEGG pathway to a CytoscapeWindow upon discovering that
+two KEGG pathways overlap, sharing some enzymes and some reactions.  No
+existing attributes are written over.
 }
 \usage{
 addGraphToGraph(obj, other.graph)

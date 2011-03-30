@@ -1,16 +1,15 @@
 \name{setDefaultNodeShape}
 \alias{setDefaultNodeShape}
-\alias{setDefaultNodeShape,CytoscapeWindowClass-method}
+\alias{setDefaultNodeShape,CytoscapeConnectionClass-method}
 \title{setDefaultNodeShape}
 \description{
-In the specified CytoscapeWindow, stipulate the color for all nodeBorders
-other than those mentioned in a node border color rule.
+For all CytoscapeWindow's, specify the default node shape.
 }
 \usage{
 setDefaultNodeShape(obj, new.shape, vizmap.style.name = "default")
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
   \item{new.shape}{a \code{String} object, one of the permissible values
     (see getNodeShapes).}
   \item{vizmap.style.name}{a \code{String} object.}

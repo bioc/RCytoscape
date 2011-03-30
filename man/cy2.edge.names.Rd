@@ -9,12 +9,14 @@ Cytoscape domain would be 'A (<edgeType>) B', where '<edgeType>' might
 be 'phosphorylates' or 'represses'.
 }
 \usage{
-cy2.edge.names(graph)
+cy2.edge.names(graph, R.edge.names=NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{graph}{
-}
+  \item{graph}{An R graph}
+  \item{R.edge.names}{one or more R graph-style edge names.  default NA,
+    in which case all edges in the graph are translated to cy2-style.}
+  
 }
 
 \value{
@@ -28,8 +30,12 @@ Paul Shannon
 \examples{
   g <- makeSimpleGraph ()
   cy2.edge.names (g)
-  #                     A~B                      B~C                      C~A 
-  #  "A (phosphorylates) B" "B (synthetic lethal) C"        "C (undefined) A" 
+    #                      A~B                      B~C                      C~A 
+    #    "A (phosphorylates) B" "B (synthetic lethal) C"        "C   (undefined) A" 
+  cy2.edge.names (g, R.edge.names="B~C")
+    #                      B~C 
+    # "B (synthetic lethal) C" 
+
 }
 
 \keyword{graph}%

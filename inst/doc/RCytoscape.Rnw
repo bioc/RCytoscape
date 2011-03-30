@@ -322,20 +322,20 @@ Once the rules are in effect, node color and size will always be a function of e
   lfc.timepoint.3 <- c (2.5, 2.0, 0.0)
 
   for (i in 1:5) {  # run this loop 5 times
-    sendNodeAttributesDirect (cwm, 'lfc',  'numeric', c ('A', 'B', 'C'), lfc.timepoint.1)
-    sendNodeAttributesDirect (cwm, 'pval', 'numeric', c ('A', 'B', 'C'), pval.timepoint.1)
+    setNodeAttributesDirect (cwm, 'lfc',  'numeric', c ('A', 'B', 'C'), lfc.timepoint.1)
+    setNodeAttributesDirect (cwm, 'pval', 'numeric', c ('A', 'B', 'C'), pval.timepoint.1)
     redraw (cwm)
     msg (cwm, 'timepoint 1')
     system ('sleep 1')
 
-    sendNodeAttributesDirect (cwm, 'lfc',  'numeric', c ('A', 'B', 'C'), lfc.timepoint.2)
-    sendNodeAttributesDirect (cwm, 'pval', 'numeric', c ('A', 'B', 'C'), pval.timepoint.2)
+    setNodeAttributesDirect (cwm, 'lfc',  'numeric', c ('A', 'B', 'C'), lfc.timepoint.2)
+    setNodeAttributesDirect (cwm, 'pval', 'numeric', c ('A', 'B', 'C'), pval.timepoint.2)
     redraw (cwm)
     msg (cwm, 'timepoint 2')
     system ('sleep 1')
 
-    sendNodeAttributesDirect (cwm, 'lfc',  'numeric', c ('A', 'B', 'C'), lfc.timepoint.3)
-    sendNodeAttributesDirect (cwm, 'pval', 'numeric', c ('A', 'B', 'C'), pval.timepoint.3)
+    setNodeAttributesDirect (cwm, 'lfc',  'numeric', c ('A', 'B', 'C'), lfc.timepoint.3)
+    setNodeAttributesDirect (cwm, 'pval', 'numeric', c ('A', 'B', 'C'), pval.timepoint.3)
     redraw (cwm)
     msg (cwm, 'timepoint 3')
     system ('sleep 1')

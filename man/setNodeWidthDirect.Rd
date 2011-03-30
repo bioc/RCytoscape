@@ -9,11 +9,11 @@ this to work.  If they ARE locked, then node and width change together,
 as specified by a node size rule, or the setNodeSize method
 }
 \usage{
-setNodeWidthDirect(obj, node.name, new.width)
+setNodeWidthDirect(obj, node.names, new.width)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
-  \item{node.name}{a \code{String} object.}
+  \item{node.names}{a \code{String} object.}
   \item{new.width}{an \code{integer}, in pixel units.}
 }
 

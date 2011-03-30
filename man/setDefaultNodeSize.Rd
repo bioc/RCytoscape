@@ -1,16 +1,16 @@
 \name{setDefaultNodeSize}
 \alias{setDefaultNodeSize}
-\alias{setDefaultNodeSize,CytoscapeWindowClass-method}
+\alias{setDefaultNodeSize,CytoscapeConnectionClass-method}
 \title{setDefaultNodeSize}
 \description{
-In the specified CytoscapeWindow, stipulate the color for all nodeBorders
+In the specified CytoscapeConnection, stipulate the color for all nodeBorders
 other than those mentioned in a node border color rule.
 }
 \usage{
 setDefaultNodeSize(obj, new.size, vizmap.style.name = "default")
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
   \item{new.size}{a \code{integer} object, typically 20 to 100.}
   \item{vizmap.style.name}{a \code{String} object.}
 

@@ -21,14 +21,14 @@ testverbose:
 # check, but ignore man pages and vignette
 #
 
-check:
+check: build
 	(cd ../..; R CMD check --no-manual --no-vignettes RCytoscape)
 
 # --- checkfull
 # check everything
 #
 
-checkfull:
+checkfull:  build
 	(cd ../..; R --vanilla CMD check RCytoscape)
 
 
@@ -38,6 +38,14 @@ checkfull:
 
 codoc:
 	(cd ../..; R CMD check --no-manual --no-vignettes --no-tests --no-examples RCytoscape)
+
+
+# --- checkvig
+# check just the vignette
+#
+
+checkvig:
+	(cd ../..; R CMD check --no-manual --no-codoc --no-tests --no-examples RCytoscape)
 
 
 # --- sweave
@@ -59,6 +67,7 @@ pdf:  doc/RCytoscape.tex
 # run all the unit tests, in a clean context
 #
 vanillaTest:  build
+	- rm vanillaTest.out
 	R --vanilla < vanillaTest.R > vanillaTest.out 2>&1
 
 vt: vanillaTest

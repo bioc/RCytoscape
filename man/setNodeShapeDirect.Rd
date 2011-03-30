@@ -6,11 +6,11 @@
 In the specified CytoscapeWindow, set the shape of the specified node.
 }
 \usage{
-setNodeShapeDirect(obj, node.name, new.shape)
+setNodeShapeDirect(obj, node.names, new.shape)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
-  \item{node.name}{a \code{String} object.}
+  \item{node.names}{one or more \code{String} objects.}
   \item{new.shape}{a \code{String} object, one of the allowed values
     returned by getNodeShapeDirects.}
 }

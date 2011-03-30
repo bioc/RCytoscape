@@ -1,15 +1,15 @@
 \name{setDefaultEdgeLineWidth}
 \alias{setDefaultEdgeLineWidth}
-\alias{setDefaultEdgeLineWidth,CytoscapeWindowClass-method}
+\alias{setDefaultEdgeLineWidth,CytoscapeConnectionClass-method}
 \title{setDefaultEdgeLineWidth}
 \description{
-In the specified CytoscapeWindow, stipulate the line width, in pixels for all edges.
+In the specified CytoscapeConnection, stipulate the line width, in pixels for all edges.
 }
 \usage{
 setDefaultEdgeLineWidth(obj, new.width, vizmap.style.name = "default")
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
   \item{new.width}{an \code{integer} object, typically from 0 to 5.}
   \item{vizmap.style.name}{a \code{String} object.}
 }

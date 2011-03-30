@@ -4,7 +4,7 @@
 \title{getDirectlyModifiableVisualProperties}
 \description{
 Retrieve the names of those visual attributes which can be set directly,
-bypassing and vizmap rule
+bypassing vizmap rules.
 }
 \usage{
 getDirectlyModifiableVisualProperties(obj)

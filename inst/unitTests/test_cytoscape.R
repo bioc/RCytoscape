@@ -48,12 +48,13 @@ run.tests = function ()
   test.setLayoutProperties ()
   test.sendNodes ()
   test.sendEdges ()
-  test.sendNodeAttributes ()
-  test.sendEdgeAttributes ()
+  test.setNodeAttributes ()
+  test.setEdgeAttributes ()
   test.noa ()
   test.eda ()
   test.cy2.edge.names ()
   test.panelOperations ()
+  test.showGraphicsDetails ()
   test.setDefaultNodeShape (direct=FALSE)
   test.setDefaultNodeColor (direct=FALSE)
   test.setDefaultNodeSize (direct=FALSE)
@@ -72,7 +73,9 @@ run.tests = function ()
   test.setNodeBorderWidthRule ()
   test.setNodeSizeRule ()
   test.setNodeShapeRule ()
-  test.setVizAttributesDirect ()
+  test.setNodeVizAttributesDirect ()
+  test.setEdgeVizPropertiesDirect 
+  test.setEdgeOpacityDirect ()
   test.setNodeOpacityDirect ()
   test.countNodes ()
   test.countEdges ()
@@ -128,6 +131,7 @@ run.tests = function ()
   test.setNodeSizeDirect ()
   test.setNodeWidthAndHeightDirect ()
   test.setNodeShapeDirect ()
+  test.setEdgeVizPropertiesDirect ()
   test.graphBAM ()
   test.createWindowFromSelection ()
   test.hexColorToInt ()
@@ -136,6 +140,8 @@ run.tests = function ()
   test.twoGraphsDoubleEdges ()
   test.graphToNodePairTable ()
   test.rcy.edgeNames ()
+  test..getNovelEdges ()
+  test.graphAM.round.trip ()
 
   options ('warn'=0)
 
@@ -282,7 +288,7 @@ test.getAttributeClassNames = function ()
   checkTrue (grep ('character', possible.values) > 0)
 
 
-} # test.getNodeShapes
+} # test.getAttributeClassNames
 #------------------------------------------------------------------------------------------------------------------------
 test.getArrowShapes = function ()
 {
@@ -343,10 +349,12 @@ test.getLayoutPropertyNames = function ()
    print (noquote ('------- test.getLayoutPropertyNames'))
    cy = CytoscapeConnection ()
    props = getLayoutPropertyNames (cy, 'force-directed')
-   expected = c ("defaultNodeMass", "defaultSpringCoefficient", "defaultSpringLength", "discrete", "edge_attribute", 
+   expected = c ("defaultNodeMass", "defaultSpringCoefficient", "defaultSpringLength", 
+                 "discrete", 
+                 "edge_attribute", 
                  "edge_weight_group", "force_alg_settings", "max_weight", "min_weight", "numIterations", 
                  "partition", "selected_only", "standard", "weight_type")
-   checkEquals (sort (props), expected)
+   checkTrue (length (intersect (props, expected)) > (length (props) - 2))  # some variation across Cytoscape versions
 
    props = getLayoutPropertyNames (cy, 'isom')
    expected = c ("coolingFactor", "initialAdaptation", "maxEpoch", "minAdaptation", "minRadius", 
@@ -373,7 +381,7 @@ test.getLayoutPropertyType = function ()
   checkEquals (propTypes.all [["defaultNodeMass"]], "DOUBLE")
   checkEquals (propTypes.all [["defaultSpringCoefficient"]], "DOUBLE")
   checkEquals (propTypes.all [["defaultSpringLength"]], "DOUBLE")
-  checkEquals (propTypes.all [["discrete"]], "BOOLEAN")
+  #checkEquals (propTypes.all [["discrete"]], "BOOLEAN")
   checkEquals (propTypes.all [["edge_attribute"]], "EDGEATTRIBUTE")
   checkEquals (propTypes.all [["edge_weight_group"]], "GROUP")
   checkEquals (propTypes.all [["force_alg_settings"]], "GROUP")
@@ -494,9 +502,9 @@ test.sendEdges = function ()
 
 } # test.sendEdges
 #------------------------------------------------------------------------------------------------------------------------
-test.sendNodeAttributes = function ()
+test.setNodeAttributes = function ()
 {
-  title = 'test.sendNodeAttributes'
+  title = 'test.setNodeAttributes'
   window.prep (title)
 
   cy = CytoscapeConnection ()
@@ -509,36 +517,36 @@ test.sendNodeAttributes = function ()
   attribute.names = noa.names (g)
 
   for (attribute.name in attribute.names) {
-    result = sendNodeAttributes (cwb, attribute.name)
+    result = setNodeAttributes (cwb, attribute.name)
     }
 
   layout (cwb, 'grid')
   redraw (cwb)
-  msg (cwb, 'sendNodeAttributes')
+  msg (cwb, 'setNodeAttributes')
 
 
-    # now call the direct method, which -- in contrast to the unmarked method (sendNodeAttributes) -- does not
+    # now call the direct method, which -- in contrast to the unmarked method (setNodeAttributes) -- does not
     # extract attributes from the graph; they are instead supplied separately, and thus are well suited to
     # successive updates, as in a movie
 
-  result = sendNodeAttributesDirect (cwb, 'count', 'int', c ('A', 'B', 'C'), c (38, 105, 0))
+  result = setNodeAttributesDirect (cwb, 'count', 'int', c ('A', 'B', 'C'), c (38, 105, 0))
 
     # sending a single attribute to CytoscapeRPC runs into a problem:  xmlrpc maps these to scalars,
     # rather than as lists of length 1, and no CytoscapeRPC method is matched.
-    # (10 dec 2010) RCytoscape::sendNodeAttributesDirect solves this inelegantly, but duplicating
+    # (10 dec 2010) RCytoscape::setNodeAttributesDirect solves this inelegantly, but duplicating
     # the node name and attribute values, making lists of length 2
     # 
-  result = sendNodeAttributesDirect (cwb, 'count', 'int', 'A', 432)
+  result = setNodeAttributesDirect (cwb, 'count', 'int', 'A', 432)
 
   invisible (cwb)
 
 
-} # test.sendNodeAttributes
+} # test.setNodeAttributes
 #------------------------------------------------------------------------------------------------------------------------
 # depends on prior creation of cwe by test.sendEdges
-test.sendEdgeAttributes = function ()
+test.setEdgeAttributes = function ()
 {
-  title = 'test.sendEdgeAttributes'
+  title = 'test.setEdgeAttributes'
   window.prep (title)
 
   cy = CytoscapeConnection ()
@@ -552,26 +560,26 @@ test.sendEdgeAttributes = function ()
   attribute.names = eda.names (cwe@graph)
 
   for (attribute.name in attribute.names) {
-    result = sendEdgeAttributes (cwe, attribute.name)
+    result = setEdgeAttributes (cwe, attribute.name)
     } 
 
   edge.names = as.character (cy2.edge.names (cwe@graph))
   checkEquals (length (edge.names), 3)
   edge.values = c ('alligator', 'hedgehog', 'anteater')
-  result = sendEdgeAttributesDirect (cwe, 'misc', 'string', edge.names, edge.values)
+  result = setEdgeAttributesDirect (cwe, 'misc', 'string', edge.names, edge.values)
 
     # sending a single attribute to CytoscapeRPC runs into a problem:  xmlrpc maps these to scalars,
     # rather than as lists of length 1, and no CytoscapeRPC method is matched.
-    # (10 dec 2010) RCytoscape::sendEdgeAttributesDirect solves this inelegantly, but duplicating
+    # (10 dec 2010) RCytoscape::setEdgeAttributesDirect solves this inelegantly, but duplicating
     # the edge name and attribute values, making lists of length 2
 
-  result = sendEdgeAttributesDirect (cwe, 'misc', 'string', edge.names [1], edge.values [1])
+  result = setEdgeAttributesDirect (cwe, 'misc', 'string', edge.names [1], edge.values [1])
 
-  msg (cwe, 'sendEdgeAttributes')
+  msg (cwe, 'setEdgeAttributes')
 
   invisible (cwe)  
 
-} # test.sendEdgeAttributes
+} # test.setEdgeAttributes
 #------------------------------------------------------------------------------------------------------------------------
 test.noa = function ()
 {
@@ -653,6 +661,21 @@ test.cy2.edge.names = function ()
 
   invisible (g3)
 
+    # now try the subsetting version, where only the cy2 edge names of the specified edges -- a subset -- are returned
+  g = makeSimpleGraph ()
+  r.edge.names = sort (edgeNames (g)) 
+  checkEquals (r.edge.names, c ("A~B", "B~C", "C~A"))
+  checkEquals (sort (as.character (cy2.edge.names (g, r.edge.names))),
+                c ("A (phosphorylates) B", "B (synthetic lethal) C", "C (undefined) A"))
+
+  checkEquals (sort (as.character (cy2.edge.names (g, r.edge.names))) [1], "A (phosphorylates) B")
+  checkEquals (sort (as.character (cy2.edge.names (g, r.edge.names))) [2], "B (synthetic lethal) C")
+  checkEquals (sort (as.character (cy2.edge.names (g, r.edge.names))) [3], "C (undefined) A")
+
+  checkEquals (sort (as.character (cy2.edge.names (g, r.edge.names))) [1:2], c ("A (phosphorylates) B", "B (synthetic lethal) C"))
+  checkEquals (sort (as.character (cy2.edge.names (g, r.edge.names))) [c(1,3)], c ("A (phosphorylates) B", "C (undefined) A"))
+  checkEquals (sort (as.character (cy2.edge.names (g, r.edge.names))) [2:3], c ("B (synthetic lethal) C", "C (undefined) A"))
+
 } # test.cy2.edge.names
 #------------------------------------------------------------------------------------------------------------------------
 # depends on prior creation of cw by test.createClass, providing a new.CytoscapeWindow object, with a 'uri' slot
@@ -675,6 +698,28 @@ test.panelOperations = function ()
 
 } # test.panelOperations
 #------------------------------------------------------------------------------------------------------------------------
+test.showGraphicsDetails = function ()
+{
+  title = 'test.showGraphicsDetails'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  showGraphicsDetails (cw, FALSE)
+  showGraphicsDetails (cw, TRUE)
+
+  cy = CytoscapeConnection ()
+  
+  showGraphicsDetails (cy, FALSE)   
+  showGraphicsDetails (cy, TRUE)
+
+  invisible (cw)
+
+} # test.showGraphicsDetails
+#------------------------------------------------------------------------------------------------------------------------
 test.setDefaultNodeShape = function (direct=FALSE)
 {
   title = 'test.setDefaultNodeShape'
@@ -693,16 +738,16 @@ test.setDefaultNodeShape = function (direct=FALSE)
        if (!exists ('xml.rpc')) library (XMLRPC)
        xml.rpc (cwe@uri, 'Cytoscape.setDefaultVizMapValue', 'default', 'Node Shape', shape); 
        redraw (cwe); 
-       system ('sleep 1')
+       Sys.sleep (1)
        } # for shape
      } # direct
 
   setDefaultNodeShape (cwe, 'octagon'); redraw (cwe)
   msg (cwe, 'octagon')
-  system ('sleep 1')
+  Sys.sleep (1)
   setDefaultNodeShape (cwe, 'ellipse');  redraw (cwe)
   msg (cwe,'ellipse')
-  system ('sleep 1')
+  Sys.sleep (1)
   setDefaultNodeShape (cwe, 'triangle');  redraw (cwe)
   msg (cwe, 'triangle')
 
@@ -750,10 +795,10 @@ test.setDefaultNodeSize = function (direct=FALSE)
   for (i in 1:3) {
     setDefaultNodeSize (cwe, 20)
     redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     setDefaultNodeSize (cwe, 200)
     redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     } # for i
 
   setDefaultNodeSize (cwe, 60)
@@ -777,10 +822,10 @@ test.setDefaultNodeBorderColor = function (direct=FALSE)
   for (i in 1:3) {
     setDefaultNodeBorderColor (cwe, '#FFFFFF'); 
     redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     setDefaultNodeBorderColor (cwe, '#FF0000'); 
     redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     } # for i
 
   invisible (cwe)
@@ -802,10 +847,10 @@ test.setDefaultNodeBorderWidth = function (direct=FALSE)
   for (i in 1:3) {
     setDefaultNodeBorderWidth (cwe, 5)
     redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     setDefaultNodeBorderWidth (cwe, 0)
     redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     } # for i
 
   setDefaultNodeBorderWidth (cwe, 1)
@@ -828,9 +873,9 @@ test.setDefaultNodeFontSize = function (direct=FALSE)
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
   for (i in 1:3) {
     setDefaultNodeFontSize (cwe, 3); redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     setDefaultNodeFontSize (cwe, 30); redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     }
   
   setDefaultNodeFontSize (cwe, 12); redraw (cwe)
@@ -853,9 +898,9 @@ test.setDefaultNodeLabelColor = function (direct=FALSE)
 
   for (i in 1:3) {
     setDefaultNodeLabelColor (cwe, '#FFAAAA');redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     setDefaultNodeLabelColor (cwe, '#000000');redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     } # for i
 
   invisible (cwe)
@@ -876,9 +921,9 @@ test.setDefaultEdgeLineWidth = function (direct=FALSE)
 
   for (i in 1:3) {
     setDefaultEdgeLineWidth (cwe, 5); redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     setDefaultEdgeLineWidth (cwe, 0); redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     }
 
   setDefaultEdgeLineWidth (cwe, 1); redraw (cwe)
@@ -901,9 +946,9 @@ test.setDefaultEdgeColor = function (direct=FALSE)
 
   for (i in 1:3) {
     setDefaultEdgeColor (cwe, '#FFFFFF'); redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     setDefaultEdgeColor (cwe, '#FF0000'); redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
     } # for i
 
   setDefaultEdgeColor (cwe, '#000000'); redraw (cwe)
@@ -924,13 +969,13 @@ test.setNodeLabelRule = function ()
 
   hidePanel (cwe, 'c');  hidePanel (cwe, 'd');
   setNodeLabelRule (cwe, 'label')
-  system ('sleep 1')
+  Sys.sleep (1)
   setNodeLabelRule (cwe, 'type')
-  system ('sleep 1')
+  Sys.sleep (1)
   setNodeLabelRule (cwe, 'lfc')
-  system ('sleep 1')
+  Sys.sleep (1)
   setNodeLabelRule (cwe, 'count')
-  system ('sleep 1')
+  Sys.sleep (1)
   setNodeLabelRule (cwe, 'label')
   msg (cwe, 'test.setNodeLabelRule')
 
@@ -950,9 +995,9 @@ test.setEdgeLabelRule = function ()
 
   hidePanel (cwe, 'c');  hidePanel (cwe, 'd');
   setEdgeLabelRule (cwe, 'edgeType')
-  system ('sleep 1')
+  Sys.sleep (1)
   setEdgeLabelRule (cwe, 'score')
-  system ('sleep 1')
+  Sys.sleep (1)
   setEdgeLabelRule (cwe, 'canonicalName')
   msg (cwe, 'test.setEdgeLabelRule')
 
@@ -1016,13 +1061,13 @@ test.setNodeColorRule = function ()
   node.attribute.values = c (-3.0, 0.0, 3.0)
   node.colors = c ('#008800', '#00FF00', '#FFFFFF', '#FF0000', '#880000')
   setNodeColorRule (cwe, 'lfc', node.attribute.values, node.colors, mode='interpolate')
-  system ('sleep 1')
+  Sys.sleep (1)
 
     # now, a lookup rule
   node.attribute.values = c ("kinase",  "transcription factor", "glycoprotein")
   node.colors =           c ('#8888FF', '#00F088',              "#00CCCC")
   setNodeColorRule (cwe, 'type', node.attribute.values, node.colors, mode='lookup')
-  system ('sleep 1')
+  Sys.sleep (1)
 
     # now, a lookup rule with an incomplete lookup table:  does the default.color argument work?  cy2.7 bug -- not yet.
     # instead, the node is painted the cytoscape default color, pale red
@@ -1062,13 +1107,13 @@ test.setNodeBorderColorRule = function ()
   node.attribute.values = c (-3.0, 0.0, 3.0)
   colors = c ('#008800', '#00FF00', '#FFFFFF', '#FF0000', '#880000')
   setNodeBorderColorRule (cwe, 'lfc', node.attribute.values, colors, mode='interpolate')
-  system ('sleep 1')
+  Sys.sleep (1)
 
     # now, a lookup rule.  bright red, green and blue borders
   node.attribute.values = c ("kinase",  "transcription factor", "glycoprotein")
   colors =                c ('#FF0000', '#00FF00',              "#0000FF")
   setNodeBorderColorRule (cwe, 'type', node.attribute.values, colors, mode='lookup')
-  system ('sleep 1')
+  Sys.sleep (1)
 
     # now, a lookup rule with an incomplete lookup table:  does the default.color argument work?  cy2.7 bug -- not yet.
     #  the glycoprotein node, 'Gene C', should have a white border around white fill
@@ -1150,13 +1195,11 @@ test.setNodeSizeRule = function ()
   setNodeSizeRule (cwe, 'count', count.control.points, node.sizes, mode='interpolate')
   system ('sleep 2')
 
-    # now use a mode='lookup' rule
-  discrete.values = c ('Gene A', 'Gene B', 'Gene C')
-  node.sizes = c (60, 10, 20)
-  setNodeSizeRule (cwe, 'label', discrete.values, node.sizes, mode='lookup')
-  setNodeSizeRule (cwe, 'label', discrete.values, 2 * (node.sizes), mode='lookup')
-
-  msg (cwe, 'test.setNodeSizeRule')
+    # now use a mode='lookup' rule.  specify two sizes, look to see that the third type, glycoprotein, gets the tiny small size
+  molecule.types = c ('kinase', 'transcription factor')
+  node.sizes     = c (60,        80)
+  setNodeSizeRule (cwe, 'type', molecule.types,  node.sizes, default.size= 5, mode='lookup')
+  redraw (cwe)
 
   invisible (cwe)
 
@@ -1191,9 +1234,9 @@ test.setNodeShapeRule = function ()
 
 } # test.setNodeShapeRule
 #------------------------------------------------------------------------------------------------------------------------
-test.setVizAttributesDirect = function ()
+test.setNodeColorDirect = function ()
 {
-  title = 'test.setVizAttributesDirect'
+  title = 'test.setNodeColorDirect'
   window.prep (title)
 
   cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
@@ -1202,17 +1245,17 @@ test.setVizAttributesDirect = function ()
   redraw (cw)
 
   setNodeColorDirect (cw, 'A', '#AA0088')
-  system ('sleep 1')
+  Sys.sleep (1)
   setNodeColorDirect (cw, 'A', '#AA4488')
-  system ('sleep 1')
+  Sys.sleep (1)
   setNodeColorDirect (cw, 'A', '#AA8888')
-  system ('sleep 1')
+  Sys.sleep (1)
 
   setNodeColorDirect (cw, c ('A', 'B'), '#448844')
 
   invisible (cw)
 
-} # test.setVizAttributesDirect
+} # test.setNodeColorirect
 #------------------------------------------------------------------------------------------------------------------------
 test.setNodeOpacityDirect = function ()
 {
@@ -1232,12 +1275,553 @@ test.setNodeOpacityDirect = function ()
   setNodeBorderOpacityDirect (cw, 'C', 0); redraw (cw);
   for (i in 1:5) {
     setNodeOpacityDirect (cw, 'D', 0); redraw (cw);
-    system ('sleep 1')
+    Sys.sleep (1)
     setNodeOpacityDirect (cw, 'D', 255); redraw (cw);
-    system ('sleep 1')
+    Sys.sleep (1)
     } # for i
 
 } # test.setNodeOpacityDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeOpacityDirect = function ()
+{
+  title = 'test.setEdgeOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edge.of.interest = cy2.edge.names (g) [1]
+  for (i in 1:5) {
+    setEdgeOpacityDirect (cw, edge.of.interest, i * 30); redraw (cw);
+    Sys.sleep (1)
+    } # for i
+
+} # test.setEdgeOpacityDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeColorDirect = function ()
+{
+  title = 'test.setEdgeColorDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edge.of.interest = as.character (cy2.edge.names (g) [1])
+  for (i in 1:5) {
+    setEdgeColorDirect (cw, edge.of.interest, '#FF0000'); redraw (cw);
+    Sys.sleep (1)
+    setEdgeColorDirect (cw, edge.of.interest, '#00FF00'); redraw (cw);
+    Sys.sleep (1)
+    setEdgeColorDirect (cw, edge.of.interest, '#0000FF'); redraw (cw);
+    Sys.sleep (1)
+    } # for i
+
+  invisible (cw)
+
+} # test.setEdgeColorDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeSourceArrowShapeDirect = function ()
+{
+  title = 'test.setEdgeSourceArrowShapeDirect'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow ('setEdgeSourceArrowShapeDirect.test', graph=makeSimpleGraph())
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+  setWindowSize (cw, 800, 800)
+  fitContent (cw)
+
+  edges.of.interest = as.character (cy2.edge.names (g))
+  supported.arrow.shapes = getArrowShapes (cy)
+
+    # first try passing three edges and three arrow shapes
+  setEdgeSourceArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [2:5])
+  redraw (cw)
+
+  Sys.sleep (1)
+  
+    # now try passing three edges and one arrow.shapes
+  setEdgeSourceArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [6])
+  redraw (cw)
+
+    # now loop through all of the arrow.shapes
+
+  for (shape in supported.arrow.shapes) {
+    setEdgeSourceArrowShapeDirect (cw, edges.of.interest, shape)
+    Sys.sleep (1)
+    redraw (cw)
+    }
+
+    # restore the default
+  setEdgeSourceArrowShapeDirect (cw, edges.of.interest, 'No Arrow')
+  redraw (cw)
+  invisible (cw)
+
+} # test.setEdgeSourceArrowShapeDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeLabelDirect = function ()
+{
+  title = 'test.setEdgeOpacityDirect'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow ('setEdgeLabelDirect.test', graph=makeSimpleGraph())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw, 'jgraph-spring')
+  edge.names = cy2.edge.names (cw@graph)[1:2]
+  for (i in 1:10) {
+    setEdgeLabelDirect (cw, edge.names, 255 - (i * 25))
+    redraw (cw)
+    }
+  for (i in 1:10) {
+    setEdgeLabelDirect (cw, edge.names, i * 25)
+    redraw (cw)
+    }
+
+  invisible (cw)
+
+} # test.setEdgeLabelDirect
+#------------------------------------------------------------------------------------------------------------------------
+#test.setEdgeFontFaceDirect = function ()
+#{
+#  title = 'test.setEdgeFontFaceDirect'
+#  window.prep (title)
+#
+#  g = RCytoscape::makeSimpleGraph ()
+#  cw = new.CytoscapeWindow (title, graph=g)
+#  displayGraph (cw)
+#  layout (cw, 'jgraph-spring')
+#  redraw (cw)
+#
+#  edge.of.interest = cy2.edge.names (g) [1]
+#  fonts = c ('courier', 'arial')
+#  for (font in fonts) {
+#    setEdgeFontFaceDirect (cw, edge.of.interest, font); redraw (cw);
+#    Sys.sleep (1)
+#    } # for i
+#
+#} # test.
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeFontSizeDirect = function ()
+{
+  title = 'test.setEdgeOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edge.of.interest = cy2.edge.names (g) [1]
+  for (i in 1:5) {
+    setEdgeOpacityDirect (cw, edge.of.interest, i * 30); redraw (cw);
+    Sys.sleep (1)
+    } # for i
+
+} # test.
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeLabelColorDirect = function ()
+{
+  title = 'test.setEdgeOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edge.of.interest = cy2.edge.names (g) [1]
+  for (i in 1:5) {
+    setEdgeOpacityDirect (cw, edge.of.interest, i * 30); redraw (cw);
+    Sys.sleep (1)
+    } # for i
+
+} # test.
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeTooltipDirect = function ()
+{
+  title = 'setEdgeTooltipDirect.test'
+  window.prep (title)
+
+  cw <- new.CytoscapeWindow (title, graph=makeSimpleGraph())
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edges.of.interest = as.character (cy2.edge.names (cw@graph))
+
+    # first try passing three edges and three tooltips
+  setEdgeTooltipDirect (cw, edges.of.interest, c ('tooltip #1', 'tooltip #2', 'tooltip #3'))
+  redraw (cw)
+
+    # now try passing three edges and one tooltip
+  setEdgeTooltipDirect (cw, edges.of.interest [1:2], 'a general purpose tooltip')
+  redraw (cw)
+
+  invisible (cw)
+
+} # test.setEdgeTooltipDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeLineWidthDirect = function ()
+{
+  title = 'test.setEdgeLineWidthDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edges.of.interest = cy2.edge.names (g) [1:2]
+
+  for (i in 1:10) {
+    setEdgeLineWidthDirect (cw, edges.of.interest, i)
+    redraw (cw)
+    }
+
+  setEdgeLineWidthDirect (cw, edges.of.interest, 1)
+  redraw (cw)
+
+} # test.setEdgeLineWidthDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeLineStyleDirect = function ()
+{
+  title = 'test.setEdgeLineStyleDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edges.of.interest = as.character (cy2.edge.names (g))
+
+  supported.styles = getLineStyles (cy)
+
+    # first try passing three edges and three styles
+  setEdgeLineStyleDirect (cw, edges.of.interest, supported.styles [5:7])
+  redraw (cw)
+
+  Sys.sleep (1)
+  
+    # now try passing three edges and one styles
+  setEdgeLineStyleDirect (cw, edges.of.interest, supported.styles [8])
+  redraw (cw)
+
+    # now loop through all of the styles
+
+  for (style in supported.styles) {
+    setEdgeLineStyleDirect (cw, edges.of.interest, style)
+    Sys.sleep (1)
+    redraw (cw)
+    }
+
+  setEdgeLineStyleDirect (cw, edges.of.interest, 'SOLID')
+  redraw (cw)
+
+  invisible (cw)
+
+} # test.setEdgeLineStyleDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeSourceArrowShapeDirect = function ()
+{
+  title = 'test.setEdgeSourceArrowShapeDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+  setWindowSize (cw, 800, 800)
+  fitContent (cw)
+
+  edges.of.interest = as.character (cy2.edge.names (g))
+  supported.arrow.shapes = getArrowShapes (cy)
+
+    # first try passing three edges and three arrow.shapes
+  setEdgeSourceArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [5:7])
+  redraw (cw)
+
+  Sys.sleep (1)
+  
+    # now try passing three edges and one arrow shape
+  setEdgeSourceArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [8])
+  redraw (cw)
+
+    # now loop through all of the arrow.shapes
+
+  for (shape in supported.arrow.shapes) {
+    setEdgeSourceArrowShapeDirect (cw, edges.of.interest, shape)
+    Sys.sleep (1)
+    redraw (cw)
+    }
+
+    # restore the default
+  setEdgeSourceArrowShapeDirect (cw, edges.of.interest, 'No Arrow')
+  redraw (cw)
+
+  invisible (cw)
+
+} # test.setEdgeSourceArrowShapeDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeTargetArrowShapeDirect = function ()
+{
+  title = 'test.setEdgeTargetArrowShapeDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edges.of.interest = as.character (cy2.edge.names (g))
+  supported.arrow.shapes = getArrowShapes (cy)
+
+    # first try passing three edges and three arrow.shapes
+  setEdgeTargetArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [5:7])
+  redraw (cw)
+
+  Sys.sleep (1)
+  
+    # now try passing three edges and one arrow shape
+  setEdgeTargetArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [8])
+  redraw (cw)
+
+    # now loop through all of the arrow.shapes
+
+  for (shape in supported.arrow.shapes) {
+    setEdgeTargetArrowShapeDirect (cw, edges.of.interest, shape)
+    Sys.sleep (1)
+    redraw (cw)
+    }
+
+    # restore the default
+  setEdgeTargetArrowShapeDirect (cw, edges.of.interest, 'No Arrow')
+  redraw (cw)
+
+  invisible (cw)
+
+} # test.setTargetArrowShapeDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeSourceArrowColorDirect = function ()
+{
+  title = 'test.setEdgeSourceArrowColorDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  arrows = c ('Arrow', 'Diamond', 'Circle')
+  edgeType.values = c ('phosphorylates', 'synthetic lethal', 'undefined')
+  setEdgeSourceArrowRule (cw, 'edgeType', edgeType.values, arrows)
+  setEdgeTargetArrowRule (cw, 'edgeType', edgeType.values, arrows)
+
+  colors.1 = c ("#FFFFFF", "#FFFFFF", "#FFFFFF")
+  colors.2 = c ("#AA00AA", "#00AAAA", "#0000AA")
+
+  edge.names = as.character (cy2.edge.names (g) [1:3])
+
+  for (i in 1:2) {
+    setEdgeSourceArrowColorDirect (cw, edge.names, colors.1)
+    redraw (cw)
+    Sys.sleep (1)
+    setEdgeSourceArrowColorDirect (cw, edge.names, colors.2)
+    redraw (cw)
+    Sys.sleep (1)
+    } # for i
+
+  invisible (cw)
+
+} # test.setEdgeSourceArrowColorDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeTargetArrowColorDirect = function ()
+{
+  title = 'test.setEdgeTargetArrowColorDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+  setWindowSize (cw, 800, 800)
+  fitContent (cw)
+
+  arrows = c ('Arrow', 'Diamond', 'Circle')
+  edgeType.values = c ('phosphorylates', 'synthetic lethal', 'undefined')
+  setEdgeSourceArrowRule (cw, 'edgeType', edgeType.values, arrows)
+  setEdgeTargetArrowRule (cw, 'edgeType', edgeType.values, arrows)
+
+  colors.1 = c ("#FFFFFF", "#FFFFFF", "#FFFFFF")
+  colors.2 = c ("#AA00AA", "#00AAAA", "#0000AA")
+
+  edge.names = as.character (cy2.edge.names (g) [1:3])
+
+  for (i in 1:2) {
+    setEdgeTargetArrowColorDirect (cw, edge.names, colors.1)
+    redraw (cw)
+    Sys.sleep (1)
+    setEdgeTargetArrowColorDirect (cw, edge.names, colors.2)
+    redraw (cw)
+    Sys.sleep (1)
+    } # for i
+
+  invisible (cw)
+
+} # test.setEdgeTargetArrowColorDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeLabelOpacityDirect = function ()
+{
+  title = 'test.setEdgeOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edge.of.interest = cy2.edge.names (g) [1]
+  for (i in 1:5) {
+    setEdgeOpacityDirect (cw, edge.of.interest, i * 30); redraw (cw);
+    Sys.sleep (1)
+    } # for i
+
+} # test.
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeSourceArrowOpacityDirect = function ()
+{
+  title = 'test.setEdgeSourceArrowOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edges.of.interest = as.character (cy2.edge.names (g))
+
+     # make sure the source arrows are visible
+  setEdgeSourceArrowShapeDirect (cw, edges.of.interest, 'Circle')
+
+    # first try passing three edges and three arrow opacity values
+  setEdgeSourceArrowOpacityDirect (cw, edges.of.interest, c (64, 128, 255))
+  redraw (cw)
+
+  Sys.sleep (1)
+  
+    # now try passing three edges and just one opacity value; it will be applied to all arrows
+  setEdgeSourceArrowOpacityDirect (cw, edges.of.interest, 32)
+  redraw (cw)
+
+    # now loop through all of the arrow.opacitys
+
+  for (opacity in seq (0, 255, by=45)) {
+    setEdgeSourceArrowOpacityDirect (cw, edges.of.interest, opacity)
+    Sys.sleep (1)
+    redraw (cw)
+    }
+
+    # restore the default
+  setEdgeSourceArrowOpacityDirect (cw, edges.of.interest, 255)
+  redraw (cw)
+
+} # test.setEdgeSourceArrowOpacityDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeTargetArrowOpacityDirect = function ()
+{
+  title = 'test.setEdgeTargetArrowOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edges.of.interest = as.character (cy2.edge.names (g))
+
+     # make sure the target arrows are visible
+  setEdgeTargetArrowShapeDirect (cw, edges.of.interest, 'Circle')
+
+    # first try passing three edges and three arrow opacity values
+  setEdgeTargetArrowOpacityDirect (cw, edges.of.interest, c (64, 128, 255))
+  redraw (cw)
+
+  Sys.sleep (1)
+  
+    # now try passing three edges and just one opacity value; it will be applied to all arrows
+  setEdgeTargetArrowOpacityDirect (cw, edges.of.interest, 32)
+  redraw (cw)
+
+    # now loop through all of the arrow.opacitys
+
+  for (opacity in seq (0, 255, by=45)) {
+    setEdgeTargetArrowOpacityDirect (cw, edges.of.interest, opacity)
+    Sys.sleep (1)
+    redraw (cw)
+    }
+
+    # restore the default
+  setEdgeTargetArrowOpacityDirect (cw, edges.of.interest, 255)
+  redraw (cw)
+
+} # test.setEdgeTargetArrowOpacityDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeLabelPositionDirect = function ()
+{
+  title = 'test.setEdgeOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edge.of.interest = cy2.edge.names (g) [1]
+  for (i in 1:5) {
+    setEdgeOpacityDirect (cw, edge.of.interest, i * 30); redraw (cw);
+    Sys.sleep (1)
+    } # for i
+
+} # test.
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeLabelWidthDirect = function ()
+{
+  title = 'test.setEdgeOpacityDirect'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  edge.of.interest = cy2.edge.names (g) [1]
+  for (i in 1:5) {
+    setEdgeOpacityDirect (cw, edge.of.interest, i * 30); redraw (cw);
+    Sys.sleep (1)
+    } # for i
+
+} # test.
 #------------------------------------------------------------------------------------------------------------------------
 test.countNodes = function ()
 {
@@ -1503,7 +2087,7 @@ test.selectEdges = function ()
     # not yet possible to select edges through CytoscapeRPCCallHandler
   selectEdges (cw, "A (phosphorylates) B")
   checkEquals (getSelectedEdgeCount (cw), 1)
-  system ('sleep 1')
+  Sys.sleep (1)
   clearSelection (cw)
   checkEquals (getSelectedEdgeCount (cw), 0)
 
@@ -1581,7 +2165,7 @@ test.setEdgeColorRule = function ()
   edgeType.values = c ('phosphorylates', 'synthetic lethal', 'undefined')
   colors = c ('#FF0000', '#FFFF00', '#00FF00')
   setEdgeColorRule (cwe, 'edgeType',  edgeType.values, colors, mode='lookup')
-  system ('sleep 1')
+  Sys.sleep (1)
 
   all.white  = c ('#FFFFFF', '#FFFFFF', '#FFFFFF')
   setEdgeColorRule (cwe, 'edgeType',  edgeType.values [2], mode='lookup', '#000000')
@@ -1717,7 +2301,7 @@ test.movie = function ()
      # the first two set new attributes on the R graph data structure, then ask RCy to send those values
      # to R from the graph
      # the third rendering bypasses storage of new attribute values on the R graph, sending them instead 
-     # directly to Cytoscape.  (hence 'sendNodeAttributesDirect')
+     # directly to Cytoscape.  (hence 'setNodeAttributesDirect')
     
   for (i in 1:count) { 
     nodeData (cwe@graph, 'A', 'lfc') = -3.0
@@ -1726,31 +2310,31 @@ test.movie = function ()
     nodeData (cwe@graph, 'A', 'count') = 10
     nodeData (cwe@graph, 'B', 'count') = 140
     nodeData (cwe@graph, 'C', 'count') = 32
-    result = sendNodeAttributes (cwe, 'lfc')
-    result = sendNodeAttributes (cwe, 'count')
+    result = setNodeAttributes (cwe, 'lfc')
+    result = setNodeAttributes (cwe, 'count')
     redraw (cwe)
 
-    system ('sleep 1')
+    Sys.sleep (1)
     nodeData (cwe@graph, 'A', 'lfc') = 3.0
     nodeData (cwe@graph, 'B', 'lfc') = 0.7
     nodeData (cwe@graph, 'C', 'lfc') = 1.9
     nodeData (cwe@graph, 'A', 'count') = 50
     nodeData (cwe@graph, 'B', 'count') = 22
     nodeData (cwe@graph, 'C', 'count') = 180
-    result = sendNodeAttributes (cwe, 'lfc')
-    result = sendNodeAttributes (cwe, 'count')
+    result = setNodeAttributes (cwe, 'lfc')
+    result = setNodeAttributes (cwe, 'count')
     redraw (cwe)
-    system ('sleep 1')
+    Sys.sleep (1)
 
     count.A = round (runif (1, 1, 200))
     count.B = round (runif (1, 1, 200))
     count.C = round (runif (1, 1, 200))
 
-    result = sendNodeAttributesDirect (cwe, 'count', 'int', c ('A', 'B', 'C'), c (count.A, count.B, count.C)); 
-    result = sendNodeAttributesDirect (cwe, 'lfc', 'numeric', c ('A', 'B', 'C'), c (-1.0, 0.0, 1.0))
+    result = setNodeAttributesDirect (cwe, 'count', 'int', c ('A', 'B', 'C'), c (count.A, count.B, count.C)); 
+    result = setNodeAttributesDirect (cwe, 'lfc', 'numeric', c ('A', 'B', 'C'), c (-1.0, 0.0, 1.0))
     redraw (cwe)
 
-    if (i < count) system ('sleep 1')
+    if (i < count) Sys.sleep (1)
     } # for i
 
   msg (cwe, 'test.movie')
@@ -1889,7 +2473,7 @@ test.randomUndirectedGraph = function ()
 
 } # test.randomUndirectedGraph 
 #------------------------------------------------------------------------------------------------------------------------
-test.simpleGraph = function ()
+test.simpleGraph = function (apply.viz.rules=TRUE)
 {
   title = 'test.simpleGraph'
   window.prep (title)
@@ -1900,18 +2484,19 @@ test.simpleGraph = function ()
   displayGraph (cws)
   layout (cws, 'jgraph-spring')
   setNodeLabelRule (cws, 'label')
-  node.attribute.values = c ("kinase",  "transcription factor")
-  colors =                c ('#A0AA00', '#FF0000')
-  setDefaultNodeBorderWidth (cws, 5)
-  setNodeBorderColorRule (cws, 'type', node.attribute.values, colors, mode='lookup', default.color='#88FF22')
-  count.control.points = c (2, 30, 100)
-  sizes                = c (20, 50, 100)
-  setNodeSizeRule (cws, 'count', count.control.points, sizes, mode='interpolate')
-  setNodeColorRule (cws, 'lfc', c (-3.0, 0.0, 3.0), c ('#00FF00', '#FFFFFF', '#FF0000'), mode='interpolate')
+
+  if (apply.viz.rules) {
+    node.attribute.values = c ("kinase",  "transcription factor")
+    colors =                c ('#A0AA00', '#FF0000')
+    setDefaultNodeBorderWidth (cws, 5)
+    setNodeBorderColorRule (cws, 'type', node.attribute.values, colors, mode='lookup', default.color='#88FF22')
+    count.control.points = c (2, 30, 100)
+    sizes                = c (20, 50, 100)
+    setNodeSizeRule (cws, 'count', count.control.points, sizes, mode='interpolate')
+    setNodeColorRule (cws, 'lfc', c (-3.0, 0.0, 3.0), c ('#00FF00', '#FFFFFF', '#FF0000'), mode='interpolate')
+    } # if apply.viz.rules
 
   redraw (cws)
-
-  msg (cws, title)
 
   invisible (cws)
 
@@ -2420,6 +3005,28 @@ test.addGraphToGraph = function ()
 
 } # test.addGraphToGraph
 #------------------------------------------------------------------------------------------------------------------------
+test.addGraphToGraph.degenerateFirstGraph = function ()
+{
+  window.title = 'test.addGraphToGraph.degenerateFirstGraph'
+  g = new ('graphNEL', edgemode='directed')
+  g = addNode ('A', g)
+  g = addNode ('E', g)
+  g = addNode ('F', g)
+  window.prep (window.title)
+  cw <<- new.CytoscapeWindow (window.title, graph=g)
+
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw, 'grid')
+
+  g2 <<- makeSimpleGraph ()
+  addGraphToGraph (cw, g2)
+  
+
+  invisible (cw)
+
+} # test.addGraphToGraph.degenerateFirstGraph
+#------------------------------------------------------------------------------------------------------------------------
 test.existing.CytoscapeWindow = function ()
 {
   title = 'test.existing.CytoscapeWindow'
@@ -2514,12 +3121,12 @@ test.addGetAndDeleteEdgeAttributes = function ()
      # now add an attribute to two of the edges 
   first.two.edges = as.character (cy2.edge.names (g)[1:2])
   values = c ('hemlock', 'yew')
-  sendEdgeAttributesDirect (cw, 'treeSpecies', 'char', first.two.edges, values)
+  setEdgeAttributesDirect (cw, 'treeSpecies', 'char', first.two.edges, values)
 
-    # now add an attribute to a single edge.  this exercises a different branch in RCytoscape:sendEdgeAttributesDirect
+    # now add an attribute to a single edge.  this exercises a different branch in RCytoscape:setEdgeAttributesDirect
   first.edge = as.character (cy2.edge.names (g)[1])
   value = 'one century'
-  sendEdgeAttributesDirect (cw, 'ageInYears', 'char', first.edge, value)
+  setEdgeAttributesDirect (cw, 'ageInYears', 'char', first.edge, value)
   checkTrue ('ageInYears' %in% getEdgeAttributeNames (cw))
 
      # get names from cy2.edge.names (cw@graph)
@@ -2552,19 +3159,19 @@ test.addGetAndDeleteNodeAttributes = function ()
   displayGraph (cw)
   layout (cw, 'jgraph-spring')
   redraw (cw)
-
+  x <<- cw
      # canonicalName is added by Cytoscape
-  checkEquals (length (intersect (getNodeAttributeNames (cy), c ("canonicalName", "count", "hiddenLabel", "label", "lfc", "type"))), 6)
+  checkEquals (length (intersect (getNodeAttributeNames (cy), c ("canonicalName", "count",  "label", "lfc", "type"))), 5)
 
      # now add an attribute to two of the nodes 
   first.two.nodes = nodes (g) [1:2]
   values = c ('cedar', 'ash')
-  sendNodeAttributesDirect (cw, 'treeSpecies', 'char', first.two.nodes, values)
+  setNodeAttributesDirect (cw, 'treeSpecies', 'char', first.two.nodes, values)
 
-    # now add an attribute to a single node.  this exercises a different branch in RCytoscape:sendNodeAttributesDirect
+    # now add an attribute to a single node.  this exercises a different branch in RCytoscape:setNodeAttributesDirect
   first.node = nodes (g) [1]
   value = 'one millenium'
-  sendNodeAttributesDirect (cw, 'ageInYears', 'char', first.node, value)
+  setNodeAttributesDirect (cw, 'ageInYears', 'char', first.node, value)
   checkTrue ('ageInYears' %in% getNodeAttributeNames (cw))
   checkEquals (getNodeAttribute (cw, 'B', 'type'), 'transcription factor')
   checkEquals (getNodeAttribute (cw, 'A', 'ageInYears'), 'one millenium')
@@ -2712,7 +3319,7 @@ test.setVisualStyle = function ()
   current.names = getVisualStyleNames (cw5)
   for (style.name in current.names) {
     setVisualStyle (cy, style.name)
-    system ('sleep 1')
+    Sys.sleep (1)
     } # for style.name
 
   invisible (cw5)
@@ -2887,7 +3494,7 @@ test.setNodeSizeDirect = function ()
   redraw (cw)
   layout (cw)
   
-  lockNodeDimensions (cw, 'default', TRUE)
+  lockNodeDimensions (cw, TRUE)
 
   small = 30
   large = 300
@@ -2911,7 +3518,7 @@ test.setNodeWidthAndHeightDirect = function ()
   redraw (cw)
   layout (cw)
 
-  lockNodeDimensions (cw, 'default', FALSE)
+  lockNodeDimensions (cw, FALSE)
   
   small = 30
   large = 300
@@ -2929,6 +3536,38 @@ test.setNodeWidthAndHeightDirect = function ()
 
 } # test.setNodeWidthAndHeightDirect
 #------------------------------------------------------------------------------------------------------------------------
+test.setNodeFontSizeDirect = function ()
+{ 
+  title = 'test.setNodeFontSizeDirect'
+  window.prep (title)
+  cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+  displayGraph (cw)
+  redraw (cw)
+  layout (cw)
+
+  starting.size = 4
+  setNodeSizeDirect (cw, c ('A', 'B', 'C'), 50)
+  setNodeFontSizeDirect (cw, c ('A', 'B'), 12)
+  redraw (cw)
+  
+  for (i in 1:20) {
+    setNodeFontSizeDirect (cw, 'A', starting.size + i)
+    setNodeFontSizeDirect (cw, 'B', starting.size + (i*3))
+    redraw (cw)
+    } # for i
+
+  starting.size = 32
+  for (i in 20:1) {
+    setNodeFontSizeDirect (cw, 'A', starting.size - i)
+    setNodeFontSizeDirect (cw, 'B', starting.size - (i*3))
+    redraw (cw)
+    } # for i
+
+
+  invisible (cw)
+
+} # test.setNodeSizeDirect
+#------------------------------------------------------------------------------------------------------------------------
 test.setNodeShapeDirect = function ()
 { 
   title = 'test.setNodeShapeDirect'
@@ -2938,7 +3577,7 @@ test.setNodeShapeDirect = function ()
   redraw (cw)
   layout (cw)
 
-  lockNodeDimensions (cw, 'default', TRUE)
+  lockNodeDimensions (cw, TRUE)
   setNodeSizeDirect (cw, 'A', 100)
 
   for (new.shape in getNodeShapes (cw)) {
@@ -2949,6 +3588,56 @@ test.setNodeShapeDirect = function ()
   invisible (cw)
 
 } # test.setNodeShapeDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeVizPropertiesDirect = function (cw=NULL)
+{
+  title = 'test.setEdgeVizPropertiesDirect'
+
+  if (is.null (cw)) {
+    window.prep (title)
+    cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
+    displayGraph (cw)
+    redraw (cw)
+    layout (cw)
+    }
+
+  cy2.edgeNames = sort (getAllEdges (cw))
+  e1 = cy2.edgeNames [1]
+  e2 = cy2.edgeNames [2]
+  e3 = cy2.edgeNames [3]
+
+  colors = c ('#440000', '#004400', '#000044', '#880000', '#008800', '#000088', '#FF0000', '#00FF00', '#0000FF', '#FFFFFF')
+  line.styles = c ('SOLID', 'LONG_DASH', 'EQUAL_DASH', 'DASH_DOT', 'DOT', 'ZIGZAG', 'SINEWAVE', 'VERTICAL_SLASH', 
+                   'FORWARD_SLASH', 'BACKWARD_SLASH', 'PARALLEL_LINES', 'CONTIGUOUS_ARROW', 'SEPARATE_ARROW')
+
+  arrow.shapes = c ('No Arrow', 'Diamond', 'Delta', 'Arrow', 'T', 'Circle', 'Half Arrow Top', 'Half Arrow Bottom', 'Diamond', 'T')
+  labels = paste ('label', seq (10,100,10), sep='-');  labels [10] = ''
+  tooltips = paste ('tooltip', seq (10,100,10), sep='-');  tooltips [10] = ''
+  widths = c (1:9, 1)
+
+  for (i in 1:10) {
+    setEdgeOpacityDirect (cw, c (e2, e3), 25 * i)
+    setEdgeColorDirect (cw, e1, colors [i])
+    setEdgeLineStyleDirect (cw, e2, line.styles [i])
+    setEdgeSourceArrowShapeDirect (cw, e1, arrow.shapes [i])
+    setEdgeTargetArrowShapeDirect (cw, e1, arrow.shapes [i])
+    setEdgeLabelDirect (cw, e2, labels [i])
+    setEdgeLabelColorDirect (cw, e2, colors [i])
+    setEdgeTooltipDirect (cw, e2, tooltips [i])
+    setEdgeLineWidthDirect (cw, e3, widths [i])
+    setEdgeFontSizeDirect (cw, e2, widths [i] * 3)
+    setEdgeSourceArrowColorDirect (cw, e1, colors [11-i])
+    setEdgeTargetArrowColorDirect (cw, e1, colors [11-i])
+    setEdgeLabelOpacityDirect (cw, e2, 25 * i)
+    setEdgeSourceArrowOpacityDirect (cw, e1, 25 * i)
+    setEdgeTargetArrowOpacityDirect (cw, e1, 255 - (25 * i))
+    redraw (cw)
+    Sys.sleep (1)
+    }
+
+  invisible (cw)
+
+} # test.setEdgeVizPropertiesDirect
 #------------------------------------------------------------------------------------------------------------------------
 test.graphBAM = function ()
 { 
@@ -2999,7 +3688,7 @@ test.hexColorToInt = function ()
 # add a node to an existing graph.
 # questions:  
 #  1) what edge attribute values are assigned to this new edge?  
-#  2) can we assign new values to those attributes?  use sendEdgeAttributesDirect
+#  2) can we assign new values to those attributes?  use setEdgeAttributesDirect
 test.addCyNode = function ()
 { 
   title = 'test.addCyNode'
@@ -3020,7 +3709,7 @@ test.addCyNode = function ()
 # add an edge to an existing graph.
 # questions:  
 #  1) what edge attribute values are assigned to this new edge?  
-#  2) can we assign new values to those attributes?  use sendEdgeAttributesDirect
+#  2) can we assign new values to those attributes?  use setEdgeAttributesDirect
 test.addCyEdge = function ()
 { 
   title = 'test.addCyEdge'
@@ -3111,4 +3800,93 @@ test.rcy.edgeNames = function ()
   checkEquals (sort (RCytoscape:::.rcyEdgeNames (gx)), c ("A~B", "B~C", "C~A", "C~B"))
 
 } # test.rcy.edgeNames
+#------------------------------------------------------------------------------------------------------------------------
+# a standard demo, up on the website.  source it, run it.  a graph is created, displayed, retrieved, checked for identity
+test.graphAM.round.trip = function ()
+{
+  title = 'test.graphAM.round.trip'
+  write (noquote (sprintf ('------- %s', title)), stderr ())
+  source ('http://rcytoscape.systemsbiology.net/versions/current/cookbook/randomAM/randomAdjacencyMatrixGraphTest.R')
+  run (0:7)
+
+} # test.graphAM.round.trip
+#------------------------------------------------------------------------------------------------------------------------
+restore.defaults = function ()
+{
+  cy = CytoscapeConnection ()
+  setDefaultBackgroundColor (cy, '#CCCCFF')
+  setDefaultNodeShape (cy, 'ellipse')
+  lockNodeDimensions (cy, TRUE)
+  setDefaultNodeSelectionColor (cy, '#FFFF00')
+  setDefaultNodeReverseSelectionColor (cy, '#00FF00')
+  setDefaultEdgeSelectionColor (cy, '#FF0000')
+  setDefaultEdgeReverseSelectionColor (cy, '#00FF00')
+  setDefaultNodeSize (cy, 30)
+  setDefaultNodeColor (cy, '#FF8888')  # a guess
+
+  setDefaultNodeBorderColor (cy, '#000000')
+  setDefaultNodeBorderWidth (cy, 1)
+  setDefaultNodeFontSize (cy, 12)
+  setDefaultNodeLabelColor (cy, '#000000')
+  setDefaultEdgeLineWidth (cy, 1)
+  setDefaultEdgeColor (cy, '#0000FF')
+
+} # restore.defaults
+#------------------------------------------------------------------------------------------------------------------------
+test..getNovelEdges = function ()
+{
+  g.3e <<- makeSimpleGraph ()
+  g.0e <<- new ("graphNEL", edgemode = "directed")
+  g.0e = initEdgeAttribute (g.0e, 'edgeType', 'char', 'unspecified')
+
+    # no novel edges if the 2nd arg has no edges
+  checkTrue (is.na (RCytoscape:::.getNovelEdges (g.3e, g.0e)))
+
+    # three novel edges if the 1st arg has zero edges, the second has 3
+  novel.edges <<- RCytoscape:::.getNovelEdges (g.0e, g.3e)
+  checkEquals (length (novel.edges), 3)
+
+    # add one edge to g.0e which is an exact duplicate of the first edge of g.3e
+
+  g.1e = addNode ('A', g.0e)
+  g.1e = addNode ('B', g.1e)
+  g.1e = addEdge ('A', 'B', g.1e)
+  edgeData (g.1e, 'A', 'B', attr='edgeType') = 'phosphorylates'
+
+  g1 <<- g.1e
+  g3 <<- g.3e
+
+  novel.edges <<- RCytoscape:::.getNovelEdges (g.3e, g.1e)
+  checkEquals (length (novel.edges), 0)
+
+  novel.edges <<- RCytoscape:::.getNovelEdges (g.1e, g.3e)
+  checkEquals (length (novel.edges), 2)
+
+} # test..getNovelEdges
+#------------------------------------------------------------------------------------------------------------------------
+test.setNodeImageDirect = function (apply.viz.rules=FALSE)
+{
+  title = 'test.imageUrl'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, makeSimpleGraph ())
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  setNodeLabelRule (cw, 'label')
+
+  setNodeImageDirect (cw, 'A', 'http://rcytoscape.systemsbiology.net/versions/current/images/isb.png')
+  setNodeImageDirect (cw, 'B', 'http://rcytoscape.systemsbiology.net/versions/current/images/tudelft.jpg')
+  setNodeImageDirect (cw, 'C', 'http://rcytoscape.systemsbiology.net/versions/current/images/bioc.tiff')
+
+  setNodeColorDirect (cw, 'A', '#0000FF')
+  setNodeColorDirect (cw, 'B', '#FF00FF')
+  setNodeColorDirect (cw, 'C', '#FF0000')
+
+  redraw (cw)
+  setWindowSize (cw, 800, 800)
+  fitContent (cw)
+
+  invisible (cw)
+
+} # test.setNodeImageDirect
 #------------------------------------------------------------------------------------------------------------------------

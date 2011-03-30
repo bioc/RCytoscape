@@ -7,11 +7,11 @@ In the specified CytoscapeWindow, set the opacity of the fill color of
 the specified node.
 }
 \usage{
-setNodeFillOpacityDirect(obj, node.name, new.value)
+setNodeFillOpacityDirect(obj, node.names, new.value)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
-  \item{node.name}{a \code{String} object.}
+  \item{node.names}{one or more \code{String} objects.}
   \item{new.value}{a \code{numeric} object, ranging from 0 to 255.}
 }
 

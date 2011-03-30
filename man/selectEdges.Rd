@@ -33,6 +33,8 @@ None.
   clearSelection (cw)
   selectEdges (cw, c ("A (phosphorylates) B", "B (synthetic lethal) C"))
   getSelectedEdges (cw)
+    # more complicated, but more realistic:
+  #selectEdges (cw, as.character ( cy2.en (g, names (which (eda (g, 'edgeType') == 'phosphorylates')))))
 }
 
 \keyword{graph}

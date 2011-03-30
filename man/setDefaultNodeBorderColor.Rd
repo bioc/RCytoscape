@@ -1,16 +1,16 @@
 \name{setDefaultNodeBorderColor}
 \alias{setDefaultNodeBorderColor}
-\alias{setDefaultNodeBorderColor,CytoscapeWindowClass-method}
+\alias{setDefaultNodeBorderColor,CytoscapeConnectionClass-method}
 \title{setDefaultNodeBorderColor}
 \description{
-In the specified CytoscapeWindow, stipulate the color for all nodeBorders
+In the specified CytoscapeConnection, stipulate the color for all nodeBorders
 other than those mentioned in a node border color rule.
 }
 \usage{
 setDefaultNodeBorderColor(obj, new.color, vizmap.style.name = "default")
 }
 \arguments{
-  \item{obj}{a \code{CytoscapeWindowClass} object. }
+  \item{obj}{a \code{CytoscapeConnectionClass} object. }
   \item{new.color}{a \code{String} object, a hex string, of the form '#RRGGBB'.}
   \item{vizmap.style.name}{a \code{String} object.}
 

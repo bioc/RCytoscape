@@ -56,6 +56,15 @@ None.
    node.sizes    <- c (1, 20, 50, 80, 200)   # anything below 20 will have size of 1; anothing above 80 will be 200.  this should be easy to see and check
    setNodeSizeRule (cw, node.attribute.name, control.points, node.sizes, mode='interpolate')  # a warning is issued; below and above sizes must be inferred
 
+    # now use a mode='lookup' rule.  specify a size for two of the molecule types
+    # look to see that the third type, glycoprotein, gets the tiny default.size of 5
+
+  molecule.types <- c ('kinase', 'transcription factor')
+  node.sizes     <- c (60,        80)
+  setNodeSizeRule (cw, 'type', molecule.types,  node.sizes, default.size= 5, mode='lookup')
+  redraw (cw)
+
+
 }
 
 \keyword{graph}

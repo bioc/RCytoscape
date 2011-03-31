@@ -163,7 +163,8 @@ exportMethods (
    setDefaultEdgeSelectionColor,
    getDefaultEdgeReverseSelectionColor,
    setDefaultEdgeReverseSelectionColor,
-   saveImage
+   saveImage,
+   saveNetwork
    )
 
 export(
@@ -179,7 +180,8 @@ export(
    makeSimpleGraph,
    makeRandomGraph,
    initNodeAttribute,
-   initEdgeAttribute
+   initEdgeAttribute,
+   validCyWin       
    )
 
 importClassesFrom(graph, graph)

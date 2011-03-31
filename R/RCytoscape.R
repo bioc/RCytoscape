@@ -108,6 +108,7 @@ setGeneric ('setDefaultEdgeReverseSelectionColor',  signature='obj',
                 function (obj, new.color, vizmap.style.name='default') standardGeneric ('setDefaultEdgeReverseSelectionColor'))
 
 setGeneric ('saveImage',                  signature='obj', function (obj, file.name, image.type, scale) standardGeneric ('saveImage'))
+setGeneric ('saveNetwork',                signature='obj', function (obj, file.name, format='gml') standardGeneric ('saveNetwork'))
 
 setGeneric ('setDefaultNodeShape',        signature='obj', function (obj, new.shape, vizmap.style.name='default') standardGeneric ('setDefaultNodeShape'))
 setGeneric ('setDefaultNodeSize',         signature='obj', function (obj, new.size, vizmap.style.name='default') standardGeneric ('setDefaultNodeSize'))
@@ -2975,8 +2976,19 @@ setMethod ('saveImage', 'CytoscapeWindowClass',
 
    function (obj, file.name, image.type, scale) {
      id = as.character (obj@window.id)
-      return (xml.rpc (obj@uri, 'Cytoscape.exportView', id, file.name, image.type, scale))
-      })
+     result = xml.rpc (obj@uri, 'Cytoscape.exportView', id, file.name, image.type, scale)
+     invisible (result)
+
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('saveNetwork', 'CytoscapeWindowClass',
+
+   function (obj, file.name, format='gml') {
+     id = as.character (obj@window.id)
+     result = xml.rpc (obj@uri, 'Cytoscape.saveNetwork', id, file.name)
+     invisible (result)
+     })
+
 #------------------------------------------------------------------------------------------------------------------------
 chad.debug = function (obj, msg)
 {

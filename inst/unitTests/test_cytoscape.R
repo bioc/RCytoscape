@@ -143,6 +143,12 @@ run.tests = function ()
   test..getNovelEdges ()
   test.graphAM.round.trip ()
 
+  test.saveImage ()
+  test.saveNetwork ()
+
+  test.setNodeImageDirect ()
+  test.validity ()
+
   options ('warn'=0)
 
 } # run.tests
@@ -3864,6 +3870,52 @@ test..getNovelEdges = function ()
 
 } # test..getNovelEdges
 #------------------------------------------------------------------------------------------------------------------------
+# apparently does not run reliably at bioc
+hiddenTest.saveImage = function ()
+{
+  title = 'test.saveImage'
+  window.prep (title)
+
+  g.simple = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, g.simple)
+
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  setNodeLabelRule (cw, 'label')
+  redraw (cw)
+
+  filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.jpg')
+  printf ('saving image file to %s', filename)
+  saveImage (cw, filename, 'jpeg', 2.0)
+  printf ('image file exists? %s', file.exists (filename))
+
+  invisible (cw)
+
+} # test.saveImage
+#------------------------------------------------------------------------------------------------------------------------
+# apparently does not run reliably at bioc
+hiddenTest.saveNetwork = function ()
+{
+  title = 'test.saveNetwork'
+  window.prep (title)
+
+  g.simple = RCytoscape::makeSimpleGraph ()
+  cw = new.CytoscapeWindow (title, g.simple)
+
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  setNodeLabelRule (cw, 'label')
+  redraw (cw)
+
+  filename = sprintf ('%s/%s', tempdir (), 'saveNetworkTest.gml')
+  printf ('saving gml file to %s', filename)
+  saveNetwork (cw, filename)
+  printf ('gml file exists? %s', file.exists (filename))
+
+  invisible (cw)
+
+} # test.saveNetwork
+#------------------------------------------------------------------------------------------------------------------------
 test.setNodeImageDirect = function (apply.viz.rules=FALSE)
 {
   title = 'test.imageUrl'
@@ -3889,4 +3941,48 @@ test.setNodeImageDirect = function (apply.viz.rules=FALSE)
   invisible (cw)
 
 } # test.setNodeImageDirect
+#------------------------------------------------------------------------------------------------------------------------
+test.validity = function ()
+{
+  title = 'test.validity error #1'
+  window.prep (title)
+
+  g = new ('graphNEL', edgemode='directed')
+
+     # should fail with 'You must provide an 'edgeType' edge attribute, which will be mapped to Cytoscape's crucial ...
+  cw = new.CytoscapeWindow (title, g)
+  checkEquals (validCyWin (cw), FALSE)
+
+     # fix the edgeType complaint
+  title = 'test.validity fixed'
+  g = initEdgeAttribute (g, 'edgeType', 'char', 'unspecified')    
+  window.prep (title)
+  cw = new.CytoscapeWindow (title, g)
+  print (checkTrue (validCyWin (cw)))
+
+    # add a new node attribute the old-fashioned R graph way, make sure the failure to properly initialize is caught
+  nodeDataDefaults (g, attr='pval') = 1.0
+  title = 'test.validity error #2'
+  window.prep (title)
+  cw = new.CytoscapeWindow (title, g)
+  checkTrue (!validCyWin (cw))
+
+    # add a new edge attribute the old-fashioned R graph way, make sure the failure to properly initialize is caught
+  title = 'test.validity error #3'
+  edgeDataDefaults (g, attr='score') = 0.0
+  window.prep (title)
+  cw = new.CytoscapeWindow (title, g)
+  checkTrue (!validCyWin (cw))
+
+    # now fix them both
+  title = 'test.validity fix all'
+  g = initNodeAttribute (g, 'pval', 'numeric', 1.0)
+  g = initEdgeAttribute (g, 'score', 'numeric', 0)
+  window.prep (title)
+  cw = new.CytoscapeWindow (title, g)
+  print (checkTrue (validCyWin (cw)))
+
+  invisible (cw)
+
+} # test.validity
 #------------------------------------------------------------------------------------------------------------------------

@@ -134,7 +134,7 @@ run.tests = function ()
   test.twoGraphsDoubleEdges ()
   test..classicGraphToNodePairTable ()
   test.rcy.edgeNames ()
-  test.graphAM.round.trip ()
+  #test.graphAM.round.trip ()
   test..getNovelEdges ()
   test.validity ()
 
@@ -3825,7 +3825,7 @@ test.rcy.edgeNames = function ()
 } # test.rcy.edgeNames
 #------------------------------------------------------------------------------------------------------------------------
 # a standard demo, up on the website.  source it, run it.  a graph is created, displayed, retrieved, checked for identity
-test.graphAM.round.trip = function ()
+hiddentest.graphAM.round.trip = function ()
 {
   title = 'test.graphAM.round.trip'
   write (noquote (sprintf ('------- %s', title)), stderr ())

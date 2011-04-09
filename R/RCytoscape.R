@@ -4,6 +4,10 @@ library (methods)
 #------------------------------------------------------------------------------------------------------------------------
 printf = function (...) print (noquote (sprintf (...)))
 #------------------------------------------------------------------------------------------------------------------------
+#setClassUnion ("biocGraph", c ("graph", "MultiGraph"))
+#setClassUnion ("biocGraph", c ("graph", "graphNEL", "graphAM", "distGraph", "clusterGraph", "graphBAM", "MultiGraph"))
+
+
 setClass ("CytoscapeConnectionClass", 
           representation = representation (uri="character"),
           prototype = prototype (uri="http://localhost:9000")
@@ -13,7 +17,7 @@ setClass ("CytoscapeConnectionClass",
 setClass ("CytoscapeWindowClass", 
           representation = representation (title="character",
                                            window.id='character',
-                                           graph="graph"),
+                                           graph="graphBase"),
           contains='CytoscapeConnectionClass',
           prototype = prototype (title="R graph", 
                                  graph=new ("graphNEL", edgemode='directed'), 
@@ -305,14 +309,13 @@ new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'
     }
 
     # add a label to each node if not already present.  default label is the node name, the node ID
-  if (edgemode (graph) == 'undirected') 
+  if (is.classic.graph (graph))
+    if (edgemode (graph) == 'undirected')
     graph = remove.redundancies.in.undirected.graph (graph)
 
   if (! 'label' %in% noa.names (graph)) {
     #write ('nodes have no label attribute -- adding default labels', stderr ())
     graph = initNodeAttribute (graph, 'label', 'char', '')
-
-
     if (length (nodes (graph) > 0))
       for (node in nodes (graph))
         nodeData (graph, node, 'label') = node
@@ -891,15 +894,20 @@ setMethod ('sendEdges', 'CytoscapeWindowClass',
        return ()
        }
                  
-    tbl.edges = .graphToNodePairTable (obj@graph)
+    if (is.classic.graph (obj@graph))
+      tbl.edges = .classicGraphToNodePairTable (obj@graph)
+    else if (is.multiGraph (obj@graph))
+      tbl.edges = .multiGraphToNodePairTable (obj@graph)
+
+       # todo:  if there is only one edge, Cytoscape.createEdges does not resolve, since arrays are expected, and 1-element arrays
+       # todo:  are treated as scalars in the trip from R to the java virutal machine.  (pshannon, 5 apr 2011)
     write (sprintf ('sending %d edges', nrow (tbl.edges)), stderr ())
     a = tbl.edges$source
     b = tbl.edges$target
     edge.type = tbl.edges$edgeType
     directed = rep (TRUE, length (a))
     forgive.if.node.is.missing = TRUE
-      
-    xml.rpc (obj@uri, 'Cytoscape.createEdges', as.character (obj@window.id), a, b, edge.type, directed, forgive.if.node.is.missing, .convert=F)
+    invisible (xml.rpc (obj@uri, 'Cytoscape.createEdges', obj@window.id, a, b, edge.type, directed, forgive.if.node.is.missing, .convert=T))
     }) # sendEdges
 
 
@@ -3030,7 +3038,7 @@ hexColorToInt = function (hex.string)
 #-----------------------------------------------------------------------------------------------------------------------
 # edges are stored variously and confusingly in graphNELs, maybe in other graph classes also
 # this function takes a native bioc graph object, and returns a data frame with 3 columns:  A, B, and edgeType
-.graphToNodePairTable = function (g)
+.classicGraphToNodePairTable = function (g)
 {
   nodes.list = edges (g)   # one named entry per node, each containing 0 or more partner (target) nodes
 
@@ -3066,7 +3074,28 @@ hexColorToInt = function (hex.string)
 
   return (tbl [-1,])
 
-} # .graphToNodePairTable
+} # .classicGraphToNodePairTable
+#------------------------------------------------------------------------------------------------------------------------
+.multiGraphToNodePairTable = function (mg)
+{
+  edge.set.names = edgeSets (mg)
+
+  template = list (source='', target='', edgeType='')
+  tbl = data.frame (template, stringsAsFactors=F)
+  for (edge.set in edgeSets (mg)) {
+    tilde.names = edgeNames (mg, edge.set)
+    pairs = strsplit (tilde.names, '~')
+    for (pair in pairs) {
+      source.node = pair [1]
+      target.node = pair [2]
+      new.row = list (source=source.node, target=target.node, edgeType=edge.set)
+      tbl = rbind (tbl, new.row)
+      }
+    } # for edge
+  
+  invisible (tbl [-1,])     
+
+} # .multiGraphToNodePairTable
 #------------------------------------------------------------------------------------------------------------------------
 # the bioc graph 'edgeNames' function does not detect, distinguish or report reciprocal edges.
 # this is fixed here.
@@ -3117,4 +3146,20 @@ hexColorToInt = function (hex.string)
   
 
 } # .getNovelEdges
+#------------------------------------------------------------------------------------------------------------------------
+is.classic.graph = function (obj)
+{
+  obj.classes = is (obj)
+
+  return ('graph' %in% obj.classes)
+
+} # is.classic.graph
+#------------------------------------------------------------------------------------------------------------------------
+is.multiGraph = function (obj)
+{
+  obj.classes = is (obj)
+
+  return ('MultiGraph' %in% obj.classes)
+
+} # is.multiGraph
 #------------------------------------------------------------------------------------------------------------------------

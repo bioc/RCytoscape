@@ -124,6 +124,15 @@ valid.graph = function (obj)
     return (FALSE)
     } # if
 
+  if (edgemode (obj@graph) == 'undirected') {
+    msgs = c ("Implementation of undirected graphs in the R graph classes includes the redundant storage of edge attributes.",
+              "RCytoscape removes this redundancy before sending the graph to Cytoscape, but this operation",
+              "can take a LONG time.",
+              "Consider using a directed graph in R until we come up with a better solution.")
+    for (msg in msgs) 
+      write (msg, stderr ())
+    } # if
+
   if (length (obj@graph) == 0) {
     write (sprintf ("missing graph"), stderr ())
     return (FALSE)

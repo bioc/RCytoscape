@@ -30,6 +30,7 @@ run.tests = function ()
 
   deleteAllWindows (cy)
 
+
   test.version ()
   test.create.class ()
   test.deleteWindow ()
@@ -73,10 +74,6 @@ run.tests = function ()
   test.setNodeBorderWidthRule ()
   test.setNodeSizeRule ()
   test.setNodeShapeRule ()
-  test.setNodeVizAttributesDirect ()
-  test.setEdgeVizPropertiesDirect 
-  test.setEdgeOpacityDirect ()
-  test.setNodeOpacityDirect ()
   test.countNodes ()
   test.countEdges ()
   test.countNodesAndEdgesInEmptyGraph ()
@@ -98,7 +95,7 @@ run.tests = function ()
   test.unmatchedAttributesError ()
   test.remove.redundancies.in.undirected.graph ()
   test.randomUndirectedGraph ()
-  test.simpleGraph ()
+  test.simpleGraph (apply.viz.rules=TRUE)
   test.simpleGraphWithReciprocalEdge ()
   test.setGraph ()
   test.setPosition ()
@@ -110,7 +107,9 @@ run.tests = function ()
   test.getGraphFromCyWindow ()
   test.sendDegenerateGraphs ()
   test.sendBigGraph ()
+  test.createWindowFromSelection ()
   test.addGraphToGraph ()
+  test.addGraphToGraph.degenerateFirstGraph ()
   test.existing.CytoscapeWindow ()
   test.existing.CytoscapeWindow.noEdges ()
   test.existing.CytoscapeWindow.emptyGraph ()
@@ -128,26 +127,44 @@ run.tests = function ()
   test.windowCoordinates ()
   test.zoom ()
   test.center ()
-  test.setNodeSizeDirect ()
-  test.setNodeWidthAndHeightDirect ()
-  test.setNodeShapeDirect ()
-  test.setEdgeVizPropertiesDirect ()
   test.graphBAM ()
-  test.createWindowFromSelection ()
   test.hexColorToInt ()
   test.addCyNode ()
   test.addCyEdge ()
   test.twoGraphsDoubleEdges ()
-  test.graphToNodePairTable ()
+  test..classicGraphToNodePairTable ()
   test.rcy.edgeNames ()
-  test..getNovelEdges ()
   test.graphAM.round.trip ()
-
-  test.saveImage ()
-  test.saveNetwork ()
-
-  test.setNodeImageDirect ()
+  test..getNovelEdges ()
   test.validity ()
+
+
+  test.setNodeColorDirect ()
+  test.setNodeOpacityDirect ()
+  test.setEdgeOpacityDirect ()
+  test.setEdgeColorDirect ()
+  test.setEdgeSourceArrowShapeDirect ()
+  test.setEdgeLabelDirect ()
+  test.setEdgeFontSizeDirect ()
+  test.setEdgeLabelColorDirect ()
+  test.setEdgeTooltipDirect ()
+  test.setEdgeLineWidthDirect ()
+  test.setEdgeLineStyleDirect ()
+  test.setEdgeSourceArrowShapeDirect ()
+  test.setEdgeTargetArrowShapeDirect ()
+  test.setEdgeSourceArrowColorDirect ()
+  test.setEdgeTargetArrowColorDirect ()
+  test.setEdgeLabelOpacityDirect ()
+  test.setEdgeSourceArrowOpacityDirect ()
+  test.setEdgeTargetArrowOpacityDirect ()
+  test.setEdgeLabelPositionDirect ()
+  test.setEdgeLabelWidthDirect ()
+  test.setNodeSizeDirect ()
+  test.setNodeWidthAndHeightDirect ()
+  test.setNodeFontSizeDirect ()
+  test.setNodeShapeDirect ()
+  test.setEdgeVizPropertiesDirect (cw=NULL)
+  test.setNodeImageDirect ()
 
   options ('warn'=0)
 
@@ -1345,7 +1362,7 @@ test.setEdgeSourceArrowShapeDirect = function ()
   fitContent (cw)
 
   edges.of.interest = as.character (cy2.edge.names (g))
-  supported.arrow.shapes = getArrowShapes (cy)
+  supported.arrow.shapes = getArrowShapes (cw)
 
     # first try passing three edges and three arrow shapes
   setEdgeSourceArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [2:5])
@@ -1513,7 +1530,7 @@ test.setEdgeLineStyleDirect = function ()
 
   edges.of.interest = as.character (cy2.edge.names (g))
 
-  supported.styles = getLineStyles (cy)
+  supported.styles = getLineStyles (cw)
 
     # first try passing three edges and three styles
   setEdgeLineStyleDirect (cw, edges.of.interest, supported.styles [5:7])
@@ -1554,7 +1571,7 @@ test.setEdgeSourceArrowShapeDirect = function ()
   fitContent (cw)
 
   edges.of.interest = as.character (cy2.edge.names (g))
-  supported.arrow.shapes = getArrowShapes (cy)
+  supported.arrow.shapes = getArrowShapes (cw)
 
     # first try passing three edges and three arrow.shapes
   setEdgeSourceArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [5:7])
@@ -1594,7 +1611,7 @@ test.setEdgeTargetArrowShapeDirect = function ()
   redraw (cw)
 
   edges.of.interest = as.character (cy2.edge.names (g))
-  supported.arrow.shapes = getArrowShapes (cy)
+  supported.arrow.shapes = getArrowShapes (cw)
 
     # first try passing three edges and three arrow.shapes
   setEdgeTargetArrowShapeDirect (cw, edges.of.interest, supported.arrow.shapes [5:7])
@@ -2684,7 +2701,7 @@ test.haveEdgeAttribute = function ()
 
 } # test.haveEdgeAttribute
 #------------------------------------------------------------------------------------------------------------------------
-test.haveEdgeAttribute.oneEdgeOnly = function ()
+hiddenTest.haveEdgeAttribute.oneEdgeOnly = function ()
 {
   title = 'test.haveEdgeAttribute.oneEdgeOnly'
   window.prep (title)
@@ -2702,7 +2719,7 @@ test.haveEdgeAttribute.oneEdgeOnly = function ()
 
   checkTrue (length (RCytoscape:::haveEdgeAttribute (cy, cy2.edgenames, 'score')) == 1)
 
-} # test.haveEdgeAttribute.oneEdgeOnly
+} # hiddenTest.haveEdgeAttribute.oneEdgeOnly
 #------------------------------------------------------------------------------------------------------------------------
 test.copyNodeAttributesFromCyGraph = function ()
 {
@@ -3763,14 +3780,14 @@ test.twoGraphsDoubleEdges = function ()
     
 } # test.twoGraphsoubleEdges
 #------------------------------------------------------------------------------------------------------------------------
-test.graphToNodePairTable = function ()
+test..classicGraphToNodePairTable = function ()
 {
-  print (noquote ('------- test.graphToNodePairTable'))
+  print (noquote ('------- test..classicGraphToNodePairTable'))
 
     # first, our standard demo graph, directed, no reciprocal edges
 
   g = makeSimpleGraph ()
-  tbl.g = RCytoscape:::.graphToNodePairTable (g)
+  tbl.g = RCytoscape:::.classicGraphToNodePairTable (g)
   checkEquals (dim (tbl.g), c (3, 3))
   checkEquals (colnames (tbl.g), c ("source", "target", "edgeType"))
   checkEquals (tbl.g$edgeType, c ("phosphorylates", "synthetic lethal", "undefined"))
@@ -3782,14 +3799,14 @@ test.graphToNodePairTable = function ()
   gx = makeSimpleGraph ()
   gx = graph::addEdge ('C', 'B', gx)
   edgeData (gx, 'C', 'B', attr='edgeType') = 'synthetic rescue'
-  tbl.egx = RCytoscape:::.graphToNodePairTable (gx)
+  tbl.egx = RCytoscape:::.classicGraphToNodePairTable (gx)
   checkEquals (dim (tbl.egx), c (4, 3))
   checkEquals (colnames (tbl.egx), c ("source", "target", "edgeType"))
   checkEquals (tbl.egx$edgeType, c ("phosphorylates", "synthetic lethal", "undefined", "synthetic rescue"))
   checkEquals (tbl.egx$source, c ("A", "B", "C", "C"))
   checkEquals (tbl.egx$target, c ("B", "C", "A", "B"))
 
-} # test.graphToNodePairTable 
+} # test..classicGraphToNodePairTable 
 #------------------------------------------------------------------------------------------------------------------------
 test.rcy.edgeNames = function ()
 {
@@ -3947,6 +3964,21 @@ test.validity = function ()
   title = 'test.validity error #1'
   window.prep (title)
 
+  g.undirected = new ('graphNEL', edgemode='undirected')
+  g.undirected = graph::addNode ('A', g.undirected)
+  g.undirected = graph::addNode ('B', g.undirected)
+  g.undirected = graph::addEdge ('A', 'B', g.undirected)
+  g.undirected = initEdgeAttribute (g.undirected, 'edgeType', 'char', 'unspecified')
+  edgeData (g.undirected, 'A', 'B', 'edgeType') = 'reciprocal'
+
+
+     # should not fail, but warning should be given
+  cw = new.CytoscapeWindow (title, g.undirected)
+  checkEquals (validCyWin (cw), TRUE)
+
+     # fix the edgeType complaint
+
+  window.prep (title)
   g = new ('graphNEL', edgemode='directed')
 
      # should fail with 'You must provide an 'edgeType' edge attribute, which will be mapped to Cytoscape's crucial ...

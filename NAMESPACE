@@ -184,7 +184,7 @@ export(
    validCyWin       
    )
 
-importClassesFrom(graph, graph)
+importClassesFrom(graph, graph, graphBase)
 
 importClassesFrom(methods, character, integer)
 

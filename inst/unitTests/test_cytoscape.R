@@ -3209,7 +3209,7 @@ test.addGetAndDeleteNodeAttributes = function ()
 #------------------------------------------------------------------------------------------------------------------------
 test.getAllNodeAttributes = function ()
 {
-  title = 'test.addGetAllNodeAttributes'
+  title = 'test.getAllNodeAttributes'
   window.prep (title)
   
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())

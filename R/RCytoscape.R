@@ -2244,9 +2244,12 @@ setMethod ('getAllNodeAttributes', 'CytoscapeWindowClass',
       }
   
     result = cbind (unlist (nodeData (g, nodes.of.interest, attr=attribute.names [1])))
+    
     if (length (attribute.names) > 1) {
       for (name in attribute.names [2:length (attribute.names)]) {
         new.column = unlist (nodeData (g, nodes.of.interest, attr=name))
+        if (is.null (new.column))
+          new.column = rep ('NULL', nrow (result))
         result = cbind (result, new.column)
         } # for name
       } # if length > 1

@@ -2255,7 +2255,7 @@ setMethod ('getAllNodeAttributes', 'CytoscapeWindowClass',
       } # if length > 1
   
     colnames (result) = attribute.names
-    result = as.data.frame (result)
+    result = as.data.frame (result, stringsAsFactors=FALSE)
   
     for (name in attribute.names) {
       attribute.class = attr (nodeDataDefaults (obj@graph, name), 'class')
@@ -2317,7 +2317,7 @@ setMethod ('getAllEdgeAttributes', 'CytoscapeWindowClass',
       column.names = c (column.names, attribute.names [2:length(attribute.names)])
 
     colnames (result) = column.names
-    result = as.data.frame (result)
+    result = as.data.frame (result, stringsAsFactors=FALSE)
     
        # we had a matrix of character strings, now a data.frame of character strings
        # use the embedded type information (created by initEdgeAttribute) to correct to the proper types

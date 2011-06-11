@@ -3235,14 +3235,13 @@ test.getAllNodeAttributes = function ()
   if (window.title %in% as.character (getWindowList (cw)))
      deleteWindow (cw, window.title)
   cw2 = new.CytoscapeWindow (window.title, graph=g2)
-  tbl.noa = getAllNodeAttributes (cw2)
-  checkEquals (ncol (tbl.noa), 1)
-  checkEquals (nrow (tbl.noa), 1)
-  checkEquals (colnames (tbl.noa), 'label')
-  checkEquals (rownames (tbl.noa), 'A')
+  tbl.noa2 = getAllNodeAttributes (cw2)
+  checkEquals (ncol (tbl.noa2), 1)
+  checkEquals (nrow (tbl.noa2), 1)
+  checkEquals (colnames (tbl.noa2), 'label')
+  checkEquals (rownames (tbl.noa2), 'A')
   
-  invisible (tbl.noa)
-  
+  invisible (list (a=tbl.noa, b=tbl.noa2))
   
 } # test.getAllNodeAttributes
 #------------------------------------------------------------------------------------------------------------------------

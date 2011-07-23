@@ -67,6 +67,8 @@ setGeneric ('setEdgeAttributesDirect', signature='obj',
 
 setGeneric ('displayGraph',             signature='obj', function (obj) standardGeneric ('displayGraph'))
 setGeneric ('layout',                   signature='obj', function (obj, layout.name='jgraph-spring') standardGeneric ('layout'))
+setGeneric ('saveLayout',               signature='obj', function (obj, filename) standardGeneric ('saveLayout'))
+setGeneric ('restoreLayout',            signature='obj', function (obj, filename) standardGeneric ('restoreLayout'))
 setGeneric ('setPosition',              signature='obj', function (obj, node.names, x.coords, y.coords) standardGeneric ('setPosition'))
 setGeneric ('getPosition',              signature='obj', function (obj, node.names) standardGeneric ('getPosition'))
 setGeneric ('redraw',                   signature='obj', function (obj) standardGeneric ('redraw'))
@@ -967,6 +969,25 @@ setMethod ('layout', 'CytoscapeWindowClass',
     }) # cy.layout
 
 #------------------------------------------------------------------------------------------------------------------------
+setMethod ('saveLayout', 'CytoscapeWindowClass',
+
+  function (obj, filename) {
+    custom.layout = getPosition (cw,  getAllNodes (cw))
+    save (custom.layout, file=filename)
+    }) # save.layout
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('restoreLayout', 'CytoscapeWindowClass',
+
+  function (obj, filename) {
+    load (filename)
+    node.names = names (custom.layout)
+    x = as.integer (sapply (custom.layout, function (node.loc) return (node.loc$x)))
+    y = as.integer (sapply (custom.layout, function (node.loc) return (node.loc$y)))
+    setPosition (cw, node.names, x, y)
+    }) # restoreLayout
+
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('setPosition', 'CytoscapeWindowClass',
 
   function (obj, node.names, x.coords, y.coords) {
@@ -1703,19 +1724,6 @@ setMethod ('setEdgeColorRule', 'CytoscapeWindowClass',
      }) # setEdgeColorRule
 
 #------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
 setMethod ('setEdgeLineStyleRule', 'CytoscapeWindowClass',
 
    function (obj, edge.attribute.name, attribute.values, line.styles, default.style='SOLID') {
@@ -2690,6 +2698,36 @@ makeSimpleGraph = function ()
   return (g)
 
 } # makeSimpleGraph
+#------------------------------------------------------------------------------------------------------------------------
+# create, display and render the 3-node, 3-edge simple graph
+demoSimpleGraph = function ()
+{
+  window.title = 'demo.simpleGraph'
+  cy = CytoscapeConnection ()
+  if (window.title %in% as.character (getWindowList (cy)))
+    deleteWindow (cy, window.title)
+
+  g.simple = RCytoscape::makeSimpleGraph ()
+  cws = new.CytoscapeWindow (window.title, g.simple)
+
+  displayGraph (cws)
+  layout (cws, 'jgraph-spring')
+  setNodeLabelRule (cws, 'label')
+
+  node.attribute.values = c ("kinase",  "transcription factor")
+  colors =                c ('#A0AA00', '#FF0000')
+  setDefaultNodeBorderWidth (cws, 5)
+  setNodeBorderColorRule (cws, 'type', node.attribute.values, colors, mode='lookup', default.color='#88FF22')
+  count.control.points = c (2, 30, 100)
+  sizes                = c (20, 50, 100)
+  setNodeSizeRule (cws, 'count', count.control.points, sizes, mode='interpolate')
+  setNodeColorRule (cws, 'lfc', c (-3.0, 0.0, 3.0), c ('#00FF00', '#FFFFFF', '#FF0000'), mode='interpolate')
+
+  redraw (cws)
+
+  invisible (cws)
+
+} # demoSimpleGraph
 #------------------------------------------------------------------------------------------------------------------------
 makeRandomGraph = function (node.count=12, seed = 123)
 {

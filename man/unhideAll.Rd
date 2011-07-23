@@ -31,6 +31,8 @@ None.
   clearSelection (cw)
   selectNodes (cw, 'A')
   hideSelectedNodes (cw)
+  system ('sleep 2')
+  unhideAll (cw)
 }
 
 

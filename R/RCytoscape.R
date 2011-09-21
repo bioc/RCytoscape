@@ -298,6 +298,8 @@ new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'
   if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
     host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
     rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
+    # for troubleshooting:
+    cat(paste("BBS: Using host", host, "and port", rpcPort, "."))
     }
   
   uri = sprintf ('http://%s:%s', host, rpcPort)

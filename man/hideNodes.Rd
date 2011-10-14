@@ -3,8 +3,10 @@
 \alias{hideNodes,CytoscapeWindowClass-method}
 \title{hideNodes}
 \description{
-Hide (but do not delete) the currently  nodes.   'Unhide' is
-supposed to return them to view, but this is broken in Cytoscape 2.7.
+Hide (but do not delete) the currently  nodes.  Highly recommended: 
+save the current layout before hiding, since 'unhideAll' will, in
+addition to restoring hidden nodes to view, will place then in
+unpredictable locations on the screen.
 }
 \usage{
 hideNodes(obj, node.names)
@@ -21,14 +23,19 @@ None.
 
 \seealso{
   hideSelectedNodes
-  unhideNodes
+  unhideAll
+  saveLayout
+  restoreLayout
 }
 
 \examples{
   cw <- new.CytoscapeWindow ('hideNodes.test', graph=makeSimpleGraph())
   redraw (cw)
   layout (cw, 'jgraph-spring')
+  # saveLayout (cw, 'layout.tmp.RData')
   hideNodes (cw, c ('A', 'B'))
+  unhideAll (cw)
+  # restoreLayout (cw, 'layout.tmp.RData')
 
 }
 

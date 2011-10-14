@@ -8,12 +8,12 @@ Not that the node dimensions (size and size) must be locked (the default
 state) for this to work.  Node height and width change together.
 }
 \usage{
-setNodeSizeDirect(obj, node.names, new.size)
+setNodeSizeDirect(obj, node.names, new.sizes)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
   \item{node.names}{one or more \code{String} objects.}
-  \item{new.size}{an \code{integer}, in pixel units.}
+  \item{new.sizes}{one or more \code{integers}, in pixel units.}
 }
 
 \value{

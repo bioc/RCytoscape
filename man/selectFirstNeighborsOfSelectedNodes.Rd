@@ -1,5 +1,7 @@
 \name{selectFirstNeighborsOfSelectedNodes}
 \alias{selectFirstNeighborsOfSelectedNodes}
+\alias{sfn,CytoscapeWindowClass-method}
+\alias{sfn}
 \alias{selectFirstNeighborsOfSelectedNodes,CytoscapeWindowClass-method}
 \title{selectFirstNeighborsOfSelectedNodes}
 \description{

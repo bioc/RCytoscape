@@ -7,12 +7,12 @@ In the specified CytoscapeWindow, set the size of the font used in
 rendering the label of the specified node.
 }
 \usage{
-setNodeFontSizeDirect(obj, node.names, new.size)
+setNodeFontSizeDirect(obj, node.names, new.sizes)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
   \item{node.names}{one or more \code{String} objects.}
-  \item{new.size}{an \code{integer}, in pixel units.}
+  \item{new.sizes}{an \code{integer}, in pixel units.}
 }
 
 \value{

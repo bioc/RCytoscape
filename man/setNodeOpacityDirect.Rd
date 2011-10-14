@@ -7,12 +7,12 @@ In the specified CytoscapeWindow, set the opacity of all aspectes of the
 specified node:  fill color, border, label.
 }
 \usage{
-setNodeOpacityDirect(obj, node.names, new.value)
+setNodeOpacityDirect(obj, node.names, new.values)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
   \item{node.names}{one or more \code{String} objects.}
-  \item{new.value}{a \code{numeric} object, ranging from 0 to 255.}
+  \item{new.values}{a \code{numeric} object, one or more, ranging from 0 to 255.}
 }
 
 \value{

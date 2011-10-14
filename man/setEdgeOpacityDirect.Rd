@@ -8,12 +8,12 @@ or edges.  Low numbers, near zero, are transparent.
 High numbers, near 255, are maximally opaque:  they are fully visible.
 }
 \usage{
-setEdgeOpacityDirect(obj, edge.names, new.value)
+setEdgeOpacityDirect(obj, edge.names, new.values)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
   \item{edge.names}{one or more \code{String} objects, cy2-style edge names.}
-  \item{new.value}{a \code{numeric} object, ranging from 0 to 255.}
+  \item{new.values}{a \code{numeric} object, ranging from 0 to 255.}
 }
 
 \value{

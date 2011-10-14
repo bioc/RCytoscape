@@ -1,5 +1,8 @@
 default: build
 
+RVER=R
+#RVER=R-devel
+
 help:
 	egrep "^#" makefile | sed "s/^#//"
 
@@ -8,28 +11,28 @@ help:
 #
 
 build:
-	(cd ../..; R CMD build --no-vignettes RCytoscape)
-	(cd ../..; R CMD install RCytoscape)
+	(cd ../..; $(RVER) CMD build --no-vignettes RCytoscape)
+	(cd ../..; $(RVER) CMD install RCytoscape)
 
 test:
-	R --vanilla < test.R > /dev/null
+	$(RVER) --vanilla < test.R > /dev/null
 
 testverbose:
-	R --vanilla < test.R
+	$(RVER) --vanilla < test.R
 
 # --- check
 # check, but ignore man pages and vignette
 #
 
 check: build
-	(cd ../..; R CMD check --no-manual --no-vignettes RCytoscape)
+	(cd ../..; $(RVER) CMD check --no-manual --no-vignettes RCytoscape)
 
 # --- checkfull
 # check everything
 #
 
 checkfull:  build
-	(cd ../..; R --vanilla CMD check RCytoscape)
+	(cd ../..; $(RVER) --vanilla CMD check RCytoscape)
 
 
 # --- codoc
@@ -37,7 +40,7 @@ checkfull:  build
 #
 
 codoc:
-	(cd ../..; R CMD check --no-manual --no-vignettes --no-tests --no-examples RCytoscape)
+	(cd ../..; $(RVER) CMD check --no-manual --no-vignettes --no-tests --no-examples RCytoscape)
 
 
 # --- checkvig
@@ -45,7 +48,7 @@ codoc:
 #
 
 checkvig:
-	(cd ../..; R CMD check --no-manual --no-codoc --no-tests --no-examples RCytoscape)
+	(cd ../..; $(RVER) CMD check --no-manual --no-codoc --no-tests --no-examples RCytoscape)
 
 
 # --- sweave
@@ -54,7 +57,7 @@ checkvig:
 #
 
 sweave: 
-	(cd doc; R --no-save < ../sweave.R)
+	(cd doc; $(RVER) --no-save < ../sweave.R)
 
 # --- pdf
 # make and open RCytoscape.pdf, the vignette 
@@ -68,7 +71,7 @@ pdf:  doc/RCytoscape.tex
 #
 vanillaTest:  build
 	- rm vanillaTest.out
-	R --vanilla < vanillaTest.R > vanillaTest.out 2>&1
+	$(RVER) --vanilla < vanillaTest.R > vanillaTest.out 2>&1
 
 vt: vanillaTest
 

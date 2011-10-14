@@ -77,6 +77,9 @@ setGeneric ('hideAllPanels',            signature='obj', function (obj) standard
 setGeneric ('dockPanel',                signature='obj', function (obj, panelName) standardGeneric ('dockPanel'))
 setGeneric ('floatPanel',               signature='obj', function (obj, panelName) standardGeneric ('floatPanel'))
 
+setGeneric ('setTooltipInitialDelay',   signature='obj', function (obj, msecs) standardGeneric ('setTooltipInitialDelay'))
+setGeneric ('setTooltipDismissDelay',   signature='obj', function (obj, msecs) standardGeneric ('setTooltipDismissDelay'))
+
 setGeneric ('raiseWindow',              signature='obj', function (obj, window.title=NA) standardGeneric ('raiseWindow'))
 setGeneric ('setWindowSize',            signature='obj', function (obj, width, height) standardGeneric ('setWindowSize'))
 setGeneric ('showGraphicsDetails',      signature='obj', function (obj, new.value) standardGeneric ('showGraphicsDetails'))
@@ -147,21 +150,30 @@ setGeneric ('setNodeShapeRule',         signature='obj',
 setGeneric ('setNodeSizeRule',          signature='obj', 
     function (obj, node.attribute.name, control.points, node.sizes, mode, default.size=40) standardGeneric ('setNodeSizeRule'))
 
-setGeneric ('setNodeSizeDirect',          signature='obj', function (obj, node.names, new.size) standardGeneric ('setNodeSizeDirect'))
+setGeneric ('setNodeSizeDirect',          signature='obj', function (obj, node.names, new.sizes) standardGeneric ('setNodeSizeDirect'))
 setGeneric ('setNodeLabelDirect',         signature='obj', function (obj, node.names, new.labels) standardGeneric ('setNodeLabelDirect'))
-setGeneric ('setNodeFontSizeDirect',      signature='obj', function (obj, node.names, new.size) standardGeneric ('setNodeFontSizeDirect'))
-setGeneric ('setNodeWidthDirect',         signature='obj', function (obj, node.names, new.width) standardGeneric ('setNodeWidthDirect'))
-setGeneric ('setNodeHeightDirect',        signature='obj', function (obj, node.names, new.height) standardGeneric ('setNodeHeightDirect'))
-setGeneric ('setNodeShapeDirect',         signature='obj', function (obj, node.names, new.shape) standardGeneric ('setNodeShapeDirect'))
+setGeneric ('setNodeFontSizeDirect',      signature='obj', function (obj, node.names, new.sizes) standardGeneric ('setNodeFontSizeDirect'))
+setGeneric ('setNodeLabelColorDirect',    signature='obj', function (obj, node.names, new.colors) standardGeneric ('setNodeLabelColorDirect'))
+setGeneric ('setNodeWidthDirect',         signature='obj', function (obj, node.names, new.widths) standardGeneric ('setNodeWidthDirect'))
+setGeneric ('setNodeHeightDirect',        signature='obj', function (obj, node.names, new.heights) standardGeneric ('setNodeHeightDirect'))
+setGeneric ('setNodeShapeDirect',         signature='obj', function (obj, node.names, new.shapes) standardGeneric ('setNodeShapeDirect'))
 setGeneric ('setNodeImageDirect',         signature='obj', function (obj, node.names, image.urls) standardGeneric ('setNodeImageDirect'))
 setGeneric ('setNodeColorDirect',         signature='obj', function (obj, node.names, new.color) standardGeneric ('setNodeColorDirect'))
+setGeneric ('setNodeBorderWidthDirect',   signature='obj', function (obj, node.names, new.sizes) standardGeneric ('setNodeBorderWidthDirect'))
+setGeneric ('setNodeBorderColorDirect',   signature='obj', function (obj, node.names, new.color) standardGeneric ('setNodeBorderColorDirect'))
 
-setGeneric ('setNodeOpacityDirect',       signature='obj', function (obj, node.names, new.value) standardGeneric ('setNodeOpacityDirect'))
-setGeneric ('setNodeFillOpacityDirect',   signature='obj', function (obj, node.names, new.value) standardGeneric ('setNodeFillOpacityDirect'))
-setGeneric ('setNodeLabelOpacityDirect',  signature='obj', function (obj, node.names, new.value) standardGeneric ('setNodeLabelOpacityDirect'))
-setGeneric ('setNodeBorderOpacityDirect', signature='obj', function (obj, node.names, new.value) standardGeneric ('setNodeBorderOpacityDirect'))
+setGeneric ('setNodeOpacityDirect',       signature='obj', function (obj, node.names, new.values) standardGeneric ('setNodeOpacityDirect'))
+setGeneric ('setNodeFillOpacityDirect',   signature='obj', function (obj, node.names, new.values) standardGeneric ('setNodeFillOpacityDirect'))
+setGeneric ('setNodeLabelOpacityDirect',  signature='obj', function (obj, node.names, new.values) standardGeneric ('setNodeLabelOpacityDirect'))
+setGeneric ('setNodeBorderOpacityDirect', signature='obj', function (obj, node.names, new.values) standardGeneric ('setNodeBorderOpacityDirect'))
+setGeneric ('setEdgeOpacityDirect',         signature='obj', function (obj, edge.names, new.values) standardGeneric ('setEdgeOpacityDirect'))
 
-setGeneric ('setEdgeOpacityDirect',       signature='obj', function (obj, edge.names, new.value) standardGeneric ('setEdgeOpacityDirect'))
+#setGeneric ('setNodeOpacitiesDirect',       signature='obj', function (obj, node.names, new.values) standardGeneric ('setNodeOpacitiesDirect'))
+#setGeneric ('setNodeFillOpacitiesDirect',   signature='obj', function (obj, node.names, new.values) standardGeneric ('setNodeFillOpacitiesDirect'))
+#setGeneric ('setNodeLabelOpacitiesDirect',  signature='obj', function (obj, node.names, new.values) standardGeneric ('setNodeLabelOpacitiesDirect'))
+#setGeneric ('setNodeBorderOpacitiesDirect', signature='obj', function (obj, node.names, new.values) standardGeneric ('setNodeBorderOpacitiesDirect'))
+#setGeneric ('setEdgeOpacitiesDirect',       signature='obj', function (obj, edge.names, new.values) standardGeneric ('setEdgeOpacitiesDirect'))
+
 setGeneric ('setEdgeColorDirect', signature='obj', function (obj, edge.names, new.value) standardGeneric ('setEdgeColorDirect'))
 setGeneric ('setEdgeLabelDirect', signature='obj', function (obj, edge.names, new.value) standardGeneric ('setEdgeLabelDirect'))
 #setGeneric ('setEdgeFontFaceDirect', signature='obj', function (obj, edge.names, new.value) standardGeneric ('setEdgeFontFaceDirect'))
@@ -217,7 +229,7 @@ setGeneric ('getSelectedNodes',         signature='obj', function (obj) standard
 setGeneric ('clearSelection',           signature='obj', function (obj) standardGeneric ('clearSelection'))
 setGeneric ('getSelectedNodeCount',     signature='obj', function (obj) standardGeneric ('getSelectedNodeCount'))
 setGeneric ('hideNodes',                signature='obj', function (obj, node.names) standardGeneric ('hideNodes'))
-setGeneric ('unhideNodes',              signature='obj', function (obj, node.names) standardGeneric ('unhideNodes'))
+# setGeneric ('unhideNodes',              signature='obj', function (obj, node.names) standardGeneric ('unhideNodes'))
 setGeneric ('hideSelectedNodes',        signature='obj', function (obj) standardGeneric ('hideSelectedNodes'))
 setGeneric ('invertNodeSelection',      signature='obj', function (obj) standardGeneric ('invertNodeSelection'))
 setGeneric ('deleteSelectedNodes',      signature='obj', function (obj) standardGeneric ('deleteSelectedNodes'))
@@ -236,6 +248,7 @@ setGeneric ('unhideAll',                signature='obj', function (obj) standard
 setGeneric ('getFirstNeighbors',        signature='obj', function (obj, node.names) standardGeneric ('getFirstNeighbors'))
 setGeneric ('selectFirstNeighborsOfSelectedNodes',
                                         signature='obj', function (obj) standardGeneric ('selectFirstNeighborsOfSelectedNodes'))
+setGeneric ('sfn',                      signature='obj', function (obj) standardGeneric ('sfn'))
 #-----------------------------------------------------------
 # methods related to transmitting data from Cytoscape to R
 #-----------------------------------------------------------
@@ -298,8 +311,6 @@ new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'
   if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
     host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
     rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
-    # for troubleshooting:
-    cat(paste("BBS: Using host", host, "and port", rpcPort, "."))
     }
   
   uri = sprintf ('http://%s:%s', host, rpcPort)
@@ -911,7 +922,10 @@ setMethod ('sendEdges', 'CytoscapeWindowClass',
     edge.type = tbl.edges$edgeType
     directed = rep (TRUE, length (a))
     forgive.if.node.is.missing = TRUE
-    invisible (xml.rpc (obj@uri, 'Cytoscape.createEdges', obj@window.id, a, b, edge.type, directed, forgive.if.node.is.missing, .convert=T))
+    if (length (a) == 1)
+      invisible (xml.rpc (obj@uri, 'Cytoscape.createEdge', obj@window.id, a, b, edge.type, directed))
+    else
+      invisible (xml.rpc (obj@uri, 'Cytoscape.createEdges', obj@window.id, a, b, edge.type, directed, forgive.if.node.is.missing, .convert=T))
     }) # sendEdges
 
 
@@ -974,7 +988,7 @@ setMethod ('layout', 'CytoscapeWindowClass',
 setMethod ('saveLayout', 'CytoscapeWindowClass',
 
   function (obj, filename) {
-    custom.layout = getPosition (cw,  getAllNodes (cw))
+    custom.layout = RCytoscape::getPosition (obj,  getAllNodes (obj))
     save (custom.layout, file=filename)
     }) # save.layout
 
@@ -984,9 +998,10 @@ setMethod ('restoreLayout', 'CytoscapeWindowClass',
   function (obj, filename) {
     load (filename)
     node.names = names (custom.layout)
-    x = as.integer (sapply (custom.layout, function (node.loc) return (node.loc$x)))
-    y = as.integer (sapply (custom.layout, function (node.loc) return (node.loc$y)))
-    setPosition (cw, node.names, x, y)
+    node.names.filtered = intersect (node.names, getAllNodes (obj))
+    x = as.integer (sapply (node.names.filtered, function (node.name) return (custom.layout [[node.name]]$x)))
+    y = as.integer (sapply (node.names.filtered, function (node.name) return (custom.layout [[node.name]]$y)))
+    setPosition (obj, node.names.filtered, x, y)
     }) # restoreLayout
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -1018,17 +1033,26 @@ setMethod ('getPosition', 'CytoscapeWindowClass',
     count = length (node.names)
     if (count == 1)
       node.names = rep (node.names, 2)   # work around R's distinction between scalar and list of strings
-    raw.result = xml.rpc (obj@uri, 'Cytoscape._rGetNodesPositions', obj@window.id, node.names)
+    node.name.delimiter = ':.:'
+    xy.delimiter = ';;'
+    raw.result = xml.rpc (obj@uri, 'Cytoscape._rGetNodesPositions', obj@window.id, node.names, node.name.delimiter, xy.delimiter)
+    #raw.result = xml.rpc (obj@uri, 'Cytoscape._rGetNodesPositions', obj@window.id, node.names)
      # sample raw result (16 dec 2010): "2022:417.0,122.0" "659:156.0,0.0"   
      # now parse this list of strings into directly usable values, a named list (using node ID's) with x,y pair values
 
-    tokens = strsplit (raw.result, ":")
+    #printf ('raw.result: %s', raw.result)
+    tokens = strsplit (raw.result, node.name.delimiter)
     result = list ()
     for (token in tokens) {
+      #printf ('token: %s', list.to.string (token))
       name = token [1]
-      xy.tokens = strsplit (token [2], ",")
+      #printf ('name: %s', name)
+      xy.tokens = strsplit (token [2], xy.delimiter)
+      #printf ('xy.tokens: %s', list.to.string (xy.tokens))
       x = as.integer (xy.tokens[[1]][1])
       y = as.integer (xy.tokens[[1]][2])
+      #printf ('x: %d', x)
+      #printf ('y: %d', y)
       result [[name]] = list (x=x, y=y)
       } # for token
 
@@ -1245,6 +1269,20 @@ setMethod ('setWindowSize', 'CytoscapeWindowClass',
      }) # redraw
 
 #------------------------------------------------------------------------------------------------------------------------
+setMethod ('setTooltipInitialDelay', 'CytoscapeConnectionClass',
+
+   function (obj, msecs) {
+     invisible (xml.rpc (obj@uri, 'Cytoscape.setToolTipInitialDelay', as.integer (msecs)))
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setTooltipDismissDelay', 'CytoscapeConnectionClass',
+
+   function (obj, msecs) {
+     invisible (xml.rpc (obj@uri, 'Cytoscape.setToolTipDismissDelay', as.integer (msecs)))
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('raiseWindow', 'CytoscapeConnectionClass',
 
    function (obj, window.title=NA) {
@@ -1360,12 +1398,15 @@ setMethod ('floatPanel', 'CytoscapeConnectionClass',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeTooltipRule', 'CytoscapeWindowClass',
 
+      # todo:  prevent the obligatory redraw
+           
   function (obj, node.attribute.name) {
     id = as.character (obj@window.id)
     viz.style.name = 'default'
     attribute.values = as.character (noa (obj@graph, node.attribute.name))
-    tooltips = attribute.values
-    xml.rpc (obj@uri, 'Cytoscape.discreteMapper', id, viz.style.name, node.attribute.name, 'Node Tooltip', '', 
+    tooltips = attribute.values   # an identity mapping: if you see node attribute x, then display x.  odd but true.
+    default.tooltip = ''
+    xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', viz.style.name, node.attribute.name, 'Node Tooltip', default.tooltip,
              attribute.values, tooltips)
     })  # setNodeTooltipRule
 
@@ -1376,8 +1417,9 @@ setMethod ('setEdgeTooltipRule', 'CytoscapeWindowClass',
     id = as.character (obj@window.id)
     viz.style.name = 'default'
     attribute.values = as.character (eda (obj@graph, edge.attribute.name))
-    tooltips = attribute.values
-    xml.rpc (obj@uri, 'Cytoscape.discreteMapper', id, viz.style.name, edge.attribute.name, 'Edge Tooltip', '', 
+    tooltips = attribute.values  # identity mapping: when eda has value x, tooltip is x.  odd but true.
+    default.tooltip = ''
+    xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', viz.style.name, edge.attribute.name, 'Edge Tooltip', default.tooltip,
              attribute.values, tooltips)
     })  # setEdgeTooltipRule
 
@@ -1387,7 +1429,6 @@ setMethod ('setNodeLabelRule', 'CytoscapeWindowClass',
   function (obj, node.attribute.name) {
     id = as.character (obj@window.id)
     xml.rpc (obj@uri, 'Cytoscape.setNodeLabel', id, node.attribute.name, 'label', 'default'); 
-    redraw (obj)
     })  # setNodeLabelRule
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -1425,7 +1466,7 @@ setMethod ('setNodeColorRule', 'CytoscapeWindowClass',
          write ("Expecting 1 color for each control.point, one for 'above' color, one for 'below' color.", stderr ())
          return ()
          }
-       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Color', control.points, colors)
+       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Color', control.points, colors, FALSE)
        invisible (result)
        } # if mode==interpolate
 
@@ -1443,7 +1484,7 @@ setMethod ('setNodeColorRule', 'CytoscapeWindowClass',
          control.points = rep (control.points, 2)
          colors = rep (colors, 2)
          } 
-       result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', as.character (obj@window.id), default.style, 
+       result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', default.style, 
                          node.attribute.name, 'Node Color', default.color, control.points, colors)
        invisible (result)
        } # else: !interpolate
@@ -1473,7 +1514,7 @@ setMethod ('setNodeBorderColorRule', 'CytoscapeWindowClass',
          write ("Expecting 1 color for each control.point, one for 'above' color, one for 'below' color.", stderr ())
          return ()
          }
-       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Border Color', control.points, colors)
+       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Border Color', control.points, colors, FALSE)
        invisible (result)
        } # if mode==interpolate
 
@@ -1491,8 +1532,8 @@ setMethod ('setNodeBorderColorRule', 'CytoscapeWindowClass',
          control.points = rep (control.points, 2)
          colors = rep (colors, 2)
          } 
-       result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', as.character (obj@window.id), default.style, 
-                         node.attribute.name, 'Node Border Color', default.color, control.points, colors)
+       result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', default.style, node.attribute.name,
+                          'Node Border Color', default.color, control.points, colors)
        invisible (result)
        } # else: !interpolate
      }) # setNodeBorderColorRule
@@ -1513,7 +1554,7 @@ setMethod ('setNodeBorderWidthRule', 'CytoscapeWindowClass',
        attribute.values = rep (attribute.values, 2)
        line.widths = rep (line.widths, 2)
        } 
-     result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', id, 'default', node.attribute.name, 
+     result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', 'default', node.attribute.name, 
                        'Node Line Width', as.character (default.width), attribute.values, as.character (line.widths))
      invisible (result)
      })
@@ -1607,7 +1648,7 @@ setMethod ('setNodeSizeRule', 'CytoscapeWindowClass',
 #        # visual attribute values (in this case, node size in pixels) than there are node data attribute values
 #     adjusted.node.sizes = c (node.sizes [1], node.sizes, c (node.sizes [length (node.sizes)]))
 #     result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Size', 
-#                       attribute.values, adjusted.node.sizes)
+#                       attribute.values, adjusted.node.sizes, FALSE)
 #     return (result)
 #     }) # setNodeSizeRule
 
@@ -1634,7 +1675,7 @@ setMethod ('setNodeSizeRule', 'CytoscapeWindowClass',
          write ("Expecting 1 node.size for each control.point, one for 'above' size, one for 'below' size.", stderr ())
          return ()
          }
-       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Size', control.points, node.sizes)
+       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Size', control.points, node.sizes, FALSE)
        invisible (result)
        } # if mode==interpolate
 
@@ -1653,7 +1694,7 @@ setMethod ('setNodeSizeRule', 'CytoscapeWindowClass',
          node.sizes = rep (node.sizes, 2)
          } 
 
-       result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', as.character (obj@window.id), default.style, 
+       result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', default.style, 
                          node.attribute.name, 'Node Size', as.character (default.size), 
                          as.character (control.points), as.character (node.sizes))
        invisible (result)
@@ -1701,7 +1742,7 @@ setMethod ('setEdgeColorRule', 'CytoscapeWindowClass',
          write ("Expecting 1 color for each control.point, one for 'above' color, one for 'below' color.", stderr ())
          return ()
          }
-       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousEdgeVisualStyle', edge.attribute.name, 'Edge Color', control.points, colors)
+       result = xml.rpc (obj@uri, 'Cytoscape.createContinuousEdgeVisualStyle', edge.attribute.name, 'Edge Color', control.points, colors, FALSE)
        invisible (result)
        } # if mode==interpolate
 
@@ -1719,7 +1760,7 @@ setMethod ('setEdgeColorRule', 'CytoscapeWindowClass',
          control.points = rep (control.points, 2)
          colors = rep (colors, 2)
          } 
-       result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', as.character (obj@window.id), default.style, 
+       result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', default.style, 
                          edge.attribute.name, 'Edge Color', default.color, control.points, colors)
        invisible (result)
        } # else: !interpolate
@@ -1754,7 +1795,7 @@ setMethod ('setEdgeLineWidthRule', 'CytoscapeWindowClass',
        attribute.values = rep (attribute.values, 2)
        line.widths = rep (line.widths, 2)
        } 
-     result = xml.rpc (obj@uri, 'Cytoscape.discreteMapper', id, 'default', edge.attribute.name, 
+     result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', 'default', edge.attribute.name, 
                        'Edge Line Width', as.character (default.width), attribute.values, as.character (line.widths))
      invisible (result)
      })
@@ -1799,7 +1840,7 @@ setMethod ('setEdgeTargetArrowColorRule', 'CytoscapeWindowClass',
        colors = rep (colors, 2)
        } 
 
-     result = xml.rpc (obj@uri, "Cytoscape.discreteMapper", id, style.name, edge.attribute.name,
+     result = xml.rpc (obj@uri, "Cytoscape.createDiscreteMapper", style.name, edge.attribute.name,
                       'Edge Target Arrow Color', default.color, attribute.values, colors, .convert=TRUE)
      invisible (result)
      }) # setTargetArrowRule
@@ -1816,7 +1857,7 @@ setMethod ('setEdgeSourceArrowColorRule', 'CytoscapeWindowClass',
        colors = rep (colors, 2)
        } 
 
-     result = xml.rpc (obj@uri, "Cytoscape.discreteMapper", id, style.name, edge.attribute.name,
+     result = xml.rpc (obj@uri, "Cytoscape.createDiscreteMapper", style.name, edge.attribute.name,
                       'Edge Source Arrow Color', default.color, attribute.values, colors, .convert=TRUE)
      invisible (result)
      }) # setTargetArrowRule
@@ -1833,76 +1874,140 @@ setMethod ('setNodeColorDirect', 'CytoscapeWindowClass',
        return ()
        }
      result = xml.rpc (obj@uri, "Cytoscape.setNodeFillColor", id, node.names,
-                       converted.color$red, converted.color$green, converted.color$blue)
+                       converted.color$red, converted.color$green, converted.color$blue, FALSE)
      invisible (result)
      })
 #------------------------------------------------------------------------------------------------------------------------
 # only works if node dimensions are locked (that is, tied together).  see lockNodeDimensions (T/F)
 setMethod ('setNodeSizeDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.size) {
+
+   function (obj, node.names, new.sizes) {
      id = as.character (obj@window.id)
-     for (node.name in node.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Size', as.character (new.size))
+     property.name = 'Node Size'
+     if (length (node.names) == 1)
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names, property.name, as.character (new.sizes [1]))
+     else {
+       properties = rep (property.name, length (node.names))
+       if (length (new.sizes) == 1)
+         new.sizes = rep (new.sizes, length (node.names))
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.sizes))
+       } # else: multiple nodes
      invisible (result)
      })
 #------------------------------------------------------------------------------------------------------------------------
 # only works if node dimensions are not locked (that is, tied together).  see lockNodeDimensions (T/F)
 setMethod ('setNodeWidthDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.width) {
+
+   function (obj, node.names, new.widths) {
+
      id = as.character (obj@window.id)
-     for (node.name in node.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Width', as.character (new.width))
+
+     property.name = 'Node Width'
+     if (length (node.names) == 1)
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names, property.name, as.character (new.widths [1]))
+     else {
+       properties = rep (property.name, length (node.names))
+       if (length (new.widths) == 1)
+         new.widths = rep (new.widths, length (node.names))
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.widths))
+       } # else: multiple nodes
      invisible (result)
      })
+
 #------------------------------------------------------------------------------------------------------------------------
 # only works if node dimensions are not locked (that is, tied together).  see lockNodeDimensions (T/F)
 setMethod ('setNodeHeightDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.height) {
+   function (obj, node.names, new.heights) {
+
      id = as.character (obj@window.id)
-     for (node.name in node.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Height', as.character (new.height))
+
+     property.name = 'Node Height'
+     if (length (node.names) == 1)
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names, property.name, as.character (new.heights [1]))
+     else {
+       properties = rep (property.name, length (node.names))
+       if (length (new.heights) == 1)
+         new.heights = rep (new.heights, length (node.names))
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.heights))
+       } # else: multiple nodes
      invisible (result)
      })
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeLabelDirect', 'CytoscapeWindowClass',
 
    function (obj, node.names, new.labels) {
 
-    if (length (new.labels) == 1)
-      new.labels = rep (new.labels, length (node.names))
-
-    if (length (node.names) != length (new.labels)) {
-       msg = sprintf ('error in RCytoscape::setNodeLabelDirect.  new.labels count (%d) is neither 1 nor same as node.names count (%d)',
-                      length (new.labels), length (node.names))
-       write (msg, stderr ())
-       return ()
-       }
      id = as.character (obj@window.id)
-     for (i in 1:length (node.names))
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names [i], 'Node Label', new.labels [i])
+
+     property.name = 'Node Label'
+
+     if (length (node.names) == 1)
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names, property.name, as.character (new.labels [1]))
+     else {
+       properties = rep (property.name, length (node.names))
+       if (length (new.labels) == 1)
+         new.sizes = rep (new.labels, length (node.names))
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.labels))
+       } # else: multiple nodes
      invisible (result)
      })
 
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeFontSizeDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.size) {
+
+   function (obj, node.names, new.sizes) {
      id = as.character (obj@window.id)
-     for (node.name in node.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Font Size', as.character (new.size))
+
+     property.name = 'Node Font Size'
+
+     if (length (node.names) == 1)
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names, property.name, as.character (new.sizes [1]))
+     else {
+       properties = rep (property.name, length (node.names))
+       if (length (new.sizes) == 1)
+         new.sizes = rep (new.sizes, length (node.names))
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.sizes))
+       } # else: multiple nodes
+     invisible (result)
+     })
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeLabelColorDirect', 'CytoscapeWindowClass',
+
+   function (obj, node.names, new.colors) {
+
+     id = as.character (obj@window.id)
+     property.name = 'Node Label Color'
+
+     if (length (node.names) == 1)
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names, property.name, as.character (new.colors [1]))
+     else {
+       properties = rep (property.name, length (node.names))
+       if (length (new.colors) == 1)
+         new.colors = rep (new.colors, length (node.names))
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.colors))
+       } # else: multiple nodes
      invisible (result)
      })
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeShapeDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.shape) {
+   function (obj, node.names, new.shapes) {
      id = as.character (obj@window.id)
-     if (! new.shape %in% getNodeShapes (obj)) {
-       write (sprintf ('error in RCytoscape::setNodeShape.  new shape ("%s") is not recognized.  see getNodeShapes (cy)', new.shape), stderr ())
-       return ()
-       } 
-     for (node.name in node.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Shape', as.character (new.shape))
+
+     property.name = 'Node Shape'
+
+     if (length (node.names) == 1)
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names, property.name, as.character (new.shapes [1]))
+     else {
+       properties = rep (property.name, length (node.names))
+       if (length (new.shapes) == 1)
+         new.shapes = rep (new.shapes, length (node.names))
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.shapes))
+       } # else: multiple nodes
      invisible (result)
      })
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeImageDirect', 'CytoscapeWindowClass',
 
@@ -1928,46 +2033,234 @@ setMethod ('setNodeImageDirect', 'CytoscapeWindowClass',
      })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('setNodeOpacityDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.value) {
+setMethod ('setNodeBorderWidthDirect', 'CytoscapeWindowClass',
+
+   function (obj, node.names, new.sizes) {
+
      id = as.character (obj@window.id)
-     result = setNodeFillOpacityDirect (obj, node.names, new.value)
-     result = setNodeLabelOpacityDirect (obj, node.names, new.value)
-     result = setNodeBorderOpacityDirect (obj, node.names, new.value)
+     if (length (node.names) == 1)
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.names, 'Node Line Width', as.character (new.sizes [1]))
+     else {
+       properties = rep ('Node Line Width', length (node.names))
+       if (length (new.sizes) == 1)
+         new.sizes = rep (new.sizes, length (node.names))
+       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.sizes))
+       } # else: multiple nodes
      invisible (result)
      })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeBorderColorDirect', 'CytoscapeWindowClass',
+
+   function (obj, node.names, new.color) {
+     id = as.character (obj@window.id)
+     if (length (node.names) == 1)
+       node.names = rep (node.names, 2)
+     converted.color = hexColorToInt (new.color)
+     if (length (converted.color) == 1 && is.na (converted.color)) {
+       write (sprintf ('illegal color string "%s" in RCytoscape::setNodeBorderColorDirect'), stderr ())
+       return ()
+       }
+     result = xml.rpc (obj@uri, "Cytoscape.setNodeBorderColor", id, node.names,
+                       converted.color$red, converted.color$green, converted.color$blue, FALSE)
+     invisible (result)
+     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setNodeOpacityDirect', 'CytoscapeWindowClass',
+   function (obj, node.names, new.values) {
+     
+  if (length (node.names) == 1) {
+    names = rep (node.names [1], 3)
+    values = rep (new.values [1], 3)
+    properties = c ('Node Opacity', 'Node Border Opacity', 'Node Label Opacity') 
+    target.function = "Cytoscape.setNodeProperties"
+    result = xml.rpc (obj@uri, target.function, names, properties, as.character (values))
+    invisible (result)
+    } # 1 name only
+  else {
+    count = length (node.names)
+    if (length (new.values) == 1)  # apply this one value to all nodes or edges
+      values = rep (new.values, 3 * count)
+    else 
+      values = c (rep (new.values, 3))
+    properties = c (rep ('Node Opacity', count), rep ('Node Border Opacity', count), rep ('Node Label Opacity', count))
+    names = rep (node.names, 3)
+    #print (names)
+    #print (properties)
+    #print (as.character (values))
+    target.function = "Cytoscape.setNodeProperties"
+    result = xml.rpc (obj@uri, target.function, names, properties, as.character (values))
+    #print ('--- back from xml.rpc')
+    invisible (result)
+    } # else: 
+    })
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setNodeOpacitiesDirect', 'CytoscapeWindowClass',
+#   function (obj, node.names, new.values) {
+#     id = as.character (obj@window.id)
+#     result = setNodeFillOpacitiesDirect (obj, node.names, new.values)
+#     result = setNodeLabelOpacitiesDirect (obj, node.names, new.values)
+#     result = setNodeBorderOpacitiesDirect (obj, node.names, new.values)
+#     invisible (result)
+#     })
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeFillOpacityDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.value) {
-     id = as.character (obj@window.id)
-     for (node.name in node.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Opacity', as.character (new.value))
-     invisible (result)
+
+   function (obj, node.names, new.values) {
+     property.name = 'Node Opacity'
+     host.uri = obj@uri
+     set.node.or.edge.properties (host.uri, property.name, node.names, new.values)
      })
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeBorderOpacityDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.value) {
-     id = as.character (obj@window.id)
-     for (node.name in node.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Border Opacity', as.character (new.value))
-     invisible (result)
+
+   function (obj, node.names, new.values) {
+     property.name = 'Node Border Opacity'
+     host.uri = obj@uri
+     set.node.or.edge.properties (host.uri, property.name, node.names, new.values)
      })
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeLabelOpacityDirect', 'CytoscapeWindowClass',
-   function (obj, node.names, new.value) {
-     id = as.character (obj@window.id)
-     for (node.name in node.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Label Opacity', as.character (new.value))
-     invisible (result)
+
+   function (obj, node.names, new.values) {
+     property.name = 'Node Label Opacity'
+     host.uri = obj@uri
+     set.node.or.edge.properties (host.uri, property.name, node.names, new.values)
      })
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setEdgeOpacityDirect', 'CytoscapeWindowClass',
-   function (obj, edge.names, new.value) {
-     id = as.character (obj@window.id)
-     for (edge.name in edge.names)
-       result = xml.rpc (obj@uri, "Cytoscape.setEdgeProperty", edge.name, 'Edge Opacity', as.character (new.value))
-     invisible (result)
+
+   function (obj, edge.names, new.values) {
+     property.name = 'Edge Opacity'
+     host.uri = obj@uri
+     set.node.or.edge.properties (host.uri, property.name, edge.names, new.values)
      })
+
+#------------------------------------------------------------------------------------------------------------------------
+set.node.or.edge.properties = function (host.uri, property.name, names, values)
+{
+  if (length (names) == 1) {
+    name = names [1]
+    value = values [1]
+    if (length (grep ('Node', property.name) > 0))
+      target.function = "Cytoscape.setNodeProperty"
+    else {
+      target.function = "Cytoscape.setEdgeProperty"
+      name = as.character (name)   # either a nop, or a kindness to callers who pass in the full output of cy2.edge.names, a list
+      }
+    result = xml.rpc (host.uri, target.function, name, property.name , as.character (value))
+    invisible (result)
+    } # 1 name only
+  else {
+    if (length (values) == 1)  # apply this one value to all nodes or edges
+      values = rep (values, length (names))
+    properties = rep (property.name, length (names))
+    #print ('--- set.node.or.edge..properties')
+    #print (names)
+    #print (properties)
+    #print (as.character (values))
+    if (length (grep ('Node', property.name) > 0))
+      target.function = "Cytoscape.setNodeProperties"
+    else {
+      target.function = "Cytoscape.setEdgeProperties"
+      names = as.character (names)   # either a nop, or a kindness to callers who pass in the full output of cy2.edge.names, a list
+      }
+    result = xml.rpc (host.uri, target.function, names, properties, as.character (values))
+    #print ('--- back from xml.rpc')
+    invisible (result)
+    } # else: 
+
+} # set.node.or.edge.properties
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setNodeFillOpacitiesDirect', 'CytoscapeWindowClass',
+#   function (obj, node.names, new.values) {
+#     id = as.character (obj@window.id)
+#     if (length (new.values) == 1)
+#       new.values = rep (new.values, length (node.names))
+#     properties = rep ('Node Opacity', length (node.names))
+#     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.values))
+#     invisible (result)
+#     })
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setNodeBorderOpacityDirect', 'CytoscapeWindowClass',
+#   function (obj, node.names, new.value) {
+#     id = as.character (obj@window.id)
+#     for (node.name in node.names)
+#       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Border Opacity', as.character (new.value))
+#     invisible (result)
+#     })
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setNodeBorderOpacitiesDirect', 'CytoscapeWindowClass',
+#   function (obj, node.names, new.values) {
+#     id = as.character (obj@window.id)
+#     if (length (new.values) == 1)
+#       new.values = rep (new.values, length (node.names))
+#     properties = rep ('Node Border Opacity', length (node.names))
+#     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.values))
+#     invisible (result)
+#     })
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setNodeLabelOpacityDirect', 'CytoscapeWindowClass',
+#   function (obj, node.names, new.value) {
+#     id = as.character (obj@window.id)
+#     for (node.name in node.names)
+#       result = xml.rpc (obj@uri, "Cytoscape.setNodeProperty", node.name, 'Node Label Opacity', as.character (new.value))
+#     invisible (result)
+#     })
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setNodeLabelOpacitiesDirect', 'CytoscapeWindowClass',
+#   function (obj, node.names, new.values) {
+#     id = as.character (obj@window.id)
+#     if (length (new.values) == 1)
+#       new.values = rep (new.values, length (node.names))
+#     properties = rep ('Node Label Opacity', length (node.names))
+#     result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.values))
+#     invisible (result)
+#     })
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setEdgeOpacityDirect', 'CytoscapeWindowClass',
+#
+#   function (obj, edge.names, new.values) {
+#
+#     id = as.character (obj@window.id)
+#     if (length (edge.names) == 1) {
+#       edge.name = edge.names [1]
+#       new.value = new.values [1]
+#       result = xml.rpc (obj@uri, "Cytoscape.setEdgeProperty", edge.name, 'Edge Opacity', as.character (new.value))
+#       invisible (result)
+#       } # 1 edge.name only
+#     else {
+#       if (length (new.values) == 1)
+#         new.values = rep (new.values, length (edge.names))
+#       properties = rep ('Edge Opacity', length (edge.names))
+#       print ('--- setEdgeOpacitiesDirect')
+#       print (edge.names)
+#       print (properties)
+#       print (as.character (new.values))
+#       result = xml.rpc (obj@uri, "Cytoscape.setEdgeProperties", edge.names, properties, as.character (new.values))
+#       print ('--- back from xml.rpc')
+#       invisible (result)
+#       } # multiple edges
+#     })
+#------------------------------------------------------------------------------------------------------------------------
+#setMethod ('setEdgeOpacitiesDirect', 'CytoscapeWindowClass',
+#   function (obj, edge.names, new.values) {
+#     id = as.character (obj@window.id)
+#     if (length (new.values) == 1)
+#       new.values = rep (new.values, length (edge.names))
+#     properties = rep ('Edge Opacity', length (edge.names))
+#     print ('--- setEdgeOpacitiesDirect')
+#     print (edge.names)
+#     print (properties)
+#     print (as.character (new.values))
+#     result = xml.rpc (obj@uri, "Cytoscape.setEdgeProperties", edge.names, properties, as.character (new.values))
+#     print ('--- back from xml.rpc')
+#     invisible (result)
+#     })
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setEdgeColorDirect', 'CytoscapeWindowClass',
    function (obj, edge.names, new.value) {
@@ -2465,14 +2758,14 @@ setMethod ('hideNodes', 'CytoscapeWindowClass',
      }) # hideNodes
    
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('unhideNodes', 'CytoscapeWindowClass',
-
-   function (obj, node.names) {
-     id = as.character (obj@window.id)
-     for (node in node.names)
-       invisible (xml.rpc (obj@uri, 'Cytoscape.unhideNode', id, node, .convert=TRUE))
-     }) # unhideNodes
-   
+#setMethod ('unhideNodes', 'CytoscapeWindowClass',
+#
+#   function (obj, node.names) {
+#     id = as.character (obj@window.id)
+#     for (node in node.names)
+#       invisible (xml.rpc (obj@uri, 'Cytoscape.unhideNode', id, node, .convert=TRUE))
+#     }) # unhideNodes
+#   
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('invertNodeSelection', 'CytoscapeWindowClass',
 
@@ -2592,6 +2885,13 @@ setMethod ('selectFirstNeighborsOfSelectedNodes', 'CytoscapeWindowClass',
        invisible (full.selection)
        } # if any nodes are already selected
      }) # selectFirstNeighborsOfSelectedNodes
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('sfn', 'CytoscapeWindowClass',
+
+   function (obj) {
+     selectFirstNeighborsOfSelectedNodes (obj)
+     })
 
 #------------------------------------------------------------------------------------------------------------------------
 noa.names = function (graph)
@@ -2725,7 +3025,7 @@ demoSimpleGraph = function ()
   setNodeSizeRule (cws, 'count', count.control.points, sizes, mode='interpolate')
   setNodeColorRule (cws, 'lfc', c (-3.0, 0.0, 3.0), c ('#00FF00', '#FFFFFF', '#FF0000'), mode='interpolate')
 
-  redraw (cws)
+  #redraw (cws)
 
   invisible (cws)
 

@@ -29,6 +29,9 @@ exportMethods (
    ping,
    redraw,
 
+   setTooltipInitialDelay,
+   setTooltipDismissDelay,
+               
    raiseWindow,
    setWindowSize,
    getZoom,
@@ -55,6 +58,7 @@ exportMethods (
    floatPanel,
    hidePanel,
    hideAllPanels,
+
    setDefaultNodeShape,
    setDefaultNodeColor,
    setDefaultNodeSize,
@@ -83,17 +87,22 @@ exportMethods (
    setEdgeColorRule,
 
    setEdgeOpacityDirect,
+
    setNodeSizeDirect,
    setNodeWidthDirect,
    setNodeHeightDirect,
    setNodeLabelDirect,
    setNodeFontSizeDirect,
+   setNodeLabelColorDirect,
    setNodeShapeDirect,
    setNodeImageDirect,
    setNodeColorDirect,
+   setNodeBorderWidthDirect,
+
    setNodeOpacityDirect,
    setNodeFillOpacityDirect,
    setNodeBorderOpacityDirect,
+   setNodeBorderColorDirect,
    setNodeLabelOpacityDirect,
 
    setEdgeColorDirect,
@@ -140,10 +149,10 @@ exportMethods (
    createWindowFromSelection,
    getFirstNeighbors,
    selectFirstNeighborsOfSelectedNodes,
+   sfn,
    getGraph,
    setGraph,
    hideNodes,
-   unhideNodes,
    hideSelectedNodes,
    unhideAll,
    version,
@@ -185,12 +194,16 @@ export(
    makeRandomGraph,
    initNodeAttribute,
    initEdgeAttribute,
-   validCyWin       
+   validCyWin
    )
 
 importClassesFrom(graph, graph, graphBase)
+importClassesFrom(AnnotationDbi)
+importMethodsFrom(AnnotationDbi, mget)
+importMethodsFrom(AnnotationDbi, get)
 
 importClassesFrom(methods, character, integer)
+importClassesFrom(org.Hs.eg.db)
 
 importMethodsFrom(graph, edgeData, "edgeData<-", edgeDataDefaults,
                  "edgeDataDefaults<-", edgeNames, edges, inEdges,

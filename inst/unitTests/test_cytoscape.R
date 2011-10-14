@@ -95,7 +95,7 @@ run.tests = function ()
   test.unmatchedAttributesError ()
   test.remove.redundancies.in.undirected.graph ()
   test.randomUndirectedGraph ()
-  test.simpleGraph (apply.viz.rules=TRUE)
+  test.simpleGraph (apply.viz.rules=TRUE, do.redraw=TRUE)
   test.simpleGraphWithReciprocalEdge ()
   test.setGraph ()
   test.setPosition ()
@@ -138,10 +138,14 @@ run.tests = function ()
   test..getNovelEdges ()
   test.validity ()
 
+  test.tooltip.delays ()
 
   test.setNodeColorDirect ()
+  test.setNodeBorderColorDirect ()
+
   test.setNodeOpacityDirect ()
   test.setEdgeOpacityDirect ()
+
   test.setEdgeColorDirect ()
   test.setEdgeSourceArrowShapeDirect ()
   test.setEdgeLabelDirect ()
@@ -165,6 +169,10 @@ run.tests = function ()
   test.setNodeShapeDirect ()
   test.setEdgeVizPropertiesDirect (cw=NULL)
   test.setNodeImageDirect ()
+
+    # some tests for the annotation functions (see pkg/R/annotation.R)
+  #test.is.kinase ()
+  #test.is.TF ()
 
   options ('warn'=0)
 
@@ -1280,6 +1288,53 @@ test.setNodeColorDirect = function ()
 
 } # test.setNodeColorirect
 #------------------------------------------------------------------------------------------------------------------------
+test.setNodeBorderColorDirect = function ()
+{
+  title = 'test.setNodeBorderColorDirect'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  setNodeBorderColorDirect (cw, 'A', '#AA0088')
+  Sys.sleep (1)
+  setNodeBorderColorDirect (cw, 'A', '#AA4488')
+  Sys.sleep (1)
+  setNodeBorderColorDirect (cw, 'A', '#AA8888')
+  Sys.sleep (1)
+
+  setNodeBorderColorDirect (cw, c ('A', 'B'), '#448844')
+
+  invisible (cw)
+
+} # test.setNodeBorderColorDirect 
+#------------------------------------------------------------------------------------------------------------------------
+test.setNodeLabelPropertiesDirect = function ()
+{  
+  print ('--- test.setNodeLabelsPropertiesDirect')
+  title = 'test.setNodeLabelPropertiesDirect'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  sizes = c (10, 50, 80)
+  colors = c ('#0000FF', '#00FF00', '#FF0000')
+  for (i in 1:length (sizes)) { 
+    setNodeFontSizeDirect (cw, 'A', sizes [i])
+    setNodeLabelColorDirect (cw, 'A', colors [i])
+    redraw (cw)
+    Sys.sleep (1)
+    } # for i
+
+  invisible (cw)
+
+} # test.setNodeLabelsPropertiesDirect 
+#------------------------------------------------------------------------------------------------------------------------
 test.setNodeOpacityDirect = function ()
 {
   title = 'test.setNodeOpacityDirect'
@@ -1290,18 +1345,31 @@ test.setNodeOpacityDirect = function ()
   nodeData (g, 'D', 'label') = 'blink'
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
+  setNodeSizeDirect (cw, 'D', 120)
   layout (cw, 'jgraph-spring')
+  fitContent (cw)
+  setZoom (cw, 0.8 * getZoom (cw))
   redraw (cw)
 
   setNodeFillOpacityDirect (cw, 'A', 0); redraw (cw);
   setNodeLabelOpacityDirect (cw, 'B', 0); redraw (cw);
   setNodeBorderOpacityDirect (cw, 'C', 0); redraw (cw);
-  for (i in 1:5) {
+  for (i in 1:3) {
     setNodeOpacityDirect (cw, 'D', 0); redraw (cw);
-    Sys.sleep (1)
+    #Sys.sleep (1)
     setNodeOpacityDirect (cw, 'D', 255); redraw (cw);
-    Sys.sleep (1)
+    #Sys.sleep (1)
     } # for i
+
+  setNodeOpacityDirect (cw, c ('A', 'C'), 255); redraw (cw)
+  setNodeOpacityDirect (cw, c ('B', 'D'), 50); redraw (cw)
+  setNodeOpacityDirect (cw, c ('A', 'B', 'C', 'D'), c (10, 50, 100, 200)); redraw (cw)
+  setNodeOpacityDirect (cw, c ('A', 'B', 'C', 'D'), c (200, 100, 50, 10)); redraw (cw)
+  Sys.sleep (1)
+
+  setNodeOpacityDirect (cw, c ('A', 'B', 'C', 'D'), 255); redraw (cw)
+
+  invisible (cw)
 
 } # test.setNodeOpacityDirect
 #------------------------------------------------------------------------------------------------------------------------
@@ -1312,15 +1380,53 @@ test.setEdgeOpacityDirect = function ()
 
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
+  setDefaultEdgeLineWidth (cw, 10)
   displayGraph (cw)
   layout (cw, 'jgraph-spring')
   redraw (cw)
 
-  edge.of.interest = cy2.edge.names (g) [1]
-  for (i in 1:5) {
-    setEdgeOpacityDirect (cw, edge.of.interest, i * 30); redraw (cw);
-    Sys.sleep (1)
+  edge.names = cy2.edge.names (g)
+  for (reps in 1:3) {
+    setEdgeOpacityDirect (cw, edge.names [1],  80); 
+    setEdgeOpacityDirect (cw, edge.names [2],  0); 
+    setEdgeOpacityDirect (cw, edge.names [3],  255); 
+    redraw (cw);
+  
+    setEdgeOpacityDirect (cw, edge.names [2],  80); 
+    setEdgeOpacityDirect (cw, edge.names [3],  0); 
+    setEdgeOpacityDirect (cw, edge.names [1],  255); 
+    redraw (cw);
+  
+    setEdgeOpacityDirect (cw, edge.names [1],  80); 
+    setEdgeOpacityDirect (cw, edge.names [3],  40); 
+    setEdgeOpacityDirect (cw, edge.names [2],  255); 
+    redraw (cw);
+  
+    setEdgeOpacityDirect (cw, edge.names [1],  0); 
+    setEdgeOpacityDirect (cw, edge.names [3],  0); 
+    setEdgeOpacityDirect (cw, edge.names [2],  0); 
+    redraw (cw);
+  
+    setEdgeOpacityDirect (cw, edge.names [1],  255); 
+    setEdgeOpacityDirect (cw, edge.names [3],  255); 
+    setEdgeOpacityDirect (cw, edge.names [2],  255); 
+    redraw (cw);
+    } # for reps
+
+  for (i in 1:3) {
+    setEdgeOpacityDirect (cw, edge.names, 0); redraw (cw)
+    setEdgeOpacityDirect (cw, edge.names, 255); redraw (cw)
     } # for i
+
+  for (i in 1:3) {
+    setEdgeOpacityDirect (cw, edge.names, c (0, 128, 255)); redraw (cw)
+    setEdgeOpacityDirect (cw, edge.names, c (255, 0, 128)); redraw (cw)
+    } # for i
+
+  Sys.sleep (1)
+  setEdgeOpacityDirect (cw, edge.names, 255); redraw (cw)
+
+  invisible (cw)
 
 } # test.setEdgeOpacityDirect
 #------------------------------------------------------------------------------------------------------------------------
@@ -2002,7 +2108,10 @@ test.nodeNeighborReportingAndSelection = function ()
   selectFirstNeighborsOfSelectedNodes (cw)
   checkEquals (getSelectedNodeCount (cw), 3)
   checkEquals (sort (getSelectedNodes (cw)), c ('L', 'M', 'N'))
-
+  sfn (cw)
+  checkEquals (getSelectedNodeCount (cw), 5)
+  nodes = sort (getSelectedNodes (cw))
+  checkEquals (nodes, c ("K", "L", "M", "N", "O"))
   invisible (cw)
 
 } # test.nodeNeighborReportingAndSelection
@@ -2496,7 +2605,7 @@ test.randomUndirectedGraph = function ()
 
 } # test.randomUndirectedGraph 
 #------------------------------------------------------------------------------------------------------------------------
-test.simpleGraph = function (apply.viz.rules=TRUE)
+test.simpleGraph = function (apply.viz.rules=TRUE, do.redraw=TRUE)
 {
   title = 'test.simpleGraph'
   window.prep (title)
@@ -2506,20 +2615,20 @@ test.simpleGraph = function (apply.viz.rules=TRUE)
 
   displayGraph (cws)
   layout (cws, 'jgraph-spring')
-  setNodeLabelRule (cws, 'label')
 
   if (apply.viz.rules) {
+    setNodeLabelRule (cws, 'label')
+    setDefaultNodeBorderWidth (cws, 5)
     node.attribute.values = c ("kinase",  "transcription factor")
     colors =                c ('#A0AA00', '#FF0000')
-    setDefaultNodeBorderWidth (cws, 5)
     setNodeBorderColorRule (cws, 'type', node.attribute.values, colors, mode='lookup', default.color='#88FF22')
     count.control.points = c (2, 30, 100)
     sizes                = c (20, 50, 100)
     setNodeSizeRule (cws, 'count', count.control.points, sizes, mode='interpolate')
     setNodeColorRule (cws, 'lfc', c (-3.0, 0.0, 3.0), c ('#00FF00', '#FFFFFF', '#FF0000'), mode='interpolate')
+    redraw (cws)
     } # if apply.viz.rules
 
-  redraw (cws)
 
   invisible (cws)
 
@@ -2648,7 +2757,66 @@ test.getPosition = function ()
 
   invisible (cwe)
 
-} # test.setPosition
+} # test.getPosition
+#------------------------------------------------------------------------------------------------------------------------
+# until now, the encoding trick for returning node positions from RCytoscape has been to separate node name from x,y by ':'
+#   "2022:417.0,122.0" "659:156.0,0.0"
+# 
+test.getPosition.colonInNodeName = function ()
+{
+  title = 'test.getPosition.colonInNodeName'
+  window.prep (title)
+
+  g = RCytoscape::makeSimpleGraph ()
+  funky.node.name = 'abcd:xyz::1234,funky?!'
+  g = graph::addNode (funky.node.name, g)
+  nodeData (g, funky.node.name, 'label') = funky.node.name
+
+  cwe = new.CytoscapeWindow (title, graph=g)
+  displayGraph (cwe)
+  layout (cwe, 'jgraph-spring')
+  redraw (cwe)
+  xx <<- cwe
+  
+  layout (cwe, 'jgraph-spring')   # get a reasonable starting layout, with the nodes well-separate
+
+     # the scheme:  get current positions, find their mean, place all the nodes there,
+     # get their new positions, check to see that they are the means just set.
+  
+  positions <<- getPosition (cwe, c ('A', 'B', 'C'))
+
+     # place the nodes on top of each other, at the center of their 3-cornered original layout
+
+  center.x = as.integer (round (mean (as.integer (sapply (positions, function (pos) pos$x)))))
+  center.y = as.integer (round (mean (as.integer (sapply (positions, function (pos) pos$y)))))
+
+     # rearrange the positions
+  layout (cwe, 'grid')
+
+    # superimpose A,B, and C  in the center
+  setPosition (cwe, c ('A', 'B', 'C'), rep (center.x, 3), rep (center.y, 3))
+  x.funky = center.x + 50
+  y.funky = center.y + 50
+    # offset funky.node.name
+  setPosition (cwe, funky.node.name, x.funky, y.funky)
+  fitContent (cwe)
+  setZoom (cwe, 0.75 * getZoom (cwe))
+  
+     # now check that the nodes have been repositioned from grid to centered (A,B,C) and offset (funky.node.name)
+  current.x = getPosition (cwe, 'A')[[1]]$x
+  current.y = getPosition (cwe, 'A')[[1]]$y
+  
+  checkEqualsNumeric (current.x, center.x, tol=1)
+  checkEqualsNumeric (current.y, center.y, tol=1)
+
+  funky.pos.x = getPosition (cwe, funky.node.name) [[1]]$x
+  funky.pos.y = getPosition (cwe, funky.node.name) [[1]]$y
+  checkEqualsNumeric (funky.pos.x, x.funky, tol=1)
+  checkEqualsNumeric (funky.pos.y, y.funky, tol=1)
+
+  invisible (cwe)
+
+} # test.getPosition.colonInNodeName
 #------------------------------------------------------------------------------------------------------------------------
 test.haveNodeAttribute = function ()
 {
@@ -4016,4 +4184,21 @@ test.validity = function ()
   invisible (cw)
 
 } # test.validity
+#------------------------------------------------------------------------------------------------------------------------
+# not really an automated test, except of syntax.  cut and paste these commands into your R session to see that
+# they really perform as expected.
+
+test.tooltip.delays = function ()
+{
+  cw = demoSimpleGraph ()
+
+    # display immediately, stay up until mouse moves away
+  setTooltipInitialDelay (cw, 0)
+  setTooltipDismissDelay (cw, 0)
+
+    # display after 1 second, for 1 second
+  setTooltipInitialDelay (cw, 1000)
+  setTooltipDismissDelay (cw, 1000)
+  
+} # test.tooltip.delays
 #------------------------------------------------------------------------------------------------------------------------

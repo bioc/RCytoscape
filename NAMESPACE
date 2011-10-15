@@ -198,12 +198,8 @@ export(
    )
 
 importClassesFrom(graph, graph, graphBase)
-importClassesFrom(AnnotationDbi)
-importMethodsFrom(AnnotationDbi, mget)
-importMethodsFrom(AnnotationDbi, get)
 
 importClassesFrom(methods, character, integer)
-importClassesFrom(org.Hs.eg.db)
 
 importMethodsFrom(graph, edgeData, "edgeData<-", edgeDataDefaults,
                  "edgeDataDefaults<-", edgeNames, edges, inEdges,

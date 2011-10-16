@@ -1,6 +1,29 @@
 library (graph)
 library (XMLRPC)
 library (methods)
+
+
+# this code is for the Bioconductor build system. You should never need to set or
+# read these environment variables in ordinary use.
+.BBSOverride <- function(host, rpcPort) {
+    ret <- list()
+    if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
+      host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
+      rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
+      }
+    if (.Platform$r_arch == "x64") {
+        if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE_64") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE_64") != "")) {
+          host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE_64")
+          rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE_64"),"integer")
+          }
+    }
+    #cat(paste("Using host", host, "and port", rpcPort, "."))
+    
+    ret["host"] <- host
+    ret["rpcPort"] <- rpcPort
+    ret
+}
+
 #------------------------------------------------------------------------------------------------------------------------
 printf = function (...) print (noquote (sprintf (...)))
 #------------------------------------------------------------------------------------------------------------------------
@@ -288,13 +311,9 @@ setValidity ("CytoscapeWindowClass",
 CytoscapeConnection = function (host='localhost', rpcPort=9000)
 {
   
-  # this code is for the Bioconductor build system. You should never need to set or
-  # read these environment variables in ordinary use.
-  if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
-    host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
-    rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
-    }
-  
+  res <- .BBSOverride(host, rpcPort)
+  host = res$host
+  rpcPort = res$rpcPort
   
   uri = sprintf ('http://%s:%s', host, rpcPort)
   cc = new ('CytoscapeConnectionClass', uri=uri)
@@ -306,12 +325,10 @@ CytoscapeConnection = function (host='localhost', rpcPort=9000)
 new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'), host='localhost', rpcPort=9000, create.window=TRUE)
 {
   
-  # this code is for the Bioconductor build system. You should never need to set or
-  # read these environment variables in ordinary use.
-  if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
-    host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
-    rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
-    }
+  res <- .BBSOverride(host, rpcPort)
+  host = res$host
+  rpcPort = res$rpcPort
+
   
   uri = sprintf ('http://%s:%s', host, rpcPort)
 
@@ -351,12 +368,9 @@ CytoscapeWindow = new.CytoscapeWindow
 existing.CytoscapeWindow = function (title, host='localhost', rpcPort=9000, copy.graph.from.cytoscape.to.R=FALSE)
 {
   
-  # this code is for the Bioconductor build system. You should never need to set or
-  # read these environment variables in ordinary use.
-  if ((Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE") != "") &&  (Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE") != "")) {
-    host = Sys.getenv("RCYTOSCAPE_HOST_OVERRIDE")
-    rpcPort = as(Sys.getenv("RCYTOSCAPE_PORT_OVERRIDE"),"integer")
-    }
+  res <- .BBSOverride(host, rpcPort)
+  host = res$host
+  rpcPort = res$rpcPort
   
   uri = sprintf ('http://%s:%s', host, rpcPort)
 

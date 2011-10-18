@@ -1023,6 +1023,15 @@ setMethod ('setPosition', 'CytoscapeWindowClass',
 
   function (obj, node.names, x.coords, y.coords) {
 
+    unknown.nodes = setdiff (node.names, nodes (obj@graph))
+    if (length (unknown.nodes) > 0) {
+      node.names = intersect (node.names, nodes (obj@graph))
+      write (sprintf ("Error!  unknown nodes in RCytoscape::setPosition"), stderr ())
+      for (i in 1:length (unknown.nodes))
+        write (sprintf ("     %s", unknown.nodes [i]), stderr ())
+      return ()
+      } # if 
+
     count = length (node.names)
     stopifnot (length (x.coords) == count)
     stopifnot (length (y.coords) == count)

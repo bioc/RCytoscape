@@ -43,13 +43,6 @@ codoc:
 	(cd ../..; $(RVER) CMD check --no-manual --no-vignettes --no-tests --no-examples RCytoscape)
 
 
-# --- checkvig
-# check just the vignette
-#
-
-checkvig:
-	(cd ../..; $(RVER) CMD check --no-manual --no-codoc --no-tests --no-examples RCytoscape)
-
 
 # --- sweave
 # creates RCytoscape.tex, runs all embedded examples
@@ -63,7 +56,7 @@ sweave:
 # make and open RCytoscape.pdf, the vignette 
 #
 
-pdf:  doc/RCytoscape.tex
+pdf:  sweave doc/RCytoscape.tex
 	(cd doc; rm *.pdf; /usr/texbin/latex --output-format=pdf  RCytoscape.tex; open RCytoscape.pdf)
 
 # --- vanillaTest

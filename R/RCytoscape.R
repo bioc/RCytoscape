@@ -405,7 +405,7 @@ check.cytoscape.plugin.version = function (cyCon)
   plugin.version = as.numeric (string.tmp3)
   # plugin.version = as.numeric ((strsplit (plugin.version.string,' ')[[1]][1]))
   
-  expected.version = 1.3
+  expected.version = 1.7
   if (plugin.version < expected.version) { 
     write (' ', stderr ())
     write (sprintf ('This version of the RCytoscape package requires CytoscapeRPC plugin version %s or greater.', expected.version), stderr ())

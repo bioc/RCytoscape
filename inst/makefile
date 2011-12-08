@@ -43,14 +43,6 @@ codoc:
 	(cd ../..; $(RVER) CMD check --no-manual --no-vignettes --no-tests --no-examples RCytoscape)
 
 
-# --- checkvig
-# check just the vignette
-#
-
-checkvig:
-	(cd ../..; $(RVER) CMD check --no-manual --no-codoc --no-tests --no-examples RCytoscape)
-
-
 # --- sweave
 # creates RCytoscape.tex, runs all embedded examples
 # run this before the pdf target

@@ -139,7 +139,7 @@ setGeneric ('getDefaultEdgeReverseSelectionColor',  signature='obj',
 setGeneric ('setDefaultEdgeReverseSelectionColor',  signature='obj',
                 function (obj, new.color, vizmap.style.name='default') standardGeneric ('setDefaultEdgeReverseSelectionColor'))
 
-setGeneric ('saveImage',                  signature='obj', function (obj, file.name, image.type, scale) standardGeneric ('saveImage'))
+setGeneric ('saveImage',                  signature='obj', function (obj, file.name, image.type, scale=1.0) standardGeneric ('saveImage'))
 setGeneric ('saveNetwork',                signature='obj', function (obj, file.name, format='gml') standardGeneric ('saveNetwork'))
 
 setGeneric ('setDefaultNodeShape',        signature='obj', function (obj, new.shape, vizmap.style.name='default') standardGeneric ('setDefaultNodeShape'))
@@ -405,7 +405,7 @@ check.cytoscape.plugin.version = function (cyCon)
   plugin.version = as.numeric (string.tmp3)
   # plugin.version = as.numeric ((strsplit (plugin.version.string,' ')[[1]][1]))
   
-  expected.version = 1.7
+  expected.version = 1.8
   if (plugin.version < expected.version) { 
     write (' ', stderr ())
     write (sprintf ('This version of the RCytoscape package requires CytoscapeRPC plugin version %s or greater.', expected.version), stderr ())
@@ -1191,6 +1191,7 @@ setMethod ('setEdgeAttributes', 'CytoscapeWindowClass',
      #write (edge.names, stderr ())
      #write (values, stderr ())
 
+     #write (sprintf ('about to call setEdgeAttributesDirect %s, %d edge.names, %d values', attribute.name, length (edge.names), length (values)), stderr())
      invisible (setEdgeAttributesDirect (obj, attribute.name, caller.specified.attribute.class, edge.names, values))
      }) # setEdgeAttributes
 
@@ -1268,7 +1269,6 @@ setMethod ('displayGraph', 'CytoscapeWindowClass',
      sendNodes (obj)
      #write (sprintf ('adding %d edges...', length (edgeNames (obj@graph))), stderr ())
      sendEdges (obj)
-     #chad.debug (obj, "just before adding node attributes")
      write ('adding node attributes...', stderr ())
      sapply (noa.names (obj@graph), function (name) {print (name); setNodeAttributes (obj, name)})
      write ('adding edge attributes...', stderr ())
@@ -1362,7 +1362,7 @@ setMethod ('getCenter', 'CytoscapeWindowClass',
 setMethod ('setCenter', 'CytoscapeWindowClass',
 
    function (obj, x, y) {
-     tmp = xml.rpc (obj@uri, 'Cytoscape.setCenter', obj@window.id, x, y)
+     tmp = xml.rpc (obj@uri, 'Cytoscape.setCenter', obj@window.id, as.numeric (x), as.numeric (y))
      invisible (tmp)
      })
 
@@ -3348,11 +3348,17 @@ setMethod ('setDefaultEdgeReverseSelectionColor',  'CytoscapeConnectionClass',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('saveImage', 'CytoscapeWindowClass',
 
-   function (obj, file.name, image.type, scale) {
+   function (obj, file.name, image.type, scale=1.0) {
+     image.type = tolower (image.type)
+     stopifnot (image.type %in% c ('png', 'pdf', 'svg'))
      id = as.character (obj@window.id)
-     result = xml.rpc (obj@uri, 'Cytoscape.exportView', id, file.name, image.type, scale)
+     if (image.type == 'png')
+        result = xml.rpc (obj@uri, 'Cytoscape.exportView', id, file.name, image.type, scale)
+     else if (image.type == 'pdf')
+       result = xml.rpc (obj@uri, 'Cytoscape.exportViewToPDF', id, file.name)
+     else if (image.type == 'svg')
+       result = xml.rpc (obj@uri, 'Cytoscape.exportViewToSVG', id, file.name)
      invisible (result)
-
      })
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('saveNetwork', 'CytoscapeWindowClass',

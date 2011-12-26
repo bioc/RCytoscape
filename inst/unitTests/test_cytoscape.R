@@ -3664,6 +3664,7 @@ test.center = function ()
 
   for (i in 1:10) {
     setCenter (cw, x.left, y.up)
+    setCenter (cw, as.integer (x.left), as.integer (y.up))   # make sure the called function casts this int back to numeric
     setCenter (cw, x.left, y.down)
     setCenter (cw, x.right, y.down)
     setCenter (cw, x.right, y.up)
@@ -4068,10 +4069,23 @@ hiddenTest.saveImage = function ()
   setNodeLabelRule (cw, 'label')
   redraw (cw)
 
-  filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.jpg')
+    #--- png first
+  filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.png')
   printf ('saving image file to %s', filename)
-  saveImage (cw, filename, 'jpeg', 2.0)
-  printf ('image file exists? %s', file.exists (filename))
+  saveImage (cw, filename, 'png', 1.0)
+  checkTrue (file.exists (filename))
+
+    #--- now pdf
+  filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.pdf')
+  printf ('saving image file to %s', filename)
+  saveImage (cw, filename, 'pdf')
+  checkTrue (file.exists (filename))
+
+    #--- now svg
+  filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.svg')
+  printf ('saving image file to %s', filename)
+  saveImage (cw, filename, 'svg')
+  checkTrue (file.exists (filename))
 
   invisible (cw)
 
@@ -4094,7 +4108,7 @@ hiddenTest.saveNetwork = function ()
   filename = sprintf ('%s/%s', tempdir (), 'saveNetworkTest.gml')
   printf ('saving gml file to %s', filename)
   saveNetwork (cw, filename)
-  printf ('gml file exists? %s', file.exists (filename))
+  checkTrue (file.exists (filename))
 
   invisible (cw)
 

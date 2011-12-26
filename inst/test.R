@@ -1,7 +1,11 @@
 library (RUnit)
 source ('unitTests/test_cytoscape.R')
-write ('creating global variable "cy" -- an instance of CytoscapeConnection', stderr ())
-cy = CytoscapeConnection ()
+
+if (!exists ('cy')) {
+  write ('creating global variable "cy" -- an instance of CytoscapeConnection', stderr ())
+  cy = CytoscapeConnection ()
+  }
+
 #------------------------------------------------------------------------------------------------------------------------
 reload.rcytoscape = function ()
 {  

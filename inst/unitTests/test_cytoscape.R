@@ -3664,6 +3664,7 @@ test.center = function ()
 
   for (i in 1:10) {
     setCenter (cw, x.left, y.up)
+    setCenter (cw, as.integer (x.left), as.integer (y.up))  # make sure RCytoscape::setCenter casts to the numeric needed by CyRPC
     setCenter (cw, x.left, y.down)
     setCenter (cw, x.right, y.down)
     setCenter (cw, x.right, y.up)

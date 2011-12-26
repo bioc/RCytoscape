@@ -1362,7 +1362,7 @@ setMethod ('getCenter', 'CytoscapeWindowClass',
 setMethod ('setCenter', 'CytoscapeWindowClass',
 
    function (obj, x, y) {
-     tmp = xml.rpc (obj@uri, 'Cytoscape.setCenter', obj@window.id, x, y)
+     tmp = xml.rpc (obj@uri, 'Cytoscape.setCenter', obj@window.id, as.numeric (x), as.numeric (y))
      invisible (tmp)
      })
 

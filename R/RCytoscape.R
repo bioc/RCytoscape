@@ -1970,7 +1970,7 @@ setMethod ('setNodeLabelDirect', 'CytoscapeWindowClass',
      else {
        properties = rep (property.name, length (node.names))
        if (length (new.labels) == 1)
-         new.sizes = rep (new.labels, length (node.names))
+         new.labels = rep (new.labels, length (node.names))
        result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.labels))
        } # else: multiple nodes
      invisible (result)

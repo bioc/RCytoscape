@@ -75,7 +75,7 @@ Here we create a 3-node graph in R, send it to Cytoscape for display and layout.
   g <- graph::addNode ('A', g)
   g <- graph::addNode ('B', g)
   g <- graph::addNode ('C', g)
-  cw <- new.CytoscapeWindow ('vignette example', graph=g)
+  cw <- new.CytoscapeWindow ('vignette', graph=g)
   displayGraph (cw)
 
 @ 
@@ -323,7 +323,7 @@ We begin with the small sample graph just like that created in the 'setPosition'
   g <- RCytoscape::makeSimpleGraph ()
   g <- initNodeAttribute (g, 'pval', 'numeric', 1.0)
 
-  cwm <- CytoscapeWindow ('movie', graph =g)
+  cwm <- new.CytoscapeWindow ('movie', graph =g)
   displayGraph (cwm)
   layout (cwm, 'jgraph-spring')
   redraw (cwm)
@@ -379,9 +379,18 @@ Once the rules are in effect, node color and size will always be a function of e
     }
 
 @ 
-Though this example is very simple and quite without biologcal value, we hope that adequately illustrate the technique.  We commonly use just this approach to explore large scale timecourse expression data experiments in the context of curated, biologically relevant pathways, such as those provided by KEGG, and selected by packages such as SPIA or Category.
+Though this example is very simple and quite without biologcal meaning, we hope that it adequately illustrates the technique.  We commonly use just this approach to explore large scale timecourse expression data experiments in the context of curated, biologically relevant pathways, such as those provided by KEGG, and selected by packages such as SPIA or Category.
 
+Finally, delete all the windows from this vignette:
 
+<<deleteWindows>>=
+  cy <- CytoscapeConnection ()
+  window.names <- c ('vignette', 'test.setPosition', 'movie')
+  for (window.name in window.names)
+    if (window.name %in% as.character (getWindowList (cy)))
+      deleteWindow (cy, window.name)
+
+@ 
 \section{Online Documentation}
 
  \url{http://db.systemsbiology.net:8080/cytoscape/RCytoscape/versions/current/index.html}

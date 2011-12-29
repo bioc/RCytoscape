@@ -142,7 +142,8 @@ run.tests = function ()
 
   test.setNodeColorDirect ()
   test.setNodeBorderColorDirect ()
-
+  test.setNodeLabelDirect ()
+  
   test.setNodeOpacityDirect ()
   test.setEdgeOpacityDirect ()
 
@@ -1310,6 +1311,31 @@ test.setNodeBorderColorDirect = function ()
   invisible (cw)
 
 } # test.setNodeBorderColorDirect 
+#------------------------------------------------------------------------------------------------------------------------
+test.setNodeLabelDirect = function ()
+{
+  title = 'test.setNodeLabelDirect'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+  layout (cw, 'jgraph-spring')
+  redraw (cw)
+
+  setNodeLabelDirect (cw, 'A', 'new A label')
+  redraw (cw)
+  Sys.sleep (1)
+    # try multiple nodes, one label, which RCy will replicate into the right number
+  setNodeLabelDirect (cw, nodes (cw@graph), '')
+  redraw (cw)
+  Sys.sleep (1)
+
+  setNodeLabelDirect (cw, c ('A', 'C'), c ('AzA', 'ByB'))
+  redraw (cw)
+
+  invisible (cw)
+
+} # test.setNodeLabelDirect
 #------------------------------------------------------------------------------------------------------------------------
 test.setNodeLabelPropertiesDirect = function ()
 {  

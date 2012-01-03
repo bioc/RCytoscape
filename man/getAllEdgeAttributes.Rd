@@ -41,7 +41,7 @@ A data frame, with a column for each attribute, a row for each edge.
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
     # get all attributes for all edges
   tbl.noa = getAllEdgeAttributes (cw, onlySelectedEdges=FALSE)
 

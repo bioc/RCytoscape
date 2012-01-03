@@ -29,7 +29,7 @@ None.
 \examples{
   cw <- new.CytoscapeWindow ('lockNodeDimensions demo', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw)
+  layoutNetwork(cw)
   redraw (cw)
   lockNodeDimensions (cw, FALSE)
   setNodeWidthDirect (cw, 'A', 100)

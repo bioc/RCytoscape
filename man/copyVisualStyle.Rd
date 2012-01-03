@@ -51,7 +51,7 @@ Nothing.
   setDefaultEdgeLineWidth (cw, 5);
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
 
      # create a unique style name, using millisecond precision, so should be unique
   time.msec = proc.time()[['elapsed']]

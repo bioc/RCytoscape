@@ -38,7 +38,7 @@ Nothing.
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
 
   styles = getVisualStyleNames (cw)
    # now cycle through the currently defined styles

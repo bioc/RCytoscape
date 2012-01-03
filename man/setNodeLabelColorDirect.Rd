@@ -28,7 +28,7 @@ None.
   cw <- new.CytoscapeWindow ('setNodeLabelColorDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   setNodeFontSizeDirect (cw, 'A', 50)
   setNodeLabelColorDirect (cw, 'A', '#FFFF00')
   redraw (cw)

@@ -31,7 +31,7 @@ None.
 \examples{
   cw <- new.CytoscapeWindow ('hideNodes.test', graph=makeSimpleGraph())
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   # saveLayout (cw, 'layout.tmp.RData')
   hideNodes (cw, c ('A', 'B'))
   unhideAll (cw)

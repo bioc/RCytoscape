@@ -33,7 +33,7 @@ None.
   displayGraph (cw)
   addCyNode (cw, 'A NEW NODE')
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
 
 
 }

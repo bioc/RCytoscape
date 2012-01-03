@@ -25,7 +25,7 @@ None.
 \examples{
   cw <- new.CytoscapeWindow ('setNodeLabelRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   setNodeLabelRule (cw, 'label')
   redraw (cw)
   setNodeLabelRule (cw, 'type')

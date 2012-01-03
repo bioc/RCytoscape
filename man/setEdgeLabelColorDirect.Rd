@@ -25,7 +25,7 @@ None.
   cw <- new.CytoscapeWindow ('setEdgeLabelColorDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   edge.names = as.character (cy2.edge.names (cw@graph)) [1:2]
   setEdgeLabelColorDirect (cw, edge.names, '#FF0000')
   redraw (cw)

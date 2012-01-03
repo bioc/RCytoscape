@@ -30,7 +30,7 @@ None.
   cw <- new.CytoscapeWindow ('setEdgeLabelOpacityDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   edge.names = as.character (cy2.edge.names (cw@graph)) [1:2]
   for (i in 1:10) {
     setEdgeLabelOpacityDirect (cw, edge.names, 255 - (i * 25))

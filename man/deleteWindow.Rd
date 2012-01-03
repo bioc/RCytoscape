@@ -32,7 +32,7 @@ Nothing.
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
   deleteWindow (cw)
   cw2 <- new.CytoscapeWindow ('demo 2')
   cy = CytoscapeConnection ()

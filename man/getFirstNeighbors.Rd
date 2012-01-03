@@ -28,7 +28,7 @@ A list of node names.
   cw <- new.CytoscapeWindow ('getFirstNeighbors.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   print (getFirstNeighbors (cw, 'A'))
   selectNodes (cw, getFirstNeighbors (cw, 'A'))  # note that A is not selected
 }

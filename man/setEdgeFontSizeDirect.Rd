@@ -30,7 +30,7 @@ None.
   cw <- new.CytoscapeWindow ('setEdgeFontSizeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   edge.names = as.character (cy2.edge.names (cw@graph)) [1:2]
   for (i in 8:30) {
     setEdgeFontSizeDirect (cw, edge.names, i)

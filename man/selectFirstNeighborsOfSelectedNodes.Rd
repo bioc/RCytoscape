@@ -32,7 +32,7 @@ None.
 \examples{
   cw <- new.CytoscapeWindow ('selectFirstNeighborsOfSelecteNodes.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw)
+  layoutNetwork(cw)
   clearSelection (cw)
   selectNodes (cw, 'A')
   selectFirstNeighborsOfSelectedNodes (cw)

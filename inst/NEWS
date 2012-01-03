@@ -1,3 +1,7 @@
-(06 december 2010, pshannon); version 1.1.8
-(12 august 2010, pshannon):  first preliminary release
+(02 jan 2012, pshannon, 1.5.9) changed method names: layout -> layoutNetwork, version -> pluginVersion, get/setPosition -> get/setNodePosition
+(02 jan 2012, pshannon, 1.5.9) added setDefaultEdgeFontSize
+(27 dec 2011, pshannon, 1.5.5) fixed bug in setNodeLabelDirect.  Multiple nodes, one label now works. 
+(26 dec 2011, pshannon, 1.5.4) setCenter now casts x,y to numeric before sending out to CyRPC
+(06 dec 2010, pshannon, 1.1.8)
+(12 aug 2010, pshannon):  first preliminary release
 

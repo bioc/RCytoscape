@@ -20,7 +20,7 @@ An integer.
 \examples{
   cw <- new.CytoscapeWindow ('getSelectedEdgeCount.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
   clearSelection (cw)
   getSelectedEdgeCount (cw) # should be 0

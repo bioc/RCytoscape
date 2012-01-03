@@ -50,7 +50,7 @@ setClass ("CytoscapeWindowClass",
 
 #------------------------------------------------------------------------------------------------------------------------
 setGeneric ('ping',                     signature='obj', function (obj) standardGeneric ('ping'))
-setGeneric ('version',                  signature='obj', function (obj) standardGeneric ('version'))
+setGeneric ('pluginVersion',            signature='obj', function (obj) standardGeneric ('pluginVersion'))
 setGeneric ('msg',                      signature='obj', function (obj, string) standardGeneric ('msg'))
 setGeneric ('clearMsg',                 signature='obj', function (obj) standardGeneric ('clearMsg'))
 setGeneric ('createWindow',             signature='obj', function (obj) standardGeneric ('createWindow'))
@@ -89,11 +89,11 @@ setGeneric ('setEdgeAttributesDirect', signature='obj',
     function (obj, attribute.name, attribute.type, edge.names, values) standardGeneric ('setEdgeAttributesDirect'))
 
 setGeneric ('displayGraph',             signature='obj', function (obj) standardGeneric ('displayGraph'))
-setGeneric ('layout',                   signature='obj', function (obj, layout.name='jgraph-spring') standardGeneric ('layout'))
+setGeneric ('layoutNetwork',            signature='obj', function (obj, layout.name='jgraph-spring') standardGeneric ('layoutNetwork'))
 setGeneric ('saveLayout',               signature='obj', function (obj, filename) standardGeneric ('saveLayout'))
 setGeneric ('restoreLayout',            signature='obj', function (obj, filename) standardGeneric ('restoreLayout'))
-setGeneric ('setPosition',              signature='obj', function (obj, node.names, x.coords, y.coords) standardGeneric ('setPosition'))
-setGeneric ('getPosition',              signature='obj', function (obj, node.names) standardGeneric ('getPosition'))
+setGeneric ('setNodePosition',          signature='obj', function (obj, node.names, x.coords, y.coords) standardGeneric ('setNodePosition'))
+setGeneric ('getNodePosition',          signature='obj', function (obj, node.names) standardGeneric ('getNodePosition'))
 setGeneric ('redraw',                   signature='obj', function (obj) standardGeneric ('redraw'))
 setGeneric ('hidePanel',                signature='obj', function (obj, panelName) standardGeneric ('hidePanel'))
 setGeneric ('hideAllPanels',            signature='obj', function (obj) standardGeneric ('hideAllPanels'))
@@ -152,7 +152,7 @@ setGeneric ('setDefaultNodeLabelColor',   signature='obj', function (obj, new.co
 
 setGeneric ('setDefaultEdgeLineWidth',    signature='obj', function (obj, new.width, vizmap.style.name='default') standardGeneric ('setDefaultEdgeLineWidth'))
 setGeneric ('setDefaultEdgeColor',        signature='obj', function (obj, new.color, vizmap.style.name='default') standardGeneric ('setDefaultEdgeColor'))
-
+setGeneric ('setDefaultEdgeFontSize',     signature='obj', function (obj, new.size) standardGeneric ('setDefaultEdgeFontSize'))
 
 setGeneric ('setNodeTooltipRule',       signature='obj', function (obj, node.attribute.name) standardGeneric ('setNodeTooltipRule'))
 setGeneric ('setEdgeTooltipRule',       signature='obj', function (obj, edge.attribute.name) standardGeneric ('setEdgeTooltipRule'))
@@ -398,14 +398,14 @@ existing.CytoscapeWindow = function (title, host='localhost', rpcPort=9000, copy
 #------------------------------------------------------------------------------------------------------------------------
 check.cytoscape.plugin.version = function (cyCon)
 {
-  plugin.version.string = version (cyCon)
+  plugin.version.string = pluginVersion (cyCon)
   string.tmp1 = strsplit (plugin.version.string,' ')[[1]][1]
   string.tmp2 = gsub ('[a-z]', '', string.tmp1)
   string.tmp3 = gsub ('[A-Z]', '', string.tmp2)
   plugin.version = as.numeric (string.tmp3)
   # plugin.version = as.numeric ((strsplit (plugin.version.string,' ')[[1]][1]))
   
-  expected.version = 1.8
+  expected.version = 1.7   # 1.8 not yet ready at the Cytoscape plugin page
   if (plugin.version < expected.version) { 
     write (' ', stderr ())
     write (sprintf ('This version of the RCytoscape package requires CytoscapeRPC plugin version %s or greater.', expected.version), stderr ())
@@ -422,7 +422,7 @@ setMethod ('ping', signature = 'CytoscapeConnectionClass',
     return (xml.rpc (obj@uri, 'Cytoscape.test'))
     })
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('version', 'CytoscapeConnectionClass', 
+setMethod ('pluginVersion', 'CytoscapeConnectionClass', 
   function (obj) { 
     return (xml.rpc (obj@uri, 'Cytoscape.version'))
     })
@@ -985,12 +985,12 @@ setMethod ('sendEdges', 'CytoscapeWindowClass',
    # }) # sendEdges
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('layout', 'CytoscapeWindowClass',
+setMethod ('layoutNetwork', 'CytoscapeWindowClass',
 
   function (obj, layout.name='jgraph-spring') {
 
     if (!layout.name %in% getLayoutNames (obj)) {
-      write (sprintf ("layout '%s' is not recognized; call getLayoutNames (<CytoscapeWindow>) to see those which are supported", layout.name), stderr ())
+      write (sprintf ("layout.name '%s' is not recognized; call getLayoutNames (<CytoscapeWindow>) to see those which are supported", layout.name), stderr ())
       return ()
       }
 
@@ -1002,7 +1002,7 @@ setMethod ('layout', 'CytoscapeWindowClass',
 setMethod ('saveLayout', 'CytoscapeWindowClass',
 
   function (obj, filename) {
-    custom.layout = RCytoscape::getPosition (obj,  getAllNodes (obj))
+    custom.layout = getNodePosition (obj,  getAllNodes (obj))
     save (custom.layout, file=filename)
     }) # save.layout
 
@@ -1015,18 +1015,18 @@ setMethod ('restoreLayout', 'CytoscapeWindowClass',
     node.names.filtered = intersect (node.names, getAllNodes (obj))
     x = as.integer (sapply (node.names.filtered, function (node.name) return (custom.layout [[node.name]]$x)))
     y = as.integer (sapply (node.names.filtered, function (node.name) return (custom.layout [[node.name]]$y)))
-    setPosition (obj, node.names.filtered, x, y)
+    setNodePosition (obj, node.names.filtered, x, y)
     }) # restoreLayout
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('setPosition', 'CytoscapeWindowClass',
+setMethod ('setNodePosition', 'CytoscapeWindowClass',
 
   function (obj, node.names, x.coords, y.coords) {
 
     unknown.nodes = setdiff (node.names, nodes (obj@graph))
     if (length (unknown.nodes) > 0) {
       node.names = intersect (node.names, nodes (obj@graph))
-      write (sprintf ("Error!  unknown nodes in RCytoscape::setPosition"), stderr ())
+      write (sprintf ("Error!  unknown nodes in RCytoscape::setNodePosition"), stderr ())
       for (i in 1:length (unknown.nodes))
         write (sprintf ("     %s", unknown.nodes [i]), stderr ())
       return ()
@@ -1046,10 +1046,10 @@ setMethod ('setPosition', 'CytoscapeWindowClass',
     else 
       invisible (xml.rpc (obj@uri, 'Cytoscape.setNodesPositions', id, node.names, as.numeric (x.coords), as.numeric (y.coords)))
 
-    }) # cy.setPosition
+    }) # cy.setNodePosition
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('getPosition', 'CytoscapeWindowClass',
+setMethod ('getNodePosition', 'CytoscapeWindowClass',
 
   function (obj, node.names) {
 
@@ -1080,7 +1080,7 @@ setMethod ('getPosition', 'CytoscapeWindowClass',
       } # for token
 
     return (result)
-    }) # cy.getPosition
+    }) # cy.getNodePosition
 
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeAttributes', 'CytoscapeWindowClass',
@@ -1426,6 +1426,10 @@ setMethod ('setNodeTooltipRule', 'CytoscapeWindowClass',
   function (obj, node.attribute.name) {
     id = as.character (obj@window.id)
     viz.style.name = 'default'
+    if (!node.attribute.name %in% noa.names (obj@graph)) {
+      write (sprintf ('warning!  setNodeTooltipRule passed non-existent node attribute: %s', node.attribute.name), stderr ())
+      return ()
+      }
     attribute.values = as.character (noa (obj@graph, node.attribute.name))
     tooltips = attribute.values   # an identity mapping: if you see node attribute x, then display x.  odd but true.
     default.tooltip = ''
@@ -1645,6 +1649,13 @@ setMethod ('setDefaultEdgeColor', 'CytoscapeConnectionClass',
 
    function (obj, new.color, vizmap.style.name='default') {
      xml.rpc (obj@uri, 'Cytoscape.setDefaultVizMapValue', 'default', 'Edge Color', as.character (new.color)); 
+     }) # setDefaultEdgeColor
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod ('setDefaultEdgeFontSize', 'CytoscapeConnectionClass', 
+
+   function (obj, new.size) {
+     xml.rpc (obj@uri, 'Cytoscape.setDefaultVizMapValue', 'default', 'Edge Font Size', as.character (new.size))
      }) # setDefaultEdgeColor
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -1970,7 +1981,7 @@ setMethod ('setNodeLabelDirect', 'CytoscapeWindowClass',
      else {
        properties = rep (property.name, length (node.names))
        if (length (new.labels) == 1)
-         new.sizes = rep (new.labels, length (node.names))
+         new.labels = rep (new.labels, length (node.names))
        result = xml.rpc (obj@uri, "Cytoscape.setNodeProperties", node.names, properties, as.character (new.labels))
        } # else: multiple nodes
      invisible (result)
@@ -2158,9 +2169,10 @@ setMethod ('setNodeLabelOpacityDirect', 'CytoscapeWindowClass',
 setMethod ('setEdgeOpacityDirect', 'CytoscapeWindowClass',
 
    function (obj, edge.names, new.values) {
-     property.name = 'Edge Opacity'
+     property.names = c ('Edge Opacity',  'Edge Source Arrow Opacity', 'Edge Target Arrow Opacity')
      host.uri = obj@uri
-     set.node.or.edge.properties (host.uri, property.name, edge.names, new.values)
+     for (property.name in property.names)
+       set.node.or.edge.properties (host.uri, property.name, edge.names, new.values)
      })
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -2570,12 +2582,14 @@ setMethod ('getAllNodeAttributes', 'CytoscapeWindowClass',
       }
   
     result = cbind (unlist (nodeData (g, nodes.of.interest, attr=attribute.names [1])))
+    print (result)
     
     if (length (attribute.names) > 1) {
       for (name in attribute.names [2:length (attribute.names)]) {
         new.column = unlist (nodeData (g, nodes.of.interest, attr=name))
         if (is.null (new.column))
           new.column = rep ('NULL', nrow (result))
+        print (new.column)
         result = cbind (result, new.column)
         } # for name
       } # if length > 1
@@ -3036,7 +3050,7 @@ demoSimpleGraph = function ()
   cws = new.CytoscapeWindow (window.title, g.simple)
 
   displayGraph (cws)
-  layout (cws, 'jgraph-spring')
+  layoutNetwork (cws, 'jgraph-spring')
   setNodeLabelRule (cws, 'label')
 
   node.attribute.values = c ("kinase",  "transcription factor")
@@ -3352,12 +3366,21 @@ setMethod ('saveImage', 'CytoscapeWindowClass',
      image.type = tolower (image.type)
      stopifnot (image.type %in% c ('png', 'pdf', 'svg'))
      id = as.character (obj@window.id)
+     result = NA
      if (image.type == 'png')
         result = xml.rpc (obj@uri, 'Cytoscape.exportView', id, file.name, image.type, scale)
-     else if (image.type == 'pdf')
-       result = xml.rpc (obj@uri, 'Cytoscape.exportViewToPDF', id, file.name)
-     else if (image.type == 'svg')
-       result = xml.rpc (obj@uri, 'Cytoscape.exportViewToSVG', id, file.name)
+     else if (image.type == 'pdf') {
+       if (length (grep ('1.8', pluginVersion (obj))) == 1)
+         result = xml.rpc (obj@uri, 'Cytoscape.exportViewToPDF', id, file.name)
+       else
+         write ('saveImage to format pdf requires CytoscapeRPC.jar version 1.8, which is still being tested', stderr ())
+       }
+     else if (image.type == 'svg') {
+       if (length (grep ('1.8', pluginVersion (obj))) == 1)
+         result = xml.rpc (obj@uri, 'Cytoscape.exportViewToSVG', id, file.name)
+       else
+         write ('saveImage to format svg requires CytoscapeRPC.jar version 1.8, which is still being tested', stderr ())
+       }
      invisible (result)
      })
 #------------------------------------------------------------------------------------------------------------------------

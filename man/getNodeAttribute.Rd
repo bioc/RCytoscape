@@ -48,7 +48,7 @@ The attribute in question, which may be of any scalar type.
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
 
   count.B = getNodeAttribute (cw, "B", 'count')
 

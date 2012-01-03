@@ -39,7 +39,7 @@ None.
   cw <- new.CytoscapeWindow ('setDefaultNodeBorderColor.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   setDefaultNodeBorderColor (cw, '#FFFFFF') # white borders
   redraw (cw)
 }

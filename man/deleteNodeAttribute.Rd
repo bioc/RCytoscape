@@ -39,7 +39,7 @@ nothing
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
 
   print (paste ("before: ", getNodeAttributeNames (cw)))
   deleteNodeAttribute (cw, 'count')

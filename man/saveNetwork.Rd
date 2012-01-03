@@ -31,7 +31,7 @@ None.
 \examples{
   cw <- new.CytoscapeWindow ('saveNetwork.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
 
   #filename <- sprintf ('%s/%s', tempdir (), 'saveNetworkTest.gml')

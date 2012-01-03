@@ -34,7 +34,7 @@ None.
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   setWindowSize (cw, 1200, 800)
   fitContent (cw)
   system ('sleep 1')

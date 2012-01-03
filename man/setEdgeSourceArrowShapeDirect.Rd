@@ -32,7 +32,7 @@ None.
 \examples{
   cw <- new.CytoscapeWindow ('setEdgeSourceArrowShapeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
 
   edges.of.interest = as.character (cy2.edge.names (cw@graph))

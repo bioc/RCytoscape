@@ -49,7 +49,7 @@ The attribute in question, which may be of any scalar type.
   setDefaultEdgeLineWidth (cw, 5);
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
 
   score.bc = getEdgeAttribute (cw, "B (synthetic lethal) C", 'score')
   print (paste ("should be -12: ", score.bc))

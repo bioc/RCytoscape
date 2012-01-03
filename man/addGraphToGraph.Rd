@@ -28,7 +28,7 @@ None.
   cw3 <- new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork(cw3)
 
     # create a new graph, which adds two nodes, and edges between them
     # and an existing node, A
@@ -54,7 +54,7 @@ None.
 
   addGraphToGraph (cw3, g2)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork(cw3)
 
 }
 

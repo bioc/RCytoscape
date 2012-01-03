@@ -28,7 +28,7 @@ None.
   cw <- new.CytoscapeWindow ('setNodeImageDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   setNodeImageDirect (cw, 'C', 'http://rcytoscape.systemsbiology.net/versions/current/images/bioc.png')
   redraw (cw)
 }

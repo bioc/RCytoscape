@@ -33,7 +33,7 @@ None.
 \examples{
   cw <- new.CytoscapeWindow ('setEdgeLineWidthRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
   edge.attribute.values = c ('phosphorylates', 'synthetic lethal',   'undefined')
   line.widths = c (0, 8, 16)

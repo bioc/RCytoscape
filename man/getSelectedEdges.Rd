@@ -20,7 +20,7 @@ A list of character strings.
 \examples{
   cw <- new.CytoscapeWindow ('getSelectedEdges.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
     # in Cytoscape, interactively select two edges
     # doesn't work yet:  selectEdges (cwe, "A (phosphorylates) B")

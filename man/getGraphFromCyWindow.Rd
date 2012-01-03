@@ -21,7 +21,7 @@ A bioconductor graph object.
 \examples{
   cw <- CytoscapeWindow ('getGraphFromCyWindow.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw)
+  layoutNetwork(cw)
   redraw (cw)
   g.cy <- getGraphFromCyWindow (cw, 'getGraphFromCyWindow.test')
   print (g.cy)  # 3 nodes, 3 edges

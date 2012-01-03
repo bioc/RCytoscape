@@ -41,7 +41,7 @@ nothing
   setDefaultEdgeLineWidth (cw, 5);
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
 
   print (paste ("before: ", getEdgeAttributeNames (cw)))
   deleteEdgeAttribute (cw, 'score')

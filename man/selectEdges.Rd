@@ -29,7 +29,7 @@ None.
 
 \examples{
   cw <- new.CytoscapeWindow ('selectEdges.test', graph=makeSimpleGraph())
-  displayGraph (cw); layout (cw); redraw (cw)
+  displayGraph (cw); layoutNetwork(cw); redraw (cw)
   clearSelection (cw)
   selectEdges (cw, c ("A (phosphorylates) B", "B (synthetic lethal) C"))
   getSelectedEdges (cw)

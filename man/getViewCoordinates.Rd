@@ -29,7 +29,7 @@ A named list of fou numbers, with these names:  top.x, top.y, bottom.x, bottom.y
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   print (getViewCoordinates (cw))
 }
 

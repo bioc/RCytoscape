@@ -17,7 +17,7 @@ run.tests = function ()
   options ('warn'=2)   # make sure that any R warnings are treated as fatal errors
 
     # before doing anything else, make sure that the Cytoscape plugin version is one we can respond to
-  test.version ()
+  test.plugin.version ()
   
     # start with a clean slate, and no windows
 
@@ -31,7 +31,7 @@ run.tests = function ()
   deleteAllWindows (cy)
 
 
-  test.version ()
+  test.plugin.version ()
   test.create.class ()
   test.deleteWindow ()
   test.deleteAllWindows ()
@@ -65,6 +65,7 @@ run.tests = function ()
   test.setDefaultNodeLabelColor (direct=FALSE)
   test.setDefaultEdgeLineWidth (direct=FALSE)
   test.setDefaultEdgeColor (direct=FALSE)
+  test.setDefaultEdgeFontSize ()
   test.setNodeLabelRule ()
   test.setEdgeLabelRule ()
   test.setNodeTooltipRule ()
@@ -98,8 +99,8 @@ run.tests = function ()
   test.simpleGraph (apply.viz.rules=TRUE, do.redraw=TRUE)
   test.simpleGraphWithReciprocalEdge ()
   test.setGraph ()
-  test.setPosition ()
-  test.getPosition ()
+  test.setNodePosition ()
+  test.getNodePosition ()
   test.haveNodeAttribute ()
   test.haveEdgeAttribute ()
   test.copyNodeAttributesFromCyGraph ()
@@ -143,6 +144,8 @@ run.tests = function ()
   test.setNodeColorDirect ()
   test.setNodeBorderColorDirect ()
 
+  test.setNodeLabelDirect ()
+  
   test.setNodeOpacityDirect ()
   test.setEdgeOpacityDirect ()
 
@@ -195,12 +198,12 @@ window.prep = function (title)
 
 } # window.prep
 #------------------------------------------------------------------------------------------------------------------------
-test.version = function ()
+test.plugin.version = function ()
 {
-  title = 'test.version'
+  title = 'test.plugin.version'
   cy = CytoscapeConnection ()
 
-  plugin.version.string = version (cy)
+  plugin.version.string = pluginVersion (cy)
   string.tmp1 = strsplit (plugin.version.string,' ')[[1]][1]
   string.tmp2 = gsub ('[a-z]', '', string.tmp1)
   string.tmp3 = gsub ('[A-Z]', '', string.tmp2)
@@ -213,7 +216,7 @@ test.version = function ()
   msg (cy, paste ('CytoscapeRPC version', major.minor.version))
   checkTrue (major.minor.version >= 1.3)
 
-} # test.version
+} # test.plugin.version
 #------------------------------------------------------------------------------------------------------------------------
 test.create.class = function ()
 {
@@ -269,7 +272,7 @@ test.getWindowID = function ()
   cw3 =  new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
 
   cy = CytoscapeConnection ()
 
@@ -488,13 +491,13 @@ test.setLayoutProperties = function ()
   checkTrue ('distance_strength' %in% getLayoutPropertyNames (cy, layout.name))
 
   setLayoutProperties (cy, layout.name, list (edge_attribute='score', distance_strength=100))
-  layout (cw, layout.name)
+  layoutNetwork (cw, layout.name)
 
   setLayoutProperties (cy, layout.name, list (edge_attribute='score', distance_strength=-100))
-  layout (cw, layout.name)
+  layoutNetwork (cw, layout.name)
 
   setLayoutProperties (cy, layout.name, list (edge_attribute='score', distance_strength=100))
-  layout (cw, layout.name)
+  layoutNetwork (cw, layout.name)
 
   invisible (cw)
 
@@ -508,7 +511,7 @@ test.sendNodes = function ()
 
   cwa = new.CytoscapeWindow (title, graph=g)
   sendNodes (cwa)
-  layout (cwa, "grid")   # no edges, so other layouts will simply superimpose the nodes
+  layoutNetwork (cwa, "grid")   # no edges, so other layouts will simply superimpose the nodes
   redraw (cwa)
   msg (cwa, 'sendNodes')
 
@@ -525,7 +528,7 @@ test.sendEdges = function ()
   cwe = new.CytoscapeWindow (title, graph=g)
   sendNodes (cwe)
   sendEdges (cwe)
-  layout (cwe, 'jgraph-circle')
+  layoutNetwork (cwe, 'jgraph-circle')
   redraw (cwe)
   msg (cwe, 'sendEdges')
 
@@ -551,7 +554,7 @@ test.setNodeAttributes = function ()
     result = setNodeAttributes (cwb, attribute.name)
     }
 
-  layout (cwb, 'grid')
+  layoutNetwork (cwb, 'grid')
   redraw (cwb)
   msg (cwb, 'setNodeAttributes')
 
@@ -586,7 +589,7 @@ test.setEdgeAttributes = function ()
 
   cwe = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
   attribute.names = eda.names (cwe@graph)
 
@@ -736,7 +739,7 @@ test.showGraphicsDetails = function ()
 
   cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   showGraphicsDetails (cw, FALSE)
@@ -758,7 +761,7 @@ test.setDefaultNodeShape = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
    hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -793,7 +796,7 @@ test.setDefaultNodeColor = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -819,7 +822,7 @@ test.setDefaultNodeSize = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -846,7 +849,7 @@ test.setDefaultNodeBorderColor = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -870,7 +873,7 @@ test.setDefaultNodeBorderWidth = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -898,7 +901,7 @@ test.setDefaultNodeFontSize = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -922,7 +925,7 @@ test.setDefaultNodeLabelColor = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -945,7 +948,7 @@ test.setDefaultEdgeLineWidth = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -970,7 +973,7 @@ test.setDefaultEdgeColor = function (direct=FALSE)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');   
@@ -988,6 +991,33 @@ test.setDefaultEdgeColor = function (direct=FALSE)
 
 } # test.setDefaultEdgeColor
 #------------------------------------------------------------------------------------------------------------------------
+test.setDefaultEdgeFontSize = function ()
+{
+  title = 'test.setDefaultEdgeFontSize'
+  window.prep (title)
+
+  cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cwe)
+  setNodeSizeDirect (cwe, getAllNodes (cwe), 40)
+  setEdgeLabelRule (cwe, 'edgeType')   # gives us some text we can inspect for changing font size (below)
+  layoutNetwork (cwe, 'jgraph-spring')
+  redraw (cwe)
+
+  hideAllPanels (cwe)
+
+  for (i in 1:3) {
+    setDefaultEdgeFontSize (cwe, i * 15);
+    redraw (cwe)
+    Sys.sleep (1)
+    } # for i
+
+  setDefaultEdgeFontSize (cwe, 12);
+  redraw (cwe)
+
+  invisible (cwe)
+
+} # test.setDefaultEdgeFontSize
+#------------------------------------------------------------------------------------------------------------------------
 test.setNodeLabelRule = function ()
 {
   title = 'test.setNodeLabelRule'
@@ -995,7 +1025,7 @@ test.setNodeLabelRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'c');  hidePanel (cwe, 'd');
@@ -1021,7 +1051,7 @@ test.setEdgeLabelRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'c');  hidePanel (cwe, 'd');
@@ -1043,7 +1073,7 @@ test.setNodeTooltipRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'c');  hidePanel (cwe, 'd');
@@ -1065,7 +1095,7 @@ test.setEdgeTooltipRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'c');  hidePanel (cwe, 'd');
@@ -1083,7 +1113,7 @@ test.setNodeColorRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');
@@ -1124,7 +1154,7 @@ test.setNodeBorderColorRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');
@@ -1171,7 +1201,7 @@ test.setNodeBorderWidthRule = function ()
   
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hideAllPanels (cy)
@@ -1204,7 +1234,7 @@ test.setNodeSizeRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   hidePanel (cwe, 'd');   hidePanel (cwe, 'c');
@@ -1243,7 +1273,7 @@ test.setNodeShapeRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
      # specify shapes for only two of the three nodes and node types.  make sure that the third node gets
@@ -1272,7 +1302,7 @@ test.setNodeColorDirect = function ()
 
   cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   setNodeColorDirect (cw, 'A', '#AA0088')
@@ -1295,7 +1325,7 @@ test.setNodeBorderColorDirect = function ()
 
   cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   setNodeBorderColorDirect (cw, 'A', '#AA0088')
@@ -1311,6 +1341,31 @@ test.setNodeBorderColorDirect = function ()
 
 } # test.setNodeBorderColorDirect 
 #------------------------------------------------------------------------------------------------------------------------
+test.setNodeLabelDirect = function ()
+{
+  title = 'test.setNodeLabelDirect'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+  layoutNetwork (cw, 'jgraph-spring')
+  redraw (cw)
+
+  setNodeLabelDirect (cw, 'A', 'new A label')
+  redraw (cw)
+  Sys.sleep (1)
+    # try multiple nodes, one label, which RCy will replicate into the right number
+  setNodeLabelDirect (cw, nodes (cw@graph), '')
+  redraw (cw)
+  Sys.sleep (1)
+
+  setNodeLabelDirect (cw, c ('A', 'C'), c ('AzA', 'ByB'))
+  redraw (cw)
+
+  invisible (cw)
+
+} # test.setNodeLabelDirect
+#------------------------------------------------------------------------------------------------------------------------
 test.setNodeLabelPropertiesDirect = function ()
 {  
   print ('--- test.setNodeLabelsPropertiesDirect')
@@ -1319,7 +1374,7 @@ test.setNodeLabelPropertiesDirect = function ()
 
   cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   sizes = c (10, 50, 80)
@@ -1346,7 +1401,7 @@ test.setNodeOpacityDirect = function ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
   setNodeSizeDirect (cw, 'D', 120)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   fitContent (cw)
   setZoom (cw, 0.8 * getZoom (cw))
   redraw (cw)
@@ -1382,7 +1437,7 @@ test.setEdgeOpacityDirect = function ()
   cw = new.CytoscapeWindow (title, graph=g)
   setDefaultEdgeLineWidth (cw, 10)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edge.names = cy2.edge.names (g)
@@ -1438,7 +1493,7 @@ test.setEdgeColorDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edge.of.interest = as.character (cy2.edge.names (g) [1])
@@ -1462,7 +1517,7 @@ test.setEdgeSourceArrowShapeDirect = function ()
 
   cw = new.CytoscapeWindow ('setEdgeSourceArrowShapeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
   setWindowSize (cw, 800, 800)
   fitContent (cw)
@@ -1503,7 +1558,7 @@ test.setEdgeLabelDirect = function ()
   cw = new.CytoscapeWindow ('setEdgeLabelDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   edge.names = cy2.edge.names (cw@graph)[1:2]
   for (i in 1:10) {
     setEdgeLabelDirect (cw, edge.names, 255 - (i * 25))
@@ -1526,7 +1581,7 @@ test.setEdgeLabelDirect = function ()
 #  g = RCytoscape::makeSimpleGraph ()
 #  cw = new.CytoscapeWindow (title, graph=g)
 #  displayGraph (cw)
-#  layout (cw, 'jgraph-spring')
+#  layoutNetwork (cw, 'jgraph-spring')
 #  redraw (cw)
 #
 #  edge.of.interest = cy2.edge.names (g) [1]
@@ -1546,7 +1601,7 @@ test.setEdgeFontSizeDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edge.of.interest = cy2.edge.names (g) [1]
@@ -1565,7 +1620,7 @@ test.setEdgeLabelColorDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edge.of.interest = cy2.edge.names (g) [1]
@@ -1583,7 +1638,7 @@ test.setEdgeTooltipDirect = function ()
 
   cw <- new.CytoscapeWindow (title, graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edges.of.interest = as.character (cy2.edge.names (cw@graph))
@@ -1608,7 +1663,7 @@ test.setEdgeLineWidthDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edges.of.interest = cy2.edge.names (g) [1:2]
@@ -1631,7 +1686,7 @@ test.setEdgeLineStyleDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edges.of.interest = as.character (cy2.edge.names (g))
@@ -1671,7 +1726,7 @@ test.setEdgeSourceArrowShapeDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
   setWindowSize (cw, 800, 800)
   fitContent (cw)
@@ -1713,7 +1768,7 @@ test.setEdgeTargetArrowShapeDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edges.of.interest = as.character (cy2.edge.names (g))
@@ -1753,7 +1808,7 @@ test.setEdgeSourceArrowColorDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   arrows = c ('Arrow', 'Diamond', 'Circle')
@@ -1787,7 +1842,7 @@ test.setEdgeTargetArrowColorDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
   setWindowSize (cw, 800, 800)
   fitContent (cw)
@@ -1823,7 +1878,7 @@ test.setEdgeLabelOpacityDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edge.of.interest = cy2.edge.names (g) [1]
@@ -1842,7 +1897,7 @@ test.setEdgeSourceArrowOpacityDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edges.of.interest = as.character (cy2.edge.names (g))
@@ -1882,7 +1937,7 @@ test.setEdgeTargetArrowOpacityDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edges.of.interest = as.character (cy2.edge.names (g))
@@ -1922,7 +1977,7 @@ test.setEdgeLabelPositionDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edge.of.interest = cy2.edge.names (g) [1]
@@ -1941,7 +1996,7 @@ test.setEdgeLabelWidthDirect = function ()
   g = RCytoscape::makeSimpleGraph ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   edge.of.interest = cy2.edge.names (g) [1]
@@ -1959,7 +2014,7 @@ test.countNodes = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
   checkEquals (getNodeCount (cwe), length (nodes (getGraph (cwe))))
 
@@ -1978,7 +2033,7 @@ test.countEdges = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
   checkEquals (getEdgeCount (cwe), length (edgeNames (getGraph (cwe))))
 
@@ -1997,7 +2052,7 @@ test.countNodesAndEdgesInEmptyGraph = function ()
 
   cwe = new.CytoscapeWindow (title, graph=g.empty)  # default behavior, but let's make it explicit
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
   checkEquals (getNodeCount (cwe), 0)
   checkEquals (getEdgeCount (cwe), 0)
@@ -2013,7 +2068,7 @@ test.getAllNodes = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   cwe.nodes = getAllNodes (cwe)
@@ -2032,7 +2087,7 @@ test.getAllEdges = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   cwe.edges = getAllEdges(cwe)
@@ -2053,7 +2108,7 @@ test.selectNodes = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   clearSelection (cwe)
@@ -2094,7 +2149,7 @@ test.nodeNeighborReportingAndSelection = function ()
   cw = new.CytoscapeWindow (title, graph=g.bam)
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
     # paint the edges shades of green as function of weight
   setDefaultEdgeLineWidth (cw, 5)
@@ -2123,7 +2178,7 @@ test.invertSelection = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   clearSelection (cwe)
@@ -2155,7 +2210,7 @@ test.deleteSelectedNodes = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   clearSelection (cwe)
@@ -2184,7 +2239,7 @@ test.hideNodes = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   clearSelection (cwe)
@@ -2195,7 +2250,7 @@ test.hideNodes = function ()
   hideSelectedNodes (cwe)
   checkEquals (getNodeCount (cwe), 1)
   unhideAll (cwe)
-  layout (cwe)
+  layoutNetwork (cwe)
   redraw (cwe)
   #checkEquals (getNodeCount (cwe), 3)
   msg (cwe, 'test.selectNodes')
@@ -2211,7 +2266,7 @@ test.selectEdges = function ()
 
   cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   clearSelection (cw)
@@ -2236,7 +2291,7 @@ test.setEdgeLineStyleRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
 
@@ -2265,7 +2320,7 @@ test.setEdgeLineWidthRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   line.styles = c ('SINEWAVE', 'DOT', 'PARALLEL_LINES')
@@ -2291,7 +2346,7 @@ test.setEdgeColorRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   edgeType.values = c ('phosphorylates', 'synthetic lethal', 'undefined')
@@ -2324,7 +2379,7 @@ test.setEdgeTargetArrowRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   arrows = c ('Delta', 'T', 'Diamond')
@@ -2355,7 +2410,7 @@ test.setEdgeArrowColorRules = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   #xml.rpc (cwe@uri, 'Cytoscape.discreteMapper', as.character (cwe@window.id), 'default', 'edgeType', 'Edge Target Arrow Color',
@@ -2391,7 +2446,7 @@ test.setEdgeSourceArrowRule = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   arrows = c ('Arrow', 'Diamond', 'Circle')
@@ -2416,7 +2471,7 @@ test.movie = function ()
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
     # establish the rules which apply during the full run of the movie
@@ -2482,7 +2537,7 @@ test.unmatchedAttributesError = function ()
 
   cwe = new.CytoscapeWindow (title, RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
     # this works
@@ -2598,7 +2653,7 @@ test.randomUndirectedGraph = function ()
 
   cwr = new.CytoscapeWindow (title, g.random)
   displayGraph (cwr)
-  layout (cwr, 'jgraph-spring')
+  layoutNetwork (cwr, 'jgraph-spring')
   redraw (cwr)
 
   invisible (cwr)
@@ -2614,7 +2669,7 @@ test.simpleGraph = function (apply.viz.rules=TRUE, do.redraw=TRUE)
   cws = new.CytoscapeWindow (title, g.simple)
 
   displayGraph (cws)
-  layout (cws, 'jgraph-spring')
+  layoutNetwork (cws, 'jgraph-spring')
 
   if (apply.viz.rules) {
     setNodeLabelRule (cws, 'label')
@@ -2650,7 +2705,7 @@ test.simpleGraphWithReciprocalEdge = function ()
   cws.x <<- cws
 
   displayGraph (cws)
-  layout (cws, 'jgraph-spring')
+  layoutNetwork (cws, 'jgraph-spring')
   setNodeLabelRule (cws, 'label')
   node.attribute.values = c ("kinase",  "transcription factor")
   colors =                c ('#A0AA00', '#FF0000')
@@ -2693,17 +2748,17 @@ test.setGraph = function ()
 
 } # test.setGraph 
 #------------------------------------------------------------------------------------------------------------------------
-test.setPosition = function ()
+test.setNodePosition = function ()
 {
-  title = 'test.setPosition'
+  title = 'test.setNodePosition'
   window.prep (title)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
-  layout (cwe, 'jgraph-spring')   # get a reasonable starting layout, with the nodes well-separate
+  layoutNetwork (cwe, 'jgraph-spring')   # get a reasonable starting layout, with the nodes well-separate
 
   center.x = 200
   center.y = 200
@@ -2716,39 +2771,39 @@ test.setPosition = function ()
     angle.in.radians = angle * pi / 180
     x = center.x + (radius * cos (angle.in.radians))
     y = center.y + (radius * sin (angle.in.radians))
-    setPosition (cwe, 'A', x, y)
+    setNodePosition (cwe, 'A', x, y)
     }
 
   invisible (cwe)
 
-} # test.setPosition
+} # test.setNodePosition
 #------------------------------------------------------------------------------------------------------------------------
-test.getPosition = function ()
+test.getNodePosition = function ()
 {
-  title = 'test.getPosition'
+  title = 'test.getNodePosition'
   window.prep (title)
 
   cwe = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
   xx <<- cwe
   
-  layout (cwe, 'jgraph-spring')   # get a reasonable starting layout, with the nodes well-separate
+  layoutNetwork (cwe, 'jgraph-spring')   # get a reasonable starting layout, with the nodes well-separate
 
      # the scheme:  get current positions, find their mean, place all the nodes there,
      # get their new positions, check to see that they are the means just set.
   
-  positions <<- getPosition (cwe, c ('A', 'B', 'C'))
+  positions <<- getNodePosition (cwe, c ('A', 'B', 'C'))
 
      # place the nodes on top of each other, at the center of their 3-cornered original layout
 
   center.x = as.integer (round (mean (as.integer (sapply (positions, function (pos) pos$x)))))
   center.y = as.integer (round (mean (as.integer (sapply (positions, function (pos) pos$y)))))
 
-  setPosition (cwe, c ('A', 'B', 'C'), rep (center.x, 3), rep (center.y, 3))
-  current.x = getPosition (cwe, 'A')[[1]]$x
-  current.y = getPosition (cwe, 'A')[[1]]$y
+  setNodePosition (cwe, c ('A', 'B', 'C'), rep (center.x, 3), rep (center.y, 3))
+  current.x = getNodePosition (cwe, 'A')[[1]]$x
+  current.y = getNodePosition (cwe, 'A')[[1]]$y
   #printf ('center:  %d  %d', center.x, center.y)
   #printf ('current: %d  %d', current.x, current.y)
   
@@ -2757,14 +2812,14 @@ test.getPosition = function ()
 
   invisible (cwe)
 
-} # test.getPosition
+} # test.getNodePosition
 #------------------------------------------------------------------------------------------------------------------------
 # until now, the encoding trick for returning node positions from RCytoscape has been to separate node name from x,y by ':'
 #   "2022:417.0,122.0" "659:156.0,0.0"
 # 
-test.getPosition.colonInNodeName = function ()
+test.getNodePosition.colonInNodeName = function ()
 {
-  title = 'test.getPosition.colonInNodeName'
+  title = 'test.getNodePosition.colonInNodeName'
   window.prep (title)
 
   g = RCytoscape::makeSimpleGraph ()
@@ -2774,16 +2829,16 @@ test.getPosition.colonInNodeName = function ()
 
   cwe = new.CytoscapeWindow (title, graph=g)
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
   xx <<- cwe
   
-  layout (cwe, 'jgraph-spring')   # get a reasonable starting layout, with the nodes well-separate
+  layoutNetwork (cwe, 'jgraph-spring')   # get a reasonable starting layout, with the nodes well-separate
 
      # the scheme:  get current positions, find their mean, place all the nodes there,
      # get their new positions, check to see that they are the means just set.
   
-  positions <<- getPosition (cwe, c ('A', 'B', 'C'))
+  positions <<- getNodePosition (cwe, c ('A', 'B', 'C'))
 
      # place the nodes on top of each other, at the center of their 3-cornered original layout
 
@@ -2791,32 +2846,32 @@ test.getPosition.colonInNodeName = function ()
   center.y = as.integer (round (mean (as.integer (sapply (positions, function (pos) pos$y)))))
 
      # rearrange the positions
-  layout (cwe, 'grid')
+  layoutNetwork (cwe, 'grid')
 
     # superimpose A,B, and C  in the center
-  setPosition (cwe, c ('A', 'B', 'C'), rep (center.x, 3), rep (center.y, 3))
+  setNodePosition (cwe, c ('A', 'B', 'C'), rep (center.x, 3), rep (center.y, 3))
   x.funky = center.x + 50
   y.funky = center.y + 50
     # offset funky.node.name
-  setPosition (cwe, funky.node.name, x.funky, y.funky)
+  setNodePosition (cwe, funky.node.name, x.funky, y.funky)
   fitContent (cwe)
   setZoom (cwe, 0.75 * getZoom (cwe))
   
      # now check that the nodes have been repositioned from grid to centered (A,B,C) and offset (funky.node.name)
-  current.x = getPosition (cwe, 'A')[[1]]$x
-  current.y = getPosition (cwe, 'A')[[1]]$y
+  current.x = getNodePosition (cwe, 'A')[[1]]$x
+  current.y = getNodePosition (cwe, 'A')[[1]]$y
   
   checkEqualsNumeric (current.x, center.x, tol=1)
   checkEqualsNumeric (current.y, center.y, tol=1)
 
-  funky.pos.x = getPosition (cwe, funky.node.name) [[1]]$x
-  funky.pos.y = getPosition (cwe, funky.node.name) [[1]]$y
+  funky.pos.x = getNodePosition (cwe, funky.node.name) [[1]]$x
+  funky.pos.y = getNodePosition (cwe, funky.node.name) [[1]]$y
   checkEqualsNumeric (funky.pos.x, x.funky, tol=1)
   checkEqualsNumeric (funky.pos.y, y.funky, tol=1)
 
   invisible (cwe)
 
-} # test.getPosition.colonInNodeName
+} # test.getNodePosition.colonInNodeName
 #------------------------------------------------------------------------------------------------------------------------
 test.haveNodeAttribute = function ()
 {
@@ -2826,7 +2881,7 @@ test.haveNodeAttribute = function ()
   cw3 = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
 
   cy = CytoscapeConnection ()
 
@@ -2851,7 +2906,7 @@ test.haveEdgeAttribute = function ()
   cw3 = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
 
   cy = CytoscapeConnection ()
 
@@ -2879,7 +2934,7 @@ hiddenTest.haveEdgeAttribute.oneEdgeOnly = function ()
   cw = new.CytoscapeWindow (title, graph=g)
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   cy = CytoscapeConnection ()
 
@@ -2897,7 +2952,7 @@ test.copyNodeAttributesFromCyGraph = function ()
   cw3 = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
 
     # we can now depend upon Cytoscape holding its own version of cw3@graph 
     # in expected use, we expect that 'getGraphFromWindow' will be called, to get the nodes, edges, and both
@@ -2928,7 +2983,7 @@ test.copyEdgeAttributesFromCyGraph = function ()
   cw3 = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
 
   g = new ('graphNEL', edgemode='directed')
   g = graph::addNode (c ('A', 'B', 'C'), g)
@@ -2978,7 +3033,7 @@ test.getGraphFromCyWindow = function ()
   cw3 = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
 
   g3 = getGraphFromCyWindow (cy, 'test.getGraphFromCyWindow')
   checkEquals (sort (nodes (g3)), c ('A', 'B', 'C'))
@@ -3016,7 +3071,7 @@ test.sendDegenerateGraphs = function ()
   cw.degen <<- new.CytoscapeWindow (title, g.no.edges)
   displayGraph (cw.degen)
   redraw (cw.degen)
-  layout (cw.degen, 'grid')
+  layoutNetwork (cw.degen, 'grid')
 
   title = 'test.sendEmptyGraph'
   window.prep (title)
@@ -3025,7 +3080,7 @@ test.sendDegenerateGraphs = function ()
   cw.empty <<- new.CytoscapeWindow (title, g.empty)
   displayGraph (cw.empty)
   redraw (cw.empty)
-  layout (cw.empty, 'grid')
+  layoutNetwork (cw.empty, 'grid')
 
   invisible (cw.empty)
 
@@ -3043,7 +3098,7 @@ test.sendDegenerateGraphs = function ()
 #  cw = new.CytoscapeWindow (title, g)
 #  displayGraph (cw)
 #  redraw (cw)
-#  layout (cw, 'grid')
+#  layoutNetwork (cw, 'grid')
 #
 #  checkEquals (getEdgeCount (cw), 1)
 #
@@ -3066,7 +3121,7 @@ test.sendBigGraph = function ()
   stopifnot (class (cbig) == "CytoscapeWindowClass")
   displayGraph (cbig)
   redraw (cbig)
-  layout (cbig, 'grid')
+  layoutNetwork (cbig, 'grid')
 
   invisible (cbig)
 
@@ -3081,7 +3136,7 @@ test.createWindowFromSelection = function ()
   cw =  new.CytoscapeWindow (title, makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
   selectNodes (cw, c ('A', 'C'))
  
   new.window.title = 'NEW'
@@ -3090,7 +3145,7 @@ test.createWindowFromSelection = function ()
 
   c2 = createWindowFromSelection (cw, new.window.title, TRUE)
   redraw (c2)
-  layout (c2)
+  layoutNetwork (c2)
 
   clearSelection (c2)
   selectNodes (c2, 'C')
@@ -3102,7 +3157,7 @@ test.createWindowFromSelection = function ()
 
   c3 = createWindowFromSelection (c2, new.window.title, T)
   redraw (c3)
-  layout (c3)
+  layoutNetwork (c3)
 
   invisible (list (cw=cw, c2=c2, c3=c3))
 
@@ -3116,7 +3171,7 @@ test.addGraphToGraph = function ()
   cw3 <<- new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
 
   g2 <<- new("graphNEL", edgemode = "directed")
   g2 <<- graph::addNode ('A', g2)
@@ -3150,7 +3205,7 @@ test.addGraphToGraph = function ()
 
   addGraphToGraph (cw3, g2)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
 
     # now copy the combined graph back to R, check it for consistency
   cw.copy <<- existing.CytoscapeWindow ('test.addGraphToGraph', copy=T)
@@ -3208,7 +3263,7 @@ test.addGraphToGraph.degenerateFirstGraph = function ()
 
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'grid')
+  layoutNetwork (cw, 'grid')
 
   g2 <<- makeSimpleGraph ()
   addGraphToGraph (cw, g2)
@@ -3230,7 +3285,7 @@ test.existing.CytoscapeWindow = function ()
   cw <<- new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   cw2 <<- existing.CytoscapeWindow (title, copy=TRUE)
   g2 <<- cw2@graph
@@ -3251,7 +3306,7 @@ test.existing.CytoscapeWindow.noEdges = function ()
   cw.edgeless = new.CytoscapeWindow (window.title, graph=g.edgeless)
   displayGraph (cw.edgeless)
   redraw (cw.edgeless)
-  layout (cw.edgeless)
+  layoutNetwork (cw.edgeless)
 
   cw3 = existing.CytoscapeWindow (window.title, copy=TRUE)
   g3 = cw3@graph
@@ -3270,7 +3325,7 @@ test.existing.CytoscapeWindow.emptyGraph = function ()
   checkEquals (length (nodes (cw.empty@graph)), 0)
   displayGraph (cw.empty)
   redraw (cw.empty)
-  layout (cw.empty)
+  layoutNetwork (cw.empty)
 
   cw3 <<- existing.CytoscapeWindow (window.title, copy=TRUE)
   g3 <<- cw3@graph
@@ -3294,7 +3349,7 @@ test.addGetAndDeleteEdgeAttributes = function ()
   g  = makeSimpleGraph ()
   cw = CytoscapeWindow ('test.addGetAndDeleteEdgeAttributes', graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
 
   cy = CytoscapeConnection ()
@@ -3348,7 +3403,7 @@ test.addGetAndDeleteNodeAttributes = function ()
   g  = makeSimpleGraph ()
   cw = CytoscapeWindow (title, graph=g)
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)
   x <<- cw
      # canonicalName is added by Cytoscape
@@ -3383,7 +3438,7 @@ test.getAllNodeAttributes = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   cwc = existing.CytoscapeWindow (title, copy=T)
   tbl.noa <<- getAllNodeAttributes (cwc)
@@ -3421,7 +3476,7 @@ test.getAllEdgeAttributes = function ()
   cw =  new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
   tbl.eda = getAllEdgeAttributes (cw)
   checkEquals (class (tbl.eda), 'data.frame')
   checkEquals (dim (tbl.eda), c (3, 5))
@@ -3464,7 +3519,7 @@ test.getVisualStyleNames = function ()
   cw3 =  new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw3)
   redraw (cw3)
-  layout (cw3)
+  layoutNetwork (cw3)
   current.names = getVisualStyleNames (cw3)
   checkTrue (length (intersect (current.names, c (title, 'default', 'Nested Network Style', 'Minimal', 'Sample1', 'Universe'))) >= 3)
 
@@ -3480,7 +3535,7 @@ test.copyVisualStyle = function ()
   cw4 = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw4)
   redraw (cw4)
-  layout (cw4)
+  layoutNetwork (cw4)
 
   current.names = getVisualStyleNames (cw4)
 
@@ -3504,7 +3559,7 @@ test.setVisualStyle = function ()
   cw5 = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw5)
   redraw (cw5)
-  layout (cw5)
+  layoutNetwork (cw5)
   
   current.names = getVisualStyleNames (cw5)
   for (style.name in current.names) {
@@ -3553,7 +3608,7 @@ test.setWindowSizeRaiseWindow = function ()
 
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
   for (i in 1:10) {
     setWindowSize (cw, 200, 200)
     setWindowSize (cw, 400, 400)
@@ -3585,7 +3640,7 @@ test.fitContent = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   clearSelection (cw)
   selectNodes (cw, 'A')
@@ -3605,7 +3660,7 @@ test.windowCoordinates = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   center = getCenter (cw)
   checkEquals (names (center), c ('x', 'y'))
@@ -3624,7 +3679,7 @@ test.zoom = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   setWindowSize (cw, 1200, 800)  
   fitContent (cw)
@@ -3649,7 +3704,7 @@ test.center = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   setWindowSize (cw, 1200, 800)  
   fitContent (cw)
@@ -3683,7 +3738,7 @@ test.setNodeSizeDirect = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
   
   lockNodeDimensions (cw, TRUE)
 
@@ -3707,7 +3762,7 @@ test.setNodeWidthAndHeightDirect = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   lockNodeDimensions (cw, FALSE)
   
@@ -3734,7 +3789,7 @@ test.setNodeFontSizeDirect = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   starting.size = 4
   setNodeSizeDirect (cw, c ('A', 'B', 'C'), 50)
@@ -3766,7 +3821,7 @@ test.setNodeShapeDirect = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   lockNodeDimensions (cw, TRUE)
   setNodeSizeDirect (cw, 'A', 100)
@@ -3789,7 +3844,7 @@ test.setEdgeVizPropertiesDirect = function (cw=NULL)
     cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
     displayGraph (cw)
     redraw (cw)
-    layout (cw)
+    layoutNetwork (cw)
     }
 
   cy2.edgeNames = sort (getAllEdges (cw))
@@ -3846,7 +3901,7 @@ test.graphBAM = function ()
   cw = new.CytoscapeWindow (title, graph=g.bam)
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
     # paint the edges shades of red as function of weight
   setDefaultEdgeLineWidth (cw, 5)
@@ -3888,10 +3943,10 @@ test.addCyNode = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'grid')
+  layoutNetwork (cw, 'grid')
   checkEquals (getNodeCount (cw), 3)
   addCyNode (cw, 'NEW')
-  layout (cw, 'grid')
+  layoutNetwork (cw, 'grid')
   checkEquals (getNodeCount (cw), 4)
   invisible (cw)
 
@@ -3909,13 +3964,13 @@ test.addCyEdge = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
   checkEquals (getEdgeCount (cw), 3)
 
   directed.edge = TRUE
   addCyEdge (cw, 'A', 'B', 'synthetic rescue', directed.edge)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
   checkEquals (getEdgeCount (cw), 4)
   invisible (cw)
     
@@ -3929,7 +3984,7 @@ test.twoGraphsDoubleEdges = function ()
   cw = new.CytoscapeWindow (title, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
 
   g2 = new ('graphNEL', edgemode='directed')
   g2 = initEdgeAttribute (g2, 'edgeType', 'char', 'unspecified')
@@ -3944,7 +3999,7 @@ test.twoGraphsDoubleEdges = function ()
   # fails:  addGraphToGraph (cw, g2)
   xml.rpc (cw@uri, 'Cytoscape.createEdge', cw@window.id, 'A', 'B', 'synthetic rescue', T)
   redraw (cw)
-  layout (cw)
+  layoutNetwork (cw)
     
 } # test.twoGraphsoubleEdges
 #------------------------------------------------------------------------------------------------------------------------
@@ -4065,7 +4120,7 @@ hiddenTest.saveImage = function ()
   cw = new.CytoscapeWindow (title, g.simple)
 
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   setNodeLabelRule (cw, 'label')
   redraw (cw)
 
@@ -4075,17 +4130,19 @@ hiddenTest.saveImage = function ()
   saveImage (cw, filename, 'png', 1.0)
   checkTrue (file.exists (filename))
 
-    #--- now pdf
-  filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.pdf')
-  printf ('saving image file to %s', filename)
-  saveImage (cw, filename, 'pdf')
-  checkTrue (file.exists (filename))
+  if (pluginVersion (cy) == '1.8') {
+      #--- now pdf
+    filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.pdf')
+    printf ('saving image file to %s', filename)
+    saveImage (cw, filename, 'pdf')
+    checkTrue (file.exists (filename))
 
-    #--- now svg
-  filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.svg')
-  printf ('saving image file to %s', filename)
-  saveImage (cw, filename, 'svg')
-  checkTrue (file.exists (filename))
+      #--- now svg
+    filename = sprintf ('%s/%s', tempdir (), 'saveImageTest.svg')
+    printf ('saving image file to %s', filename)
+    saveImage (cw, filename, 'svg')
+    checkTrue (file.exists (filename))
+    } # if plugin version 1.8 is being used
 
   invisible (cw)
 
@@ -4101,7 +4158,7 @@ hiddenTest.saveNetwork = function ()
   cw = new.CytoscapeWindow (title, g.simple)
 
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   setNodeLabelRule (cw, 'label')
   redraw (cw)
 
@@ -4121,7 +4178,7 @@ test.setNodeImageDirect = function (apply.viz.rules=FALSE)
 
   cw = new.CytoscapeWindow (title, makeSimpleGraph ())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork (cw, 'jgraph-spring')
   setNodeLabelRule (cw, 'label')
 
   setNodeImageDirect (cw, 'A', 'http://rcytoscape.systemsbiology.net/versions/current/images/isb.png')

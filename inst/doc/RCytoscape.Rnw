@@ -86,7 +86,7 @@ other windows within the Cytoscape Desktop.  This graph needs layout.  You can a
 After layout, you will see the structure of this graph:  3 unconnected nodes, unlabeled, small and colored red, and thus not very informative.  Fortunately, Cytoscape has some built-in rendering rules in which (and unless instructed otherwise) nodes are rendered round in shape, pale red in color, and labeled with the names supplied when they were added to the graph;  edges (if any) are simple blue lines. To get this default rendering, simply type
 
 <<g1>>=
-  layout (cw, layout.name='grid')
+  layoutNetwork (cw, layout.name='grid')
   redraw (cw)
 @ 
 
@@ -290,13 +290,13 @@ You will see that all three nodes are now selected.  Get their identifers back t
 
 \section{Positioning nodes (and possibilities for data-driven graph layout)}
 
-Despite its simplicity, RCytoscape's \emph{\textbf{setPosition}} method provides the means to create custom layout algorithms and animations.  Here is a rather nonsensical example, in which the 'A' node orbits around a fixed center, with the 'B' and 'C' nodes left unchanged.
+Despite its simplicity, RCytoscape's \emph{\textbf{setNodePosition}} method provides the means to create custom layout algorithms and animations.  Here is a rather nonsensical example, in which the 'A' node orbits around a fixed center, with the 'B' and 'C' nodes left unchanged.
 
 <<position>>=
-  cwe <- CytoscapeWindow ('test.setPosition',
+  cwe <- CytoscapeWindow ('test.setNodePosition',
                           graph=RCytoscape::makeSimpleGraph ())
   displayGraph (cwe)
-  layout (cwe, 'jgraph-spring')
+  layoutNetwork (cwe, 'jgraph-spring')
   redraw (cwe)
 
   center.x <- 200
@@ -308,7 +308,7 @@ Despite its simplicity, RCytoscape's \emph{\textbf{setPosition}} method provides
     angle.in.radians <- angle * pi / 180
     x <- center.x + (radius * cos (angle.in.radians))
     y <- center.y + (radius * sin (angle.in.radians))
-    setPosition (cwe, 'A', x, y)
+    setNodePosition (cwe, 'A', x, y)
     }
 
 @ 
@@ -317,7 +317,7 @@ Despite its simplicity, RCytoscape's \emph{\textbf{setPosition}} method provides
 
 Timecourse microarray expression experiments are commonplace in molecular biology research.  Once reduced, the expression data is often summarized as a lfc (log fold change, experiment vs control) and a p-value for each gene at each time point.  Many Bioconductor packages can be used to find biologically interesting patterns in such data, but visualization -- as one aspect of exploratory data analysis -- should not be overlooked.  Here is a toy problem, a small example illustrating how this can be accomplished with RCytoscape.
 
-We begin with the small sample graph just like that created in the 'setPosition' example above.  We add some made-up statistical signficicance data into a new node attribute, 'pval'.
+We begin with the small sample graph just like that created in the 'setNodePosition' example above.  We add some made-up statistical signficicance data into a new node attribute, 'pval'.
 
 <<moviePrep>>=
   g <- RCytoscape::makeSimpleGraph ()
@@ -325,7 +325,7 @@ We begin with the small sample graph just like that created in the 'setPosition'
 
   cwm <- new.CytoscapeWindow ('movie', graph =g)
   displayGraph (cwm)
-  layout (cwm, 'jgraph-spring')
+  layoutNetwork (cwm, 'jgraph-spring')
   redraw (cwm)
 @ 
 
@@ -385,7 +385,7 @@ Finally, delete all the windows from this vignette:
 
 <<deleteWindows>>=
   cy <- CytoscapeConnection ()
-  window.names <- c ('vignette', 'test.setPosition', 'movie')
+  window.names <- c ('vignette', 'test.setNodePosition', 'movie')
   for (window.name in window.names)
     if (window.name %in% as.character (getWindowList (cy)))
       deleteWindow (cy, window.name)

@@ -31,7 +31,7 @@ None.
   cw <- new.CytoscapeWindow ('setNodeColorDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   setNodeColorDirect (cw, 'A', '#880000')
   redraw (cw)
 }

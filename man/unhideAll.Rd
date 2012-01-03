@@ -26,7 +26,7 @@ None.
 \examples{
   cw <- new.CytoscapeWindow ('unhideAll.test', graph=makeSimpleGraph())
   displayGraph (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
   clearSelection (cw)
   selectNodes (cw, 'A')

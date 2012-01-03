@@ -40,7 +40,7 @@ A data frame, with a column for each attribute, a row for each node.
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
     # get all attributes for all nodes
   tbl.noa = getAllNodeAttributes (cw, onlySelectedNodes=FALSE)
 

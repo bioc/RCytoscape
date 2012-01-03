@@ -33,7 +33,7 @@ an empty graph.
   cw <-  new.CytoscapeWindow (title, makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
   selectNodes (cw, c ('A', 'C'))
  
   new.window.title <- 'NEW WINDOW'
@@ -42,7 +42,7 @@ an empty graph.
 
   c2 <- createWindowFromSelection (cw, new.window.title, TRUE)
   redraw (c2)
-  layout (c2)
+  layoutNetwork(c2)
 
   clearSelection (c2)
   selectNodes (c2, 'C')

@@ -37,7 +37,7 @@ None.
   directed = TRUE
   addCyEdge (cw, 'A', 'B', 'synthetic rescue', directed)
   redraw (cw)
-  layout (cw)
+  layoutNetwork(cw)
 
 
 }

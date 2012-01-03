@@ -33,7 +33,7 @@ None.
   cw <- new.CytoscapeWindow ('setNodeHeightDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   lockNodeDimensions (cw, 'default', FALSE)
   setNodeHeightDirect (cw, 'A', 32)
   redraw (cw)

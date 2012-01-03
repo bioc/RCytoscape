@@ -27,7 +27,7 @@ None.
   cw <- new.CytoscapeWindow ('fitContent.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
-  layout (cw, 'jgraph-spring')
+  layoutNetwork(cw, 'jgraph-spring')
   setZoom (cw, 0.1)
   fitContent (cw)
   setZoom (cw, 10.0)

@@ -1,3 +1,6 @@
+(30 jan 2012, pshannon, 1.5.11): now imports four more methods from graph: edgemode, addNode, addEdge, requested by Robert Flight.
+(22 jan 2012, pshannon, 1.5.10): changed getNodePosition node.name.delimiter to eliminate regex token, from ':.:' to ':-:'
+                                 saveLayout now has optional 3rd parameter, 'timestamp.in.filename'
 (02 jan 2012, pshannon, 1.5.9) changed method names: layout -> layoutNetwork, version -> pluginVersion, get/setPosition -> get/setNodePosition
 (02 jan 2012, pshannon, 1.5.9) added setDefaultEdgeFontSize
 (27 dec 2011, pshannon, 1.5.5) fixed bug in setNodeLabelDirect.  Multiple nodes, one label now works. 

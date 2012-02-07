@@ -6,11 +6,12 @@
 save the current layout (that is, node positions) to the specified file.
 }
 \usage{
-saveLayout(obj, filename)
+saveLayout(obj, filename, timestamp.in.filename=FALSE)
 }
 \arguments{
   \item{obj}{a \code{CytoscapeWindowClass} object. }
-  \item{filename}{a \code{string}}
+  \item{filename}{a \code{string}.}
+  \item{timestamp.in.filename}{\code{logical}.}
 }
 
 \value{
@@ -29,6 +30,7 @@ Nothing.
   saveLayout (cw, 'layout.RData')
   layoutNetwork(cw, 'jgraph-circle')
   restoreLayout (cw, 'layout.RData')
+  saveLayout (cw, 'layout2', timestamp.in.filename=TRUE)
 }
 
 

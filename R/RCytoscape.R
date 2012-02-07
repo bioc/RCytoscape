@@ -90,7 +90,7 @@ setGeneric ('setEdgeAttributesDirect', signature='obj',
 
 setGeneric ('displayGraph',             signature='obj', function (obj) standardGeneric ('displayGraph'))
 setGeneric ('layoutNetwork',            signature='obj', function (obj, layout.name='jgraph-spring') standardGeneric ('layoutNetwork'))
-setGeneric ('saveLayout',               signature='obj', function (obj, filename) standardGeneric ('saveLayout'))
+setGeneric ('saveLayout',               signature='obj', function (obj, filename, timestamp.in.filename=FALSE) standardGeneric ('saveLayout'))
 setGeneric ('restoreLayout',            signature='obj', function (obj, filename) standardGeneric ('restoreLayout'))
 setGeneric ('setNodePosition',          signature='obj', function (obj, node.names, x.coords, y.coords) standardGeneric ('setNodePosition'))
 setGeneric ('getNodePosition',          signature='obj', function (obj, node.names) standardGeneric ('getNodePosition'))
@@ -1001,8 +1001,14 @@ setMethod ('layoutNetwork', 'CytoscapeWindowClass',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('saveLayout', 'CytoscapeWindowClass',
 
-  function (obj, filename) {
+  function (obj, filename, timestamp.in.filename=FALSE) {
     custom.layout = getNodePosition (obj,  getAllNodes (obj))
+    if (timestamp.in.filename) {
+      dateString = format (Sys.time (), "%a.%b.%d.%Y-%H:%M:%S")
+      stem = strsplit (filename, '\\.RData')[[1]]
+      filename = sprintf ('%s.%s.RData', stem, dateString)
+      write (sprintf ('saving layout to %s\n', filename), stderr ())
+      }
     save (custom.layout, file=filename)
     }) # save.layout
 
@@ -1056,7 +1062,7 @@ setMethod ('getNodePosition', 'CytoscapeWindowClass',
     count = length (node.names)
     if (count == 1)
       node.names = rep (node.names, 2)   # work around R's distinction between scalar and list of strings
-    node.name.delimiter = ':.:'
+    node.name.delimiter = ':-:'
     xy.delimiter = ';;'
     raw.result = xml.rpc (obj@uri, 'Cytoscape._rGetNodesPositions', obj@window.id, node.names, node.name.delimiter, xy.delimiter)
     #raw.result = xml.rpc (obj@uri, 'Cytoscape._rGetNodesPositions', obj@window.id, node.names)

@@ -1,3 +1,4 @@
+(30 jan 2012, pshannon, 1.4.4): now imports four more methods from graph: edgemode, addNode, addEdge, requested by Robert Flight.
 (28 dec 2011, pshannon, 1.4.3): vignette now cleans up after itself, deleting the windows it created
 (27 dec 2011, pshannon, 1.4.2): fixed bug in setNodeLabelDirect.  Multiple nodes, one label now works. 
 (26 dec 2011, pshannon, 1.4.1): setCenter now casts x,y to numeric before sending out to CyRPC

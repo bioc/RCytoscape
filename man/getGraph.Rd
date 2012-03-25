@@ -20,6 +20,7 @@ A graph object.
 
 \examples{
   cw <- CytoscapeWindow ('getGraph.test', graph=makeSimpleGraph())
+  displayGraph (cw)
   print (getGraph (cw))
 }
 

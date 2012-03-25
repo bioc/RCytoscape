@@ -69,6 +69,7 @@ None.
     # values are dark red
   node.colors <- c ("#00AA00", "#00FF00", "#FFFFFF", "#FF0000", "#AA0000")
   setNodeColorRule (cw, node.attribute.name='lfc', control.points, node.colors, mode='interpolate')
+  displayGraph (cw)
   redraw (cw)
   data.values <- c ("kinase", "transcription factor", "glycoprotein")
   node.colors <- c ("#0000AA", "#FFFF00", "#0000AA") 

@@ -22,7 +22,8 @@ look at the graph in Cytoscape.
 
 \examples{
   cw <- CytoscapeWindow ('getAllNodes.test', graph=makeSimpleGraph())
-  getAllNodes (cw)
+  displayGraph (cw)
+  print (getAllNodes (cw))
     #  [1] "C" "B" "A"
 }
 

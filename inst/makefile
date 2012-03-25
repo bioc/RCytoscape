@@ -32,7 +32,7 @@ check: build
 #
 
 checkfull:  build
-	(cd ../..; $(RVER) --vanilla CMD check RCytoscape)
+	(cd ../..; $(RVER) --vanilla CMD check --timings RCytoscape)
 
 
 # --- codoc

@@ -1004,7 +1004,7 @@ setMethod ('saveLayout', 'CytoscapeWindowClass',
   function (obj, filename, timestamp.in.filename=FALSE) {
     custom.layout = getNodePosition (obj,  getAllNodes (obj))
     if (timestamp.in.filename) {
-      dateString = format (Sys.time (), "%a.%b.%d.%Y-%H:%M:%S")
+      dateString = format (Sys.time (), "%a.%b.%d.%Y-%H.%M.%S")
       stem = strsplit (filename, '\\.RData')[[1]]
       filename = sprintf ('%s.%s.RData', stem, dateString)
       write (sprintf ('saving layout to %s\n', filename), stderr ())
@@ -2588,14 +2588,12 @@ setMethod ('getAllNodeAttributes', 'CytoscapeWindowClass',
       }
   
     result = cbind (unlist (nodeData (g, nodes.of.interest, attr=attribute.names [1])))
-    print (result)
     
     if (length (attribute.names) > 1) {
       for (name in attribute.names [2:length (attribute.names)]) {
         new.column = unlist (nodeData (g, nodes.of.interest, attr=name))
         if (is.null (new.column))
           new.column = rep ('NULL', nrow (result))
-        print (new.column)
         result = cbind (result, new.column)
         } # for name
       } # if length > 1
@@ -3530,8 +3528,8 @@ hexColorToInt = function (hex.string)
   else
     gNew.edgeCount = length (edgeNames (g.new))
 
-  printf ('g.old: %d edges', gOld.edgeCount)
-  printf ('g.new: %d edges', gNew.edgeCount)
+  #printf ('g.old: %d edges', gOld.edgeCount)
+  #printf ('g.new: %d edges', gNew.edgeCount)
 
   if (gNew.edgeCount == 0)
     return (NA)

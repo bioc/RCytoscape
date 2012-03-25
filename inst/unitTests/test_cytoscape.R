@@ -1,16 +1,13 @@
-# RCytoscape/inst/test.R
+# RCytoscape/inst/test_cytoscape.R
 #------------------------------------------------------------------------------------------------------------------------
 library (RCytoscape)
 #------------------------------------------------------------------------------------------------------------------------
-save.default.vizmap = function ()
+# the peculiar naming of this function ensures that it will be called first, before all other test.xxx methods.  i think!
+test...aaaaFirstTestCalled = function ()
 {
-  default.style.name <<- 'original.default.style'
-
-  if (!default.style.name %in% getVisualStyleNames (cy)) # it has not previously been stored
-     copyVisualStyle (cy, 'default', 'orginal.default.style')
-
-
-} # save.default.vizmap
+  print ('------- first test, deleting any pre-existing CytoscapeWindows')
+  deleteAllWindows (CytoscapeConnection ());
+}
 #------------------------------------------------------------------------------------------------------------------------
 run.tests = function ()
 {
@@ -29,7 +26,6 @@ run.tests = function ()
   save.default.vizmap ()
 
   deleteAllWindows (cy)
-
 
   test.plugin.version ()
   test.create.class ()
@@ -56,15 +52,15 @@ run.tests = function ()
   test.cy2.edge.names ()
   test.panelOperations ()
   test.showGraphicsDetails ()
-  test.setDefaultNodeShape (direct=FALSE)
-  test.setDefaultNodeColor (direct=FALSE)
-  test.setDefaultNodeSize (direct=FALSE)
-  test.setDefaultNodeBorderColor (direct=FALSE)
-  test.setDefaultNodeBorderWidth (direct=FALSE)
-  test.setDefaultNodeFontSize (direct=FALSE)
-  test.setDefaultNodeLabelColor (direct=FALSE)
-  test.setDefaultEdgeLineWidth (direct=FALSE)
-  test.setDefaultEdgeColor (direct=FALSE)
+  test.setDefaultNodeShape ()
+  test.setDefaultNodeColor ()
+  test.setDefaultNodeSize ()
+  test.setDefaultNodeBorderColor ()
+  test.setDefaultNodeBorderWidth ()
+  test.setDefaultNodeFontSize ()
+  test.setDefaultNodeLabelColor ()
+  test.setDefaultEdgeLineWidth ()
+  test.setDefaultEdgeColor ()
   test.setDefaultEdgeFontSize ()
   test.setNodeLabelRule ()
   test.setEdgeLabelRule ()
@@ -75,6 +71,29 @@ run.tests = function ()
   test.setNodeBorderWidthRule ()
   test.setNodeSizeRule ()
   test.setNodeShapeRule ()
+  test.setNodeColorDirect ()
+  test.setNodeBorderColorDirect ()
+  test.setNodeLabelDirect ()
+  test.setNodeLabelPropertiesDirect ()
+  test.setNodeOpacityDirect ()
+  test.setEdgeOpacityDirect ()
+  test.setEdgeColorDirect ()
+  test.setEdgeSourceArrowShapeDirect ()
+  test.setEdgeLabelDirect ()
+  test.setEdgeFontSizeDirect ()
+  test.setEdgeLabelColorDirect ()
+  test.setEdgeTooltipDirect ()
+  test.setEdgeLineWidthDirect ()
+  test.setEdgeLineStyleDirect ()
+  test.setEdgeSourceArrowShapeDirect ()
+  test.setEdgeTargetArrowShapeDirect ()
+  test.setEdgeSourceArrowColorDirect ()
+  test.setEdgeTargetArrowColorDirect ()
+  test.setEdgeLabelOpacityDirect ()
+  test.setEdgeSourceArrowOpacityDirect ()
+  test.setEdgeTargetArrowOpacityDirect ()
+  test.setEdgeLabelPositionDirect ()
+  test.setEdgeLabelWidthDirect ()
   test.countNodes ()
   test.countEdges ()
   test.countNodesAndEdgesInEmptyGraph ()
@@ -96,11 +115,12 @@ run.tests = function ()
   test.unmatchedAttributesError ()
   test.remove.redundancies.in.undirected.graph ()
   test.randomUndirectedGraph ()
-  test.simpleGraph (apply.viz.rules=TRUE, do.redraw=TRUE)
+  test.simpleGraph ()
   test.simpleGraphWithReciprocalEdge ()
   test.setGraph ()
   test.setNodePosition ()
   test.getNodePosition ()
+  test.getNodePosition.colonInNodeName ()
   test.haveNodeAttribute ()
   test.haveEdgeAttribute ()
   test.copyNodeAttributesFromCyGraph ()
@@ -128,6 +148,11 @@ run.tests = function ()
   test.windowCoordinates ()
   test.zoom ()
   test.center ()
+  test.setNodeSizeDirect ()
+  test.setNodeWidthAndHeightDirect ()
+  test.setNodeFontSizeDirect ()
+  test.setNodeShapeDirect ()
+  test.setEdgeVizPropertiesDirect ()
   test.graphBAM ()
   test.hexColorToInt ()
   test.addCyNode ()
@@ -135,51 +160,24 @@ run.tests = function ()
   test.twoGraphsDoubleEdges ()
   test..classicGraphToNodePairTable ()
   test.rcy.edgeNames ()
-  #test.graphAM.round.trip ()
   test..getNovelEdges ()
-  test.validity ()
-
-  test.tooltip.delays ()
-
-  test.setNodeColorDirect ()
-  test.setNodeBorderColorDirect ()
-
-  test.setNodeLabelDirect ()
-  
-  test.setNodeOpacityDirect ()
-  test.setEdgeOpacityDirect ()
-
-  test.setEdgeColorDirect ()
-  test.setEdgeSourceArrowShapeDirect ()
-  test.setEdgeLabelDirect ()
-  test.setEdgeFontSizeDirect ()
-  test.setEdgeLabelColorDirect ()
-  test.setEdgeTooltipDirect ()
-  test.setEdgeLineWidthDirect ()
-  test.setEdgeLineStyleDirect ()
-  test.setEdgeSourceArrowShapeDirect ()
-  test.setEdgeTargetArrowShapeDirect ()
-  test.setEdgeSourceArrowColorDirect ()
-  test.setEdgeTargetArrowColorDirect ()
-  test.setEdgeLabelOpacityDirect ()
-  test.setEdgeSourceArrowOpacityDirect ()
-  test.setEdgeTargetArrowOpacityDirect ()
-  test.setEdgeLabelPositionDirect ()
-  test.setEdgeLabelWidthDirect ()
-  test.setNodeSizeDirect ()
-  test.setNodeWidthAndHeightDirect ()
-  test.setNodeFontSizeDirect ()
-  test.setNodeShapeDirect ()
-  test.setEdgeVizPropertiesDirect (cw=NULL)
   test.setNodeImageDirect ()
-
-    # some tests for the annotation functions (see pkg/R/annotation.R)
-  #test.is.kinase ()
-  #test.is.TF ()
+  test.validity ()
+  test.tooltip.delays ()
 
   options ('warn'=0)
 
 } # run.tests
+#------------------------------------------------------------------------------------------------------------------------
+save.default.vizmap = function ()
+{
+  default.style.name <<- 'original.default.style'
+
+  if (!default.style.name %in% getVisualStyleNames (cy)) # it has not previously been stored
+     copyVisualStyle (cy, 'default', 'orginal.default.style')
+
+
+} # save.default.vizmap
 #------------------------------------------------------------------------------------------------------------------------
 # almost every test needs to
 #

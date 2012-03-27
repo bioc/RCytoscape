@@ -7,9 +7,11 @@ NEW FEATURES
 
     o getNodeSize
 
-    o saveImage now supports pdf as well as png and svg
+    o saveImage now supports pdf as well as png and svg formats
 
-    o added setDefaultEdgeFontSize
+    o setDefaultEdgeFontSize
+
+    o getAdjacentEdgeNames
 
 SIGNIFICANT USER-VISIBLE CHANGES
 

@@ -1,6 +1,10 @@
 # RCytoscape/inst/test_cytoscape.R
 #------------------------------------------------------------------------------------------------------------------------
 library (RCytoscape)
+library (RUnit)
+#------------------------------------------------------------------------------------------------------------------------
+if (!exists ('cy'))
+  cy = CytoscapeConnection ()
 #------------------------------------------------------------------------------------------------------------------------
 # the peculiar naming of this function ensures that it will be called first, before all other test.xxx methods.  i think!
 test...aaaaFirstTestCalled = function ()
@@ -18,16 +22,14 @@ run.tests = function ()
   
     # start with a clean slate, and no windows
 
-  cy = CytoscapeConnection ()
 
     # many of the tests modify the default visual style, quite heedless of prior or successor tests.
     # if you wish to restore the initial default style, it is saved here, just once, upon entry to this method
     # 
-  save.default.vizmap ()
+  #save.default.vizmap ()
 
   deleteAllWindows (cy)
 
-  test.plugin.version ()
   test.create.class ()
   test.deleteWindow ()
   test.deleteAllWindows ()
@@ -50,6 +52,7 @@ run.tests = function ()
   test.noa ()
   test.eda ()
   test.cy2.edge.names ()
+  test.getAdjacentEdgeNames ()
   test.panelOperations ()
   test.showGraphicsDetails ()
   test.setDefaultNodeShape ()
@@ -71,6 +74,7 @@ run.tests = function ()
   test.setNodeBorderWidthRule ()
   test.setNodeSizeRule ()
   test.setNodeShapeRule ()
+  test.setNodeOpacityRule ()
   test.setNodeColorDirect ()
   test.setNodeBorderColorDirect ()
   test.setNodeLabelDirect ()
@@ -121,6 +125,7 @@ run.tests = function ()
   test.setNodePosition ()
   test.getNodePosition ()
   test.getNodePosition.colonInNodeName ()
+  test.getNodeSize ()
   test.haveNodeAttribute ()
   test.haveEdgeAttribute ()
   test.copyNodeAttributesFromCyGraph ()
@@ -137,8 +142,8 @@ run.tests = function ()
   test.getAttributeNames ()
   test.addGetAndDeleteEdgeAttributes ()
   test.addGetAndDeleteNodeAttributes ()
-  test.getAllNodeAttributes ()
-  test.getAllEdgeAttributes ()
+  #test.getAllNodeAttributes ()
+  #test.getAllEdgeAttributes ()
   test.getVisualStyleNames ()
   test.copyVisualStyle ()
   test.setVisualStyle ()
@@ -174,7 +179,7 @@ save.default.vizmap = function ()
   default.style.name <<- 'original.default.style'
 
   if (!default.style.name %in% getVisualStyleNames (cy)) # it has not previously been stored
-     copyVisualStyle (cy, 'default', 'orginal.default.style')
+     copyVisualStyle (CytoscapeConnection (), 'default', 'orginal.default.style')
 
 
 } # save.default.vizmap
@@ -212,7 +217,7 @@ test.plugin.version = function ()
   #version.numbers = as.integer (strsplit (tokens, '\\.')[[1]])
   #major.minor.version = version.numbers [1] + (version.numbers [2]/10.0)
   msg (cy, paste ('CytoscapeRPC version', major.minor.version))
-  checkTrue (major.minor.version >= 1.3)
+  checkTrue (major.minor.version >= 1.8)
 
 } # test.plugin.version
 #------------------------------------------------------------------------------------------------------------------------
@@ -1140,6 +1145,7 @@ test.setNodeColorRule = function ()
   node.colors =           c ('#FFFFFF')
   setNodeColorRule (cwe, 'type', node.attribute.values, node.colors, mode='lookup', default.color='#AA33AA')
   msg (cwe, 'test.setNodeColorRule')
+  redraw (cwe)
 
   invisible (cwe)
 
@@ -1292,6 +1298,103 @@ test.setNodeShapeRule = function ()
   invisible (cwe)
 
 } # test.setNodeShapeRule
+#------------------------------------------------------------------------------------------------------------------------
+test.setNodeOpacityRule = function ()
+{
+  title = 'test.setNodeOpacityRule'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+
+     # make the node borders prominent
+  setDefaultNodeBorderColor (cw, '#FFFF00')
+  setDefaultNodeBorderWidth (cw, 10)
+
+  lfc.values = c (-3.0, 0, 3.0)
+
+    # make the nodes big, give them strong colors
+  setNodeSizeDirect (cw, nodes (cw@graph), 100)
+  setNodeColorRule (cw, 'lfc', lfc.values, c ('#FF0000', '#00FF00', '#0000FF'), mode='interpolate'); redraw (cw)
+  layoutNetwork (cw, 'jgraph-spring')
+
+    # first, the continuous 'interpolate' case, in which opacity is a function of lfc
+  opacities = c (10, 128, 255)
+  x <<- cw
+  setNodeOpacityRule (cw, node.attribute.name='lfc', lfc.values, opacities, mode='interpolate')
+  redraw (cw)
+
+     # reset
+  setNodeOpacityRule (cw, 'lfc', lfc.values, c (255, 255, 255), mode='interpolate', aspect='all'); 
+  redraw (cw)
+
+    # now try a few of the aspect-specific rules, still in interpolate mode
+    # border:
+  setNodeOpacityRule (cw, 'lfc', lfc.values, c (255, 255, 255), mode='interpolate', aspect='border'); 
+  redraw (cw)
+  setNodeOpacityRule (cw, 'lfc', lfc.values, c (40,128, 0), mode='interpolate', aspect='border'); 
+  redraw (cw)
+
+     # reset
+  setNodeOpacityRule (cw, 'lfc', lfc.values, c (255, 255, 255), mode='interpolate');   redraw (cw)
+
+    # label
+  setNodeOpacityRule (cw, 'lfc', lfc.values, c (40,128, 0), mode='interpolate', aspect='border'); 
+  redraw (cw)
+
+     # reset
+  setNodeOpacityRule (cw, 'lfc', lfc.values, c (255, 255, 255), mode='interpolate');   redraw (cw)
+
+    # border
+  setNodeOpacityRule (cw, 'lfc', lfc.values, c (40,128, 0), mode='interpolate', aspect='border'); 
+  redraw (cw)
+
+    # a mix...
+  setNodeOpacityRule (cw, 'lfc', lfc.values, c (128, 128, 128), mode='interpolate', aspect='border, label, fill'); 
+  redraw (cw)
+
+
+  scalar.values = as.character (noa (cw@graph, 'type'))
+     # reset
+  setNodeOpacityRule (cw, 'type', scalar.values, c (255, 255, 255), mode='lookup');   redraw (cw)
+
+    # label
+  setNodeOpacityRule (cw, 'type', scalar.values, c (40,128, 0), mode='lookup', aspect='border'); 
+  redraw (cw)
+
+     # reset
+  setNodeOpacityRule (cw, 'type', scalar.values, c (255, 255, 255), mode='lookup');   redraw (cw)
+
+    # border
+  setNodeOpacityRule (cw, 'type', scalar.values, c (40,128, 0), mode='lookup', aspect='border'); 
+  redraw (cw)
+
+    # a mix...
+  setNodeOpacityRule (cw, 'type', scalar.values, c (128, 128, 128), mode='lookup', aspect='border, label, fill'); 
+  redraw (cw)
+
+    # make everything except labels transparent
+  setNodeOpacityRule (cw, 'type', scalar.values, c (0, 0, 0), mode='lookup', aspect='border, fill'); 
+  setNodeOpacityRule (cw, 'type', scalar.values, c (255, 255, 255), mode='lookup', aspect='label')
+  redraw (cw)
+
+    # make everything except borders transparent
+  setNodeOpacityRule (cw, 'type', scalar.values, c (0, 0, 0), mode='lookup', aspect='label, fill'); 
+  setNodeOpacityRule (cw, 'type', scalar.values, c (255, 255, 255), mode='lookup', aspect='border')
+  redraw (cw)
+
+    # make everything except fill transparent
+  setNodeOpacityRule (cw, 'type', scalar.values, c (0, 0, 0), mode='lookup', aspect='label, border'); 
+  setNodeOpacityRule (cw, 'type', scalar.values, c (255, 255, 255), mode='lookup', aspect='fill')
+  redraw (cw)
+
+    # now restore everything
+  setNodeOpacityRule (cw, 'type', scalar.values, c (255, 255, 255), mode='lookup', aspect='all')
+  redraw (cw)
+
+  invisible (cw)
+
+} # test.setNodeOpacityRule
 #------------------------------------------------------------------------------------------------------------------------
 test.setNodeColorDirect = function ()
 {
@@ -2282,6 +2385,24 @@ test.selectEdges = function ()
 
 } # test.selectEdges
 #------------------------------------------------------------------------------------------------------------------------
+test.getAdjacentEdgeNames = function ()
+{
+  title = 'test.getAdjacentEdgeNames'
+  g = RCytoscape::makeSimpleGraph ()
+  expected.names = c ("A (phosphorylates) B", "B (synthetic lethal) C", "C (undefined) A")
+  checkEquals (sort (as.character (cy2.edge.names (g))), expected.names)
+
+  checkEquals (sort (getAdjacentEdgeNames (g, 'A')), expected.names [c (1,3)])
+  checkEquals (sort (getAdjacentEdgeNames (g, 'B')), expected.names [c (1,2)])
+  checkEquals (sort (getAdjacentEdgeNames (g, 'C')), expected.names [c (2,3)])
+
+  checkEquals (sort (getAdjacentEdgeNames (g, c ('A', 'B'))), expected.names [1:3])
+  checkEquals (sort (getAdjacentEdgeNames (g, c ('B', 'C'))), expected.names [1:3])
+  checkEquals (sort (getAdjacentEdgeNames (g, c ('A', 'C'))), expected.names [1:3])
+  invisible (g)
+
+} # test.getAdjacentEdgeNames
+#------------------------------------------------------------------------------------------------------------------------
 test.setEdgeLineStyleRule = function ()
 {
   title = 'test.setEdgeLineStyleRule'
@@ -2870,6 +2991,58 @@ test.getNodePosition.colonInNodeName = function ()
   invisible (cwe)
 
 } # test.getNodePosition.colonInNodeName
+#------------------------------------------------------------------------------------------------------------------------
+test.getNodeSize = function ()
+{
+  title = 'test.getNodeSize'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+  layoutNetwork (cw, 'jgraph-spring')
+
+     # establish a good starting point
+  setNodeSizeDirect (cw, nodes (cw@graph), rep (100, 3))
+  redraw (cw)
+
+  cwx <<- cw
+  sizes =  getNodeSize (cw, nodes (cw@graph))
+  checkEquals (sizes$width, c (100, 100, 100))
+  checkEquals (sizes$height, c (100, 100, 100))
+
+  setNodeSizeDirect (cw, c ('A', 'B'), 150); redraw (cw)
+  sizes =  getNodeSize (cw, nodes (cw@graph))
+
+  checkEquals (sizes$width, c (150, 150, 100))
+  checkEquals (sizes$height, c (150, 150, 100))
+
+  setNodeSizeDirect (cw, c ('A', 'B'), c (180, 32));   redraw (cw)
+
+  sizes = getNodeSize (cw, nodes (cw@graph))
+  checkEquals (sizes$width, c (180, 32, 100))
+  checkEquals (sizes$height, c (180, 32, 100))
+
+     # now allow for non-symmetric dimensions, in which width and height are set separately
+  lockNodeDimensions (cw, FALSE)
+  setNodeHeightDirect (cw, c ('A', 'B', 'C'), c (12, 22, 32))
+  setNodeWidthDirect (cw, c ('A', 'B', 'C'), c (120, 122, 132))
+  redraw (cw)
+
+  sizes = getNodeSize (cw, 'B')
+  checkEquals (sizes$width, 122)
+  checkEquals (sizes$height, 22)
+
+       # return to symmetric dimensions
+  lockNodeDimensions (cw, TRUE)
+  redraw (cw)
+
+      # not sure how width and height are rectified.  it appears that the last-used width=height values are returned
+  sizes = getNodeSize (cw, nodes (cw@graph))
+  checkEquals (sizes$width, sizes$height)
+         
+  invisible (cw)
+
+} # test.getNodeSize
 #------------------------------------------------------------------------------------------------------------------------
 test.haveNodeAttribute = function ()
 {

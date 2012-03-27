@@ -94,6 +94,7 @@ setGeneric ('saveLayout',               signature='obj', function (obj, filename
 setGeneric ('restoreLayout',            signature='obj', function (obj, filename) standardGeneric ('restoreLayout'))
 setGeneric ('setNodePosition',          signature='obj', function (obj, node.names, x.coords, y.coords) standardGeneric ('setNodePosition'))
 setGeneric ('getNodePosition',          signature='obj', function (obj, node.names) standardGeneric ('getNodePosition'))
+setGeneric ('getNodeSize',              signature='obj', function (obj, node.names) standardGeneric ('getNodeSize'))
 setGeneric ('redraw',                   signature='obj', function (obj) standardGeneric ('redraw'))
 setGeneric ('hidePanel',                signature='obj', function (obj, panelName) standardGeneric ('hidePanel'))
 setGeneric ('hideAllPanels',            signature='obj', function (obj) standardGeneric ('hideAllPanels'))
@@ -172,6 +173,10 @@ setGeneric ('setNodeShapeRule',         signature='obj',
     function (obj, node.attribute.name, attribute.values, node.shapes, default.shape='ellipse') standardGeneric ('setNodeShapeRule'))
 setGeneric ('setNodeSizeRule',          signature='obj', 
     function (obj, node.attribute.name, control.points, node.sizes, mode, default.size=40) standardGeneric ('setNodeSizeRule'))
+
+setGeneric ('setNodeOpacityRule',          signature='obj', 
+    function (obj, node.attribute.name, control.points, opacities, mode, aspect='all') standardGeneric ('setNodeOpacityRule'))
+
 
 setGeneric ('setNodeSizeDirect',          signature='obj', function (obj, node.names, new.sizes) standardGeneric ('setNodeSizeDirect'))
 setGeneric ('setNodeLabelDirect',         signature='obj', function (obj, node.names, new.labels) standardGeneric ('setNodeLabelDirect'))
@@ -1089,6 +1094,26 @@ setMethod ('getNodePosition', 'CytoscapeWindowClass',
     }) # cy.getNodePosition
 
 #------------------------------------------------------------------------------------------------------------------------
+setMethod ('getNodeSize', 'CytoscapeWindowClass',
+
+  function (obj, node.names) {
+
+    count = length (node.names)
+    if (count == 1)
+      node.names = rep (node.names, 2)   # work around R's distinction between scalar and list of strings
+
+    widths  = as.integer (round (xml.rpc (obj@uri, 'Cytoscape.getNodesWidth',  node.names)))
+    heights = as.integer (round (xml.rpc (obj@uri, 'Cytoscape.getNodesHeight', node.names)))
+
+    if (count == 1) {
+      widths = widths [1]
+      heights = heights [1]
+      }
+
+    return (list (width=widths, height=heights))
+    }) # cy.getNodeSize
+
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeAttributes', 'CytoscapeWindowClass',
 
    function (obj, attribute.name) {
@@ -1486,7 +1511,7 @@ setMethod ('setNodeColorRule', 'CytoscapeWindowClass',
 
      setDefaultNodeColor (obj, default.color)
      if (mode=='interpolate') {  # need a 'below' color and an 'above' color.  so there should be two more colors than control.points 
-       if (length (control.points) == length (colors)) { # called did not supply 'below' and 'above' values; manufacture them
+       if (length (control.points) == length (colors)) { # caller did not supply 'below' and 'above' values; manufacture them
          colors = c (colors [1], colors, colors [length (colors)])
          #write ("RCytoscape::setNodeColorRule, no 'below' or 'above' colors specified.  Inferred from supplied colors.", stderr ());
          } # 
@@ -1523,6 +1548,94 @@ setMethod ('setNodeColorRule', 'CytoscapeWindowClass',
        } # else: !interpolate
      }) # setNodeColorRule
 
+
+#------------------------------------------------------------------------------------------------------------------------
+# Cytoscape distinguishes between Node Opacity, Node Border Opacity, and Node Label Opacity.  we call this 'aspect' here.
+
+setMethod ('setNodeOpacityRule', 'CytoscapeWindowClass',
+
+   function (obj, node.attribute.name, control.points, opacities, mode, aspect='all') {
+
+     if (!mode %in% c ('interpolate', 'lookup')) {
+       write ("Error! RCytoscape:setNodeOpacityRule.  mode must be 'interpolate' (the default) or 'lookup'.", stderr ())
+       return ()
+       }
+
+     aspect.all = length (grep ('all', aspect))  > 0
+     aspect.fill = length (grep ('fill', aspect)) > 0
+     aspect.border = length (grep ('border', aspect)) > 0
+     aspect.label = length (grep ('label', aspect)) > 0
+
+     if (aspect.all) {
+       aspect.fill = TRUE
+       aspect.border = TRUE
+       aspect.label = TRUE
+       }
+
+     if (aspect.fill == FALSE && aspect.border == FALSE && aspect.label == FALSE) {
+       specific.options = 'fill, border, label'
+       msg.1 = "Error! RCytoscape:setNodeOpacityRule.  apect must be 'all' (the default) "
+       msg.2 = sprintf ("or some combination, in any order, of %s", specific.options)
+       write (msg.1, stderr ())
+       write (msg.2, stderr ())
+       return ()
+       }
+
+     if (mode=='interpolate') {  # need a 'below' opacity and an 'above' opacity.  so there should be two more opacities than control.points 
+       if (length (control.points) == length (opacities)) { # caller did not supply 'below' and 'above' values; manufacture them
+         opacities = c (opacities [1], opacities, opacities [length (opacities)])
+         #write ("RCytoscape::setNodeOpacityRule, no 'below' or 'above' opacities specified.  Inferred from supplied opacities.", stderr ());
+         } # 
+
+       good.args = length (control.points) == (length (opacities) - 2)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (opacities)), stderr ())
+         write ("Error! RCytoscape:setNodeOpacityRule, interpolate mode.", stderr ())
+         write ("Expecting 1 opacity for each control.point, one for 'above' opacity, one for 'below' opacity.", stderr ())
+         return ()
+         }
+       
+       if (aspect.fill)
+         result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Opacity', control.points, opacities, FALSE)
+       if (aspect.border) 
+         result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Border Opacity', control.points, 
+                           opacities, FALSE)
+       if (aspect.label) 
+         result = xml.rpc (obj@uri, 'Cytoscape.createContinuousNodeVisualStyle', node.attribute.name, 'Node Label Opacity', control.points, 
+                           opacities, FALSE)
+       invisible (result)
+       } # if mode==interpolate
+
+     else { # mode==lookup, use a discrete rule, with no interpolation
+       good.args = length (control.points) == length (opacities)
+       if (!good.args) {
+         write (sprintf ('cp: %d', length (control.points)), stderr ())
+         write (sprintf ('co: %d', length (opacities)), stderr ())
+         write ("Error! RCytoscape:setNodeOpacityRule.  Expecting exactly as many opacities as control.points in lookup mode.", stderr ())
+         return ()
+         }
+
+       default.style = 'default'
+       default.opacity = 255;
+       if (length (control.points) == 1) {   # code around the requirement that one-element lists are turned into scalars
+         control.points = rep (control.points, 2)
+         opacities = rep (opacities, 2)
+         } 
+
+       if (aspect.fill)
+         result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', default.style, 
+                           node.attribute.name, 'Node Opacity', as.character (default.opacity), control.points, as.character (opacities))
+       if (aspect.border) 
+         result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', default.style, 
+                           node.attribute.name, 'Node Border Opacity', as.character (default.opacity), control.points, as.character (opacities))
+       if (aspect.label) 
+         result = xml.rpc (obj@uri, 'Cytoscape.createDiscreteMapper', default.style, 
+                           node.attribute.name, 'Node Label Opacity', as.character (default.opacity), control.points, as.character (opacities))
+       invisible (result)
+       } # else: !interpolate
+     }) # setNodeOpacityRule
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod ('setNodeBorderColorRule', 'CytoscapeWindowClass',
 
@@ -1536,7 +1649,7 @@ setMethod ('setNodeBorderColorRule', 'CytoscapeWindowClass',
      setDefaultNodeBorderColor (obj, default.color)
      
      if (mode=='interpolate') {  # need a 'below' color and an 'above' color.  so there should be two more colors than control.points 
-       if (length (control.points) == length (colors))  # called did not supply 'below' and 'above' values; manufacture them
+       if (length (control.points) == length (colors))  # caller did not supply 'below' and 'above' values; manufacture them
          colors = c (default.color, colors, default.color)
 
        good.args = length (control.points) == (length (colors) - 2)
@@ -1769,7 +1882,7 @@ setMethod ('setEdgeColorRule', 'CytoscapeWindowClass',
 
      setDefaultEdgeColor (obj, default.color)
      if (mode=='interpolate') {  # need a 'below' color and an 'above' color.  so there should be two more colors than control.points 
-       if (length (control.points) == length (colors)) { # called did not supply 'below' and 'above' values; manufacture them
+       if (length (control.points) == length (colors)) { # caller did not supply 'below' and 'above' values; manufacture them
          colors = c (colors [1], colors, colors [length (colors)])
          #write ("RCytoscape::setEdgeColorRule, no 'below' or 'above' colors specified.  Inferred from supplied colors.", stderr ());
          } # 
@@ -2890,6 +3003,8 @@ setMethod ('hideSelectedEdges', 'CytoscapeWindowClass',
      }) # hideSelectedEdges
    
 #------------------------------------------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------------------------------------------------
 setMethod ('unhideAll', 'CytoscapeWindowClass',
 
    function (obj) {
@@ -2995,6 +3110,24 @@ cy2.edge.names = function (graph, R.edge.names=NA)
   return (edge.names)
 
 } # cy2.edge.names
+#------------------------------------------------------------------------------------------------------------------------
+getAdjacentEdgeNames = function (graph, node.names) 
+{
+  all.edge.names = cy2.edge.names (graph) 
+  all.edge.names.cyStyle = as.character (all.edge.names) 
+  indices.of.edges.with.nodes = c () 
+
+  for (node in node.names) { 
+    node.regex.nodeA = sprintf ('^%s ', node)
+    node.regex.nodeB = sprintf (' %s$', node)
+    indices.A = grep (node.regex.nodeA, all.edge.names.cyStyle) 
+    indices.B = grep (node.regex.nodeB, all.edge.names.cyStyle) 
+    indices.of.edges.with.nodes = c (indices.of.edges.with.nodes, indices.A, indices.B) 
+    } # for node
+
+  return (unique (as.character (all.edge.names) [indices.of.edges.with.nodes]))
+
+} # getAdjacentEdgeNames
 #------------------------------------------------------------------------------------------------------------------------
 makeSimpleGraph = function ()
 {

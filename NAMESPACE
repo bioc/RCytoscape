@@ -26,6 +26,7 @@ exportMethods (
    layoutNetwork,
    setNodePosition,
    getNodePosition,
+   getNodeSize,
    ping,
    redraw,
 
@@ -75,6 +76,7 @@ exportMethods (
    setNodeLabelRule,
    setEdgeLabelRule,
    setNodeColorRule,
+   setNodeOpacityRule,
    setNodeBorderColorRule,
    setNodeBorderWidthRule,
    setNodeShapeRule,
@@ -190,6 +192,7 @@ export(
    eda.names,
    eda,
    cy2.edge.names,
+   getAdjacentEdgeNames,
    makeSimpleGraph,
    demoSimpleGraph,
    makeRandomGraph,

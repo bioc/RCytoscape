@@ -9,7 +9,7 @@ build process.
 In order to run them 'offline' however, take these steps from within a running R 
 session:
 
-  1) source (paste (find.package ('RCytoscape'), 'unitTests/test_cytoscape.R', sep='/'))
+  1) source(system.file("unitTests", "test_cytoscape.R", package="RCytoscape"))
   2) run.tests ()
 
 They take about 20 minutes to run.

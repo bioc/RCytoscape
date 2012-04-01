@@ -28,9 +28,11 @@ Paul Shannon
 }
 
 \examples{
+\dontrun{
   g <- makeSimpleGraph ()
   print (nodes (g))
   print (getAdjacentEdgeNames (g, 'A'))
+}
 }
 
 \keyword{graph}

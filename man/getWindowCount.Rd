@@ -18,12 +18,14 @@ An integer.
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   count.at.start = getWindowCount (cy)
   cw2 <- CytoscapeWindow ('getWindowCount.test1', graph=makeSimpleGraph())
   cw3 <- CytoscapeWindow ('getWindowCount.test2', graph=makeSimpleGraph())
   getWindowCount (cy)
     # should be two greater than 'count.at.start'
+}
 }
 
 

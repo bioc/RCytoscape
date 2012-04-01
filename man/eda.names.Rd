@@ -27,9 +27,11 @@ Paul Shannon
  eda
 }
 \examples{
+\dontrun{
   g <- makeSimpleGraph()
   eda.names (g)
    # "edgeType" "score"    "misc"
+}
 }
 
 \keyword{graph}

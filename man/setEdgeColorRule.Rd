@@ -31,6 +31,7 @@ None.
 }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeColorRule.test', graph=makeSimpleGraph())
   edgeType.values = c ('phosphorylates', 'synthetic lethal', 'undefined')
   colors = c ('#FF0000', '#FFFF00', '#00FF00')
@@ -45,6 +46,7 @@ None.
   setEdgeColorRule (cw, 'score',  score.values, colors, mode='interpolate')
 
   redraw (cw)
+}
 }
 
 \keyword{graph}

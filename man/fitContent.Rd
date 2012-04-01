@@ -24,6 +24,7 @@ None.
  }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('fitContent.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -32,6 +33,7 @@ None.
   fitContent (cw)
   setZoom (cw, 10.0)
   fitContent (cw)
+}
 }
 
 

@@ -31,6 +31,7 @@ None.
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setNodeBorderWidthRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -38,6 +39,7 @@ None.
   node.attribute.values = c ('kinase', 'transcription factor', 'glycoprotein')
   line.widths = c (0, 8, 16)
   setNodeBorderWidthRule (cw, 'type', node.attribute.values, line.widths)
+}
 }
 
 \keyword{graph}

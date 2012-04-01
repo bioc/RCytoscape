@@ -31,10 +31,12 @@ Nothing.
 
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   hidePanel (cy, 'Control Panel')
    # or
   hidePanel (cy, 'c')
+}
 }
 
 

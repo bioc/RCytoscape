@@ -23,8 +23,10 @@ None.
 }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('redraw.test', graph=makeSimpleGraph())
   redraw (cw)
+}
 }
 
 \keyword{graph}

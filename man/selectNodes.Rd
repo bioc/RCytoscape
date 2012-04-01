@@ -27,11 +27,13 @@ None.
 }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('selectNodes.test', graph=makeSimpleGraph())
   clearSelection (cw)
   selectNodes (cw, c ('A', 'B'))
   getSelectedNodes (cw)
     # [1] "A" "B"
+}
 }
 
 \keyword{graph}

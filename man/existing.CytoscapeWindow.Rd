@@ -38,11 +38,13 @@ existing.CytoscapeWindow (title, host='localhost', rpcPort=9000, copy.graph.from
 
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   cw <- new.CytoscapeWindow ('demo.existing', graph=makeSimpleGraph ())
   displayGraph (cw)
   cw2 <- existing.CytoscapeWindow ('demo.existing',  copy.graph.from.cytoscape.to.R=TRUE)
 
+}
 }
 
 \keyword{ graph }

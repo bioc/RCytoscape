@@ -20,8 +20,10 @@ Nothing.
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   print (setDefaultEdgeSelectionColor (cy, '#FF0000'))
+}
 }
 
 \keyword{graph}

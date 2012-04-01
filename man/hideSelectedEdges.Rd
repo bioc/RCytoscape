@@ -23,6 +23,7 @@ None.
 }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('hideSelectedEdges.test', graph=makeSimpleGraph())
   # selectEdges (cw, 'B (synthetic lethal) C')
   hideSelectedEdges (cw)
@@ -31,6 +32,7 @@ None.
    # layout, so that they are visible again
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
+}
 }
 
 

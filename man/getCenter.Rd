@@ -27,12 +27,14 @@ A names list, x and y.
  }
 
 \examples{
+\dontrun{
   window.title = 'getCenter demo'
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   print (getCenter (cw))
+}
 }
 
 \keyword{graph}

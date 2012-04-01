@@ -25,12 +25,14 @@ A named list of fou numbers, with these names:  top.x, top.y, bottom.x, bottom.y
  }
 
 \examples{
+\dontrun{
   window.title = 'getViewCoordinates demo'
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   print (getViewCoordinates (cw))
+}
 }
 
 \keyword{graph}

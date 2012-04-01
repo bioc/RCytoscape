@@ -31,9 +31,11 @@
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
      # create a CytoscapeWindowClass object by calling the constructor
   c2 <- CytoscapeWindow ('cwc demo', makeSimpleGraph ())  
 
+}
 }
 \keyword{graphs}
 \keyword{classes}

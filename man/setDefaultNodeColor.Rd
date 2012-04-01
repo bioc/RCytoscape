@@ -35,12 +35,14 @@ None.
  }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setDefaultNodeColor.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setDefaultNodeColor (cw, '#8888FF') # light blue
   redraw (cw)
+}
 }
 
 

@@ -31,6 +31,7 @@ None.
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeLineWidthRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -38,6 +39,7 @@ None.
   edge.attribute.values = c ('phosphorylates', 'synthetic lethal',   'undefined')
   line.widths = c (0, 8, 16)
   setEdgeLineWidthRule (cw, 'edgeType', edge.attribute.values, line.widths)
+}
 }
 
 \keyword{graph}

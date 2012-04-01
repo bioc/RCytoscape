@@ -26,6 +26,7 @@ None.
  }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeLabelDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -40,6 +41,7 @@ None.
     redraw (cw)
     }
 
+}
 }
 
 \keyword{graph}

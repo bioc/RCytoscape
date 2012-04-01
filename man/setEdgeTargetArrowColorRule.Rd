@@ -32,10 +32,12 @@ None.
 \seealso{ \code{\link{setEdgeSourceArrowColorRule}}}
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeTargetArrowColorRule.test', graph=makeSimpleGraph())
   colors <- c ("#AA00AA", "#AAAA00", "#AA0000")
   edgeType.values <- c ('phosphorylates', 'synthetic lethal', 'undefined')
   setEdgeTargetArrowColorRule (cw, 'edgeType', edgeType.values, colors)
+}
 }
 
 \keyword{graph}

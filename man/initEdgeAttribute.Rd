@@ -34,8 +34,10 @@ Paul Shannon
 }
 
 \examples{
+\dontrun{
   g = new ('graphNEL', edgemode='directed')
   g = initEdgeAttribute (g, 'edgeType', 'char', 'associates with')
+}
 }
 
 \keyword{graph}

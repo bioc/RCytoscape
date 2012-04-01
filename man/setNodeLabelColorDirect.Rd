@@ -25,6 +25,7 @@ None.
  }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setNodeLabelColorDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -32,6 +33,7 @@ None.
   setNodeFontSizeDirect (cw, 'A', 50)
   setNodeLabelColorDirect (cw, 'A', '#FFFF00')
   redraw (cw)
+}
 }
 
 

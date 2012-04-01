@@ -29,11 +29,13 @@ a \code{list} of character strings.
 
 
 \examples{
+\dontrun{
 
 
   cy = CytoscapeConnection ()
   print (getVisualStyleNames (cy))
 
+}
 }
 
 \keyword{graph}

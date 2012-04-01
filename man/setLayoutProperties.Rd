@@ -32,6 +32,7 @@ None.
  }
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   prop.names <- getLayoutPropertyNames (cy, 'isom')
   print (prop.names)
@@ -39,6 +40,7 @@ None.
   print (getLayoutPropertyValue (cy, 'isom', 'radiusConstantTime'))
     # modify just two of the eight properties; the others are unchanged
   setLayoutProperties (cy, 'isom', list (radiusConstantTime=4, radius=20))
+}
 }
 
 \keyword{graph}

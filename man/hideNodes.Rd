@@ -29,6 +29,7 @@ None.
 }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('hideNodes.test', graph=makeSimpleGraph())
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -37,6 +38,7 @@ None.
   unhideAll (cw)
   # restoreLayout (cw, 'layout.tmp.RData')
 
+}
 }
 
 

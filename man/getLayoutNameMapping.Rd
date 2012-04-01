@@ -32,12 +32,14 @@ getLayoutNameMapping(obj)
  }
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   layout.name.map <- getLayoutNameMapping (cy)
   print (head (names (layout.name.map), n=3))
     # [1] "Inverted Self-Organizing Map Layout" "Group Attributes Layout" "MOEN Layout"
   print (head (as.character (layout.name.map), n=3))
     # [1] "isom"   "attributes-layout"   "jgraph-moen"
+}
 }
 
 \keyword{graph}

@@ -32,10 +32,12 @@ A list of names.
 
 
 \examples{
+\dontrun{
 
   cy = CytoscapeConnection ()
   print (getEdgeAttributeNames (cy))
 
+}
 }
 
 \keyword{graph}

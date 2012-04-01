@@ -30,11 +30,13 @@ None.
 
 \seealso{ \code{\link{getArrowShapes}}}
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeTargetArrowRule.test', graph=makeSimpleGraph())
   arrows <- c ('Arrow', 'Diamond', 'Circle')
   edgeType.values <- c ('phosphorylates', 'synthetic lethal', 'undefined')
   setEdgeTargetArrowRule (cw, 'edgeType', edgeType.values, arrows)
   redraw (cw)
+}
 }
 
 \keyword{graph}

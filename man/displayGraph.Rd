@@ -25,10 +25,12 @@ Nothing.
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
   cw <- CytoscapeWindow ('displayGraph.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
+}
 }
 
 \keyword{graph}

@@ -19,9 +19,11 @@ ping(obj)
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   ping (cy)
     # "It works!"   
+}
 }
 
 \keyword{graph}

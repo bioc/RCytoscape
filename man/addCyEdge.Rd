@@ -31,6 +31,7 @@ None.
 }
 
 \examples{
+\dontrun{
   window.name <- 'demo addCyEdge'
   cw <- new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw)
@@ -40,6 +41,7 @@ None.
   layoutNetwork(cw)
 
 
+}
 }
 
 \keyword{graph}

@@ -30,6 +30,7 @@ None.
  }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeTargetArrowShapeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -62,6 +63,7 @@ None.
   redraw (cw)
 
 
+}
 }
 
 \keyword{graph}

@@ -23,6 +23,7 @@ None.
 }
 
 \examples{
+\dontrun{
   cw <- new.CytoscapeWindow ('invertEdgeSelection demo', graph=makeSimpleGraph())
      # all edges should be selected, since none were before
   invertEdgeSelection (cw)
@@ -30,6 +31,7 @@ None.
      # a richer test will be to programmatically select edges, but that
      #  does not work yet (pshannon, 13 jan 2011)
    
+}
 }
 
 \keyword{graph}

@@ -21,8 +21,10 @@ Nothing.
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   print (setDefaultNodeSelectionColor (cy, '#FF0000'))
+}
 }
 
 \keyword{graph}

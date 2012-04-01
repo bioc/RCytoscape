@@ -28,6 +28,7 @@ Paul Shannon
 }
 
 \examples{
+\dontrun{
   g <- makeSimpleGraph ()
   cy2.edge.names (g)
     #                      A~B                      B~C                      C~A 
@@ -36,6 +37,7 @@ Paul Shannon
     #                      B~C 
     # "B (synthetic lethal) C" 
 
+}
 }
 
 \keyword{graph}%

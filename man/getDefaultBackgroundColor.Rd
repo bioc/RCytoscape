@@ -19,8 +19,10 @@ A character string, eg "java.awt.Color[r=204,g=204,b=255]"
 \author{Paul Shannon}
 
 \examples{
+\dontrun{
   cy <- CytoscapeConnection ()
   print (getDefaultBackgroundColor (cy))   # "java.awt.Color[r=204,g=204,b=255]"
+}
 }
 
 \keyword{graph}

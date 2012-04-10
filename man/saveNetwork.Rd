@@ -29,7 +29,6 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('saveNetwork.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -40,7 +39,6 @@ None.
   #saveNetwork (cw, filename)
   #print (sprintf ('gml file exists? %s', file.exists (filename)))
 
-}
 }
 
 

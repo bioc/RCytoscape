@@ -29,7 +29,6 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeTargetArrowColorDirect.test', graph=makeSimpleGraph ())
   displayGraph (cw)
   redraw (cw)
@@ -53,7 +52,6 @@ None.
     redraw (cw)
     Sys.sleep (1)
     } # for i
-}
 }
 
 \keyword{graph}

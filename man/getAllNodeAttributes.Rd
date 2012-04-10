@@ -35,7 +35,6 @@ A data frame, with a column for each attribute, a row for each node.
 
 
 \examples{
-\dontrun{
 
   window.name = 'demo.getAllNodeAttributes'
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
@@ -45,7 +44,6 @@ A data frame, with a column for each attribute, a row for each node.
     # get all attributes for all nodes
   tbl.noa = getAllNodeAttributes (cw, onlySelectedNodes=FALSE)
 
-}
 }
 
 \keyword{graph}

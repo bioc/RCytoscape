@@ -17,7 +17,6 @@ and edges.
 Paul Shannon
 }
 \examples{
-\dontrun{
 g = makeSimpleGraph ()
 
 ## The function is currently defined as
@@ -62,7 +61,6 @@ function ()
     edgeData(g, "B", "C", "score") = -12
     return(g)
   }
-}
 }
 
 \keyword{graph}

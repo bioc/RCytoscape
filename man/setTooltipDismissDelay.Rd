@@ -29,7 +29,6 @@ None.
  }
 
 \examples{
-\dontrun{
   window.title = 'setTooltipDismissDelay demo'
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
     # use node type as the tooltip
@@ -43,7 +42,6 @@ None.
      # disappear after 3000 (3 seconds)
   setTooltipInitialDelay (cw, 200)
   setTooltipDismissDelay (cw, 3000)
-}
 }
 
 \keyword{graph}

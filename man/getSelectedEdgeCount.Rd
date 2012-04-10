@@ -18,7 +18,6 @@ An integer.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('getSelectedEdgeCount.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -29,7 +28,6 @@ An integer.
     # selectEdges (cwe, "A (phosphorylates) B")
   getSelectedEdgeCount (cw)
   # should be 1
-}
 }
 
 \keyword{graph}

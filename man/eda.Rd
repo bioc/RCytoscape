@@ -27,7 +27,6 @@ Paul Shannon
  eda.names
 }
 \examples{
-\dontrun{
 g  <- makeSimpleGraph()
 eda (g, 'edgeType')
 
@@ -37,6 +36,5 @@ function (graph, edge.attribute.name)
   unlist (sapply (names (edgeData (graph)), function (n) edgeData (graph)[[n]][[edge.attribute.name]]))
 
   } # eda
-}
 }
 \keyword{graph}

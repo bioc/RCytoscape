@@ -36,14 +36,12 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setDefaultEdgeColor test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setDefaultEdgeColor (cw, '#FFFFFF') # white edges
   redraw (cw)
-}
 }
 
 

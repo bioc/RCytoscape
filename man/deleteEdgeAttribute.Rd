@@ -35,7 +35,6 @@ nothing
 
 
 \examples{
-\dontrun{
 
   window.name = 'demo.deleteEdgeAttribute'
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
@@ -48,7 +47,6 @@ nothing
   deleteEdgeAttribute (cw, 'score')
   print (paste ("after: ", getEdgeAttributeNames (cw)))
 
-}
 }
 
 \keyword{graph}

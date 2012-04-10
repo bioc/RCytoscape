@@ -27,7 +27,6 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeFontSizeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -39,7 +38,6 @@ None.
     }
   setEdgeFontSizeDirect (cw, edge.names, 12)
 
-}
 }
 
 \keyword{graph}

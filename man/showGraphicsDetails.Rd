@@ -21,11 +21,9 @@ None.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   showGraphicsDetails (cy, TRUE)
 
-}
 }
 
 \keyword{graph}

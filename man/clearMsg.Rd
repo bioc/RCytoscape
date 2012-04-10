@@ -24,10 +24,8 @@ Nothing.
 
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   clearMsg (cy)
-}
 }
 
 

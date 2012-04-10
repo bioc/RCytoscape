@@ -23,7 +23,6 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('invertNodeSelection demo', graph=makeSimpleGraph())
      # all nodes should be selected, since none were before
   selectNodes (cw, 'A')
@@ -32,7 +31,6 @@ None.
      # a richer test will be to programmatically select nodes, but that
      #  does not work yet (pshannon, 13 jan 2011)
    
-}
 }
 
 \keyword{graph}

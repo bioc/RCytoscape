@@ -25,14 +25,12 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeLabelDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setNodeLabelDirect (cw, 'A', 'A new, very long label')
   redraw (cw)
-}
 }
 
 

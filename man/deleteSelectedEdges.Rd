@@ -25,7 +25,6 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('deleteSelectedEdges.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -34,7 +33,6 @@ None.
   selectEdges (cw, "B (synthetic lethal) C")
   deleteSelectedEdges (cw)
   redraw (cw)
-}
 }
 
 

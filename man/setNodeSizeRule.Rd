@@ -39,7 +39,6 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeSizeRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -66,7 +65,6 @@ None.
   redraw (cw)
 
 
-}
 }
 
 \keyword{graph}

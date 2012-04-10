@@ -25,7 +25,6 @@ Unless node dimensions are 'unlocked' these two vectors will be identical.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('getNodeSize.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw)
@@ -46,7 +45,6 @@ Unless node dimensions are 'unlocked' these two vectors will be identical.
   setNodeSizeDirect (cw, 'A', 80)
   redraw (cw)
   print (getNodeSize (cw, 'A'))
-}
 }
 
 \keyword{graph}

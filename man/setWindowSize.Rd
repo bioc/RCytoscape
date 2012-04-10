@@ -30,7 +30,6 @@ None.
  }
 
 \examples{
-\dontrun{
   window.title = 'setWindowSize demo'
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
@@ -44,7 +43,6 @@ None.
   system ('sleep 1')
   setWindowSize (cw, 600, 400)
   fitContent (cw)
-}
 }
 
 \keyword{graph}

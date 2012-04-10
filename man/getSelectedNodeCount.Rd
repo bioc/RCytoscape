@@ -18,7 +18,6 @@ An integer.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('getSelectedNodeCount.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -27,7 +26,6 @@ An integer.
   selectNodes (cw, c ('A','B'))
   getSelectedNodeCount (cw)
   # [1] 2
-}
 }
 
 \keyword{graph}

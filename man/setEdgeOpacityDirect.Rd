@@ -27,7 +27,6 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeOpacityDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -42,7 +41,6 @@ None.
     redraw (cw)
     }
 
-}
 }
 
 \keyword{graph}

@@ -27,7 +27,6 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeTooltipDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -48,7 +47,6 @@ None.
   setEdgeTooltipDirect (cw, edges.of.interest, '')
   redraw (cw)
 
-}
 }
 
 \keyword{graph}

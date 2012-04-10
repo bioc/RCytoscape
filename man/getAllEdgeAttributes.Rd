@@ -36,7 +36,6 @@ A data frame, with a column for each attribute, a row for each edge.
 
 
 \examples{
-\dontrun{
 
   window.name = 'demo.getAllEdgeAttributes'
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
@@ -46,7 +45,6 @@ A data frame, with a column for each attribute, a row for each edge.
     # get all attributes for all edges
   tbl.noa = getAllEdgeAttributes (cw, onlySelectedEdges=FALSE)
 
-}
 }
 
 \keyword{graph}

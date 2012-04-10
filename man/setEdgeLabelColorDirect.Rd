@@ -22,7 +22,6 @@ None.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeLabelColorDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -35,7 +34,6 @@ None.
   setEdgeLabelColorDirect (cw, edge.names, '#000000')
   redraw (cw)
 
-}
 }
 
 \keyword{graph}

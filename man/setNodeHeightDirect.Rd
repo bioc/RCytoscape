@@ -30,7 +30,6 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeHeightDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -38,7 +37,6 @@ None.
   lockNodeDimensions (cw, 'default', FALSE)
   setNodeHeightDirect (cw, 'A', 32)
   redraw (cw)
-}
 }
 
 

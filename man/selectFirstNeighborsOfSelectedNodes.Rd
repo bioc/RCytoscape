@@ -30,7 +30,6 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('selectFirstNeighborsOfSelecteNodes.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw)
@@ -39,7 +38,6 @@ None.
   selectFirstNeighborsOfSelectedNodes (cw)
   print (sort (getSelectedNodes (cw)))
     # [1] "A" "B" "C"
-}
 }
 
 \keyword{graph}

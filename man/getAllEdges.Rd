@@ -18,12 +18,10 @@ A list of character strings.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- CytoscapeWindow ('getAllEdges.test', graph=makeSimpleGraph())
   displayGraph (cw)
   print (getAllEdges (cw))
     # [1] "C (undefined) A"  "B (synthetic lethal) C" "A (phosphorylates) B"  
-}
 }
 
 \keyword{graph}

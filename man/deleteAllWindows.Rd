@@ -20,12 +20,10 @@ Nothing.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   cw1 = new.CytoscapeWindow ('cw1')
   cw2 = new.CytoscapeWindow ('cw2')
   deleteAllWindows (cy)
-}
 }
 
 \keyword{graph}

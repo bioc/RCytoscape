@@ -60,7 +60,6 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeOpacityRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   control.points <- c (-3.0, 0.0, 3.0)   # typical range of log-fold-change ratio values
@@ -75,7 +74,6 @@ None.
   opacities <- c (10, 80, 255)
   setNodeOpacityRule (cw, node.attribute.name='type', gene.types, opacities, mode='lookup', aspect='border,fill')
   redraw (cw)
-}
 }
 
 

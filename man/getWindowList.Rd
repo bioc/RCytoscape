@@ -18,10 +18,8 @@ A named list,  in which the values are the titles of the windows; the names of t
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   getWindowList (cy) 
-}
 }
 
 \keyword{graph}

@@ -34,7 +34,6 @@ nothing
 
 
 \examples{
-\dontrun{
 
   window.name = 'demo.deleteNodeAttribute'
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
@@ -46,7 +45,6 @@ nothing
   deleteNodeAttribute (cw, 'count')
   print (paste ("after: ", getNodeAttributeNames (cw)))
 
-}
 }
 
 \keyword{graph}

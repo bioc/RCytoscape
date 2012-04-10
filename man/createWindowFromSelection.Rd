@@ -27,7 +27,6 @@ an empty graph.
 }
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   title <- 'createWindowFromSelection demo'
 
@@ -48,6 +47,5 @@ an empty graph.
   clearSelection (c2)
   selectNodes (c2, 'C')
   print (getSelectedNodeCount (c2))  # should be 1
-}
 }
 \keyword{graph}

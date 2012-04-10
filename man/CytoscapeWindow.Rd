@@ -44,9 +44,7 @@ CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = "loc
   }
 
 \examples{
-\dontrun{
   cw <- CytoscapeWindow ('cw demo', new ('graphNEL'))
-}
 }
 
 \keyword{ graph }

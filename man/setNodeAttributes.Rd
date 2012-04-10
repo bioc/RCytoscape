@@ -32,14 +32,12 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeAttributes.test', graph=makeSimpleGraph())
   attribute.names = noa.names (cw@graph)
 
   for (attribute.name in attribute.names)
     result = setNodeAttributes (cw, attribute.name)
 
-}
 }
 
 

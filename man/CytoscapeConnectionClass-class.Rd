@@ -41,11 +41,9 @@
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
      # create a CytoscapeConnectionClass object by calling the constructor
   cy <- CytoscapeConnection (host='localhost', rpcPort=9000)
 
-}
 }
 \keyword{graphs}
 \keyword{classes}

@@ -25,14 +25,12 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeShapeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setNodeShapeDirect (cw, 'A', 'triangle')
   redraw (cw)
-}
 }
 
 

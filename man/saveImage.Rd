@@ -31,14 +31,12 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('saveImage.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
   filename = tempfile () # paste (getwd (), 'saveImageTest.jpg', sep='/')
   # saveImage (cw, filename, 'jpeg', 2.0)   # doesn't yet work reliably at bioc
-}
 }
 
 

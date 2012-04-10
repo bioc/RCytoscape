@@ -24,11 +24,9 @@ Paul Shannon
 }
 
 \examples{
-\dontrun{
   g <- makeSimpleGraph()
   noa.names (g)
     #  [1] "type"  "lfc"   "label" "count"
-}
 }
 
 

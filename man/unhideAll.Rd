@@ -24,7 +24,6 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('unhideAll.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -34,7 +33,6 @@ None.
   hideSelectedNodes (cw)
   system ('sleep 2')
   unhideAll (cw)
-}
 }
 
 

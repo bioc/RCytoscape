@@ -18,7 +18,6 @@ A list of character strings.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('getSelectedNodes.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -27,7 +26,6 @@ A list of character strings.
   selectNodes (cw, c ('A','B'))
   getSelectedNodes (cw)
   # [1] "A" "B"
-}
 }
 
 \keyword{graph}

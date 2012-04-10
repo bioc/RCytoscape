@@ -33,13 +33,11 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeSourceArrowRule.test', graph=makeSimpleGraph())
   arrows <- c ('Arrow', 'Diamond', 'Circle')
   edgeType.values <- c ('phosphorylates', 'synthetic lethal', 'undefined')
   setEdgeSourceArrowRule (cw, 'edgeType', edgeType.values, arrows)
   redraw (cw)
-}
 }
 
 \keyword{graph}

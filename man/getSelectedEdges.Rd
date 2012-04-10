@@ -18,7 +18,6 @@ A list of character strings.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('getSelectedEdges.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -26,7 +25,6 @@ A list of character strings.
     # in Cytoscape, interactively select two edges
     # doesn't work yet:  selectEdges (cwe, "A (phosphorylates) B")
   getSelectedEdges (cw)
-}
 }
 
 \keyword{graph}

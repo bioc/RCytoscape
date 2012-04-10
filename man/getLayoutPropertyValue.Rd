@@ -31,7 +31,6 @@ getLayoutPropertyValue(obj, layout.name, property.name)
  }
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   prop.names <- getLayoutPropertyNames (cy, 'isom')
   print (prop.names)
@@ -39,7 +38,6 @@ getLayoutPropertyValue(obj, layout.name, property.name)
   sapply (prop.names, function (pn) getLayoutPropertyValue (cy, 'isom', 'coolingFactor'))
     #        maxEpoch         sizeFactor radiusConstantTime             radius          minRadius  initialAdaptation      minAdaptation      coolingFactor 
     #            2                  2                  2                  2                  2                  2                  2                  2 
-}
 }
 
 \keyword{graph}

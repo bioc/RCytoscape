@@ -23,13 +23,11 @@ None.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setEdgeTooltipRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
   setEdgeTooltipRule (cw, 'edgeType')
-}
 }
 
 \keyword{graph}

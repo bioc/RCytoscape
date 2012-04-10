@@ -19,14 +19,12 @@ A list of about 60 character strings, e.g., "Node Color" and "Edge Font Size"
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   getDirectlyModifiableVisualProperties (cy)
    #  [1] "Node Color"                      "Node Border Color"               "Node Line Type"                  "Node Shape"                     
    #  [5] "Node Size"                       "Node Width"                      "Node Height"                     "Node Label"                     
    # ...
 
-}
 }
 
 \keyword{graph}

@@ -24,7 +24,6 @@ None.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   window.name <- 'demo addGraphToGraph'
   cw3 <- new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw3)
@@ -57,7 +56,6 @@ None.
   redraw (cw3)
   layoutNetwork(cw3)
 
-}
 }
 
 \keyword{graph}

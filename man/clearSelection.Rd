@@ -19,7 +19,6 @@ Nothing
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw<- CytoscapeWindow ('clearSelection.test', graph=makeSimpleGraph())
   displayGraph (cw)
   selectNodes (cw, 'A')
@@ -27,7 +26,6 @@ Nothing
   clearSelection (cw)
   print (getSelectedNodeCount (cw))   # should be 0
 
-}
 }
 
 \keyword{graph}

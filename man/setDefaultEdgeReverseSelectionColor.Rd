@@ -21,10 +21,8 @@ Nothing.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   print (setDefaultEdgeReverseSelectionColor (cy, '#FF0000'))
-}
 }
 
 \keyword{graph}

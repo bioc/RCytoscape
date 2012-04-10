@@ -28,14 +28,12 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeColorDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setNodeColorDirect (cw, 'A', '#880000')
   redraw (cw)
-}
 }
 
 

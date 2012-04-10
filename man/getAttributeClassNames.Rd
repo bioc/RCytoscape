@@ -22,11 +22,9 @@ A list of character strings group, e.g., "floating|numeric|double",
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   getAttributeClassNames (cy)
    # [1] "floating|numeric|double" "integer|int"             "string|char|character"  
-}
 }
 
 \keyword{graph}

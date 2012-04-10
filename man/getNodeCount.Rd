@@ -18,7 +18,6 @@ A list of character strings.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('getNodeCount.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -26,7 +25,6 @@ A list of character strings.
     # in Cytoscape, interactively select two nodes, or
   getNodeCount (cw)
   # [1] 3
-}
 }
 
 \keyword{graph}

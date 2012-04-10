@@ -19,11 +19,9 @@ A list of character strings, e.g., 'SOLID', 'DOT'
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   getLineStyles (cy)
   #  [1] "SOLID" "LONG_DASH" "EQUAL_DASH" ...
-}
 }
 
 \keyword{graph}

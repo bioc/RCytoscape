@@ -25,14 +25,12 @@ A list of node names.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('getFirstNeighbors.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   print (getFirstNeighbors (cw, 'A'))
   selectNodes (cw, getFirstNeighbors (cw, 'A'))  # note that A is not selected
-}
 }
 
 

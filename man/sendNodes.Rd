@@ -24,10 +24,8 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('sendNodes.test', graph=makeSimpleGraph())
   sendNodes (cw)
-}
 }
 
 \keyword{graph}

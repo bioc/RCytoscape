@@ -30,7 +30,6 @@ None.
  }
 
 \examples{
-\dontrun{
   window.title = 'setZoom demo'
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
@@ -41,7 +40,6 @@ None.
   setZoom (cw, 3.0)
   system ('sleep 1')
   setZoom (cw, 1.0)
-}
 }
 
 \keyword{graph}

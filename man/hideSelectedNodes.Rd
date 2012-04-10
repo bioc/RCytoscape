@@ -24,14 +24,12 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('hideSelectedNodes.test', graph=makeSimpleGraph())
   # saveLayout (cw, 'layout.tmp.RData')
   selectNodes (cw, c ('A', 'B'))
   hideSelectedNodes (cw)
   unhideAll (cw)
   # restoreLayout (cw, 'layout.tmp.RData')
-}
 }
 
 

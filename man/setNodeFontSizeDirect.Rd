@@ -27,14 +27,12 @@ None.
  }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeFontSizeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setNodeFontSizeDirect (cw, 'A', 32)
   redraw (cw)
-}
 }
 
 

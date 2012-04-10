@@ -25,12 +25,10 @@ Paul Shannon
 }
 
 \examples{
-\dontrun{
   g <- new ('graphNEL', edgemode='directed')
   cw <- new.CytoscapeWindow ('test validCyWin', graph=g)
   validCyWin (cw)  # should see warning about absence of the privileged edge attribute 'edgeType'; returns FALSE
 
-}
 }
 
 \keyword{graph}%

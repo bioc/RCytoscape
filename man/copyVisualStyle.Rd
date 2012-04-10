@@ -36,7 +36,6 @@ Nothing.
 }
 
 \examples{
-\dontrun{
 
     # create the usual demo graph and Cytoscape window, then
     # specify that all the edges should be 5 pixels wide.  This affects the 'default' style only
@@ -64,7 +63,6 @@ Nothing.
 
    # save the session form the Cytoscape application menu.  the new
    # style name  will be saved along with the network and its attributes
-}
 }
 
 \keyword{graph}

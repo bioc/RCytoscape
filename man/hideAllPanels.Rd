@@ -26,10 +26,8 @@ Nothing.
 
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   hideAllPanels (cy)
-}
 }
 
 

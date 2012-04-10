@@ -23,7 +23,6 @@ None.
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('setNodeTooltipRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -32,7 +31,6 @@ None.
   setNodeTooltipRule (cw, 'lfc')
   setNodeTooltipRule (cw, 'count')
 
-}
 }
 
 \keyword{graph}

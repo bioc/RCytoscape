@@ -25,10 +25,8 @@ None.
 }
 
 \examples{
-\dontrun{
   cw <- new.CytoscapeWindow ('sendEdges.test', graph=makeSimpleGraph())
   sendEdges (cw)
-}
 }
 
 

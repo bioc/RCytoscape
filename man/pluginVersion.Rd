@@ -19,11 +19,9 @@ pluginVersion(obj)
 \author{Paul Shannon}
 
 \examples{
-\dontrun{
   cy <- CytoscapeConnection ()
   print (pluginVersion (cy))
     # e.g., "1.7"
-}
 }
 
 \keyword{graph}

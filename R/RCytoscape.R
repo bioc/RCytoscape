@@ -333,7 +333,6 @@ new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'
   res <- .BBSOverride(host, rpcPort)
   host = res$host
   rpcPort = res$rpcPort
-
   
   uri = sprintf ('http://%s:%s', host, rpcPort)
 
@@ -346,16 +345,16 @@ new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'
     }
 
     # add a label to each node if not already present.  default label is the node name, the node ID
-  if (is.classic.graph (graph))
-    if (edgemode (graph) == 'undirected')
-    graph = remove.redundancies.in.undirected.graph (graph)
+  if (is.classic.graph (graph)) 
+    if (edgemode (graph) == 'undirected'){
+      graph = remove.redundancies.in.undirected.graph (graph)
+      }
 
   if (! 'label' %in% noa.names (graph)) {
-    #write ('nodes have no label attribute -- adding default labels', stderr ())
-    graph = initNodeAttribute (graph, 'label', 'char', '')
+    write ('nodes have no label attribute -- adding default labels', stderr ())
+    graph = initNodeAttribute (graph, 'label', 'char', 'noLabel')
     if (length (nodes (graph) > 0))
-      for (node in nodes (graph))
-        nodeData (graph, node, 'label') = node
+      nodeData (graph, nodes (graph), 'label') = nodes (graph)  # nodes (graph) returns strings
     } # if no label node attribute
 
   cw = new ('CytoscapeWindowClass', title=title, graph=graph, uri=uri)

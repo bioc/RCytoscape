@@ -3586,24 +3586,34 @@ hexColorToInt = function (hex.string)
     edgeTypes = edgeData (g, attr='edgeType')
     }
 
-  template = list (source='', target='', edgeType='')
-  tbl = data.frame (template, stringsAsFactors=F)
-  for (source.node in names (nodes.list)) {
-    target.nodes = nodes.list [[source.node]]
-    if (length (target.nodes) == 0)
-      next;
-    for (target.node in target.nodes) {
-      barred.edge.name = sprintf ('%s|%s', source.node, target.node)      
-      if (edgeType.supplied)
-        e.type = edgeTypes [[barred.edge.name]]
-      else
-        e.type = edgeType.default.value
-      new.row = list (source=source.node, target=target.node, edgeType=e.type)
-      tbl = rbind (tbl, new.row)
-      } # for target.node
-    } # for source.node
+  pairs = strsplit (edgeNames (g), '~')
+  a = sapply (pairs, function (pair) return (pair [1]))
+  b = sapply (pairs, function (pair) return (pair [2]))
+  if ('edgeType' %in% eda.names (g))
+    edgeType = as.character (edgeData (g, from=a, to=b, attr='edgeType'))
+  else
+    edgeType = rep ('unspecified', length (a))
 
-  return (tbl [-1,])
+  return (data.frame (source=a, target=b, edgeType=edgeType, stringsAsFactors=FALSE))
+
+  #template = list (source='', target='', edgeType='')
+  #tbl = data.frame (template, stringsAsFactors=F)
+  #for (source.node in names (nodes.list)) {
+  #  target.nodes = nodes.list [[source.node]]
+  #  if (length (target.nodes) == 0)
+  #    next;
+  #  for (target.node in target.nodes) {
+  #    barred.edge.name = sprintf ('%s|%s', source.node, target.node)      
+  #    if (edgeType.supplied)
+  #      e.type = edgeTypes [[barred.edge.name]]
+  #    else
+  #      e.type = edgeType.default.value
+  #    new.row = list (source=source.node, target=target.node, edgeType=e.type)
+  #    tbl = rbind (tbl, new.row)
+  #    } # for target.node
+  #  } # for source.node
+
+  #return (tbl [-1,])
 
 } # .classicGraphToNodePairTable
 #------------------------------------------------------------------------------------------------------------------------

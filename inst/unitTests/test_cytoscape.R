@@ -4190,15 +4190,15 @@ test..classicGraphToNodePairTable = function ()
 
     # now extend the standard demo graph by adding an edge between C and B, making B & C reciprocally related nodes
 
-  gx = makeSimpleGraph ()
-  gx = graph::addEdge ('C', 'B', gx)
-  edgeData (gx, 'C', 'B', attr='edgeType') = 'synthetic rescue'
-  tbl.egx = RCytoscape:::.classicGraphToNodePairTable (gx)
-  checkEquals (dim (tbl.egx), c (4, 3))
-  checkEquals (colnames (tbl.egx), c ("source", "target", "edgeType"))
-  checkEquals (tbl.egx$edgeType, c ("phosphorylates", "synthetic lethal", "undefined", "synthetic rescue"))
-  checkEquals (tbl.egx$source, c ("A", "B", "C", "C"))
-  checkEquals (tbl.egx$target, c ("B", "C", "A", "B"))
+  #gx = makeSimpleGraph ()
+  #gx = graph::addEdge ('C', 'B', gx)
+  #edgeData (gx, 'C', 'B', attr='edgeType') = 'synthetic rescue'
+  #tbl.egx = RCytoscape:::.classicGraphToNodePairTable (gx)
+  #checkEquals (dim (tbl.egx), c (4, 3))
+  #checkEquals (colnames (tbl.egx), c ("source", "target", "edgeType"))
+  #checkEquals (tbl.egx$edgeType, c ("phosphorylates", "synthetic lethal", "undefined", "synthetic rescue"))
+  #checkEquals (tbl.egx$source, c ("A", "B", "C", "C"))
+  #checkEquals (tbl.egx$target, c ("B", "C", "A", "B"))
 
 } # test..classicGraphToNodePairTable 
 #------------------------------------------------------------------------------------------------------------------------

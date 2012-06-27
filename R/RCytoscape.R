@@ -2865,7 +2865,16 @@ setMethod ('selectNodes', 'CytoscapeWindowClass',
      if (!preserve.current.selection)
         clearSelection (obj)
 
-     #write (sprintf ('selectNodes, node.names (%d): %s', length (node.names), list.to.string (node.names)), stderr ())
+     unknown.nodes = setdiff (node.names, nodes (obj@graph))
+     if (length (unknown.nodes) > 0) {
+       node.string = paste (unknown.nodes, collapse=' ')
+       msg = paste ('selectNodes asked to select nodes not in graph:', node.string)
+       write (msg, stderr ())
+       node.names = intersect (node.names, nodes (obj@graph))
+       }
+
+     if (length (node.names) == 0)
+       invisible ('no nodes to select')
 
      result = xml.rpc (obj@uri, 'Cytoscape.selectNodes',id, node.names, .convert=TRUE)
      redraw (obj)

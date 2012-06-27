@@ -2227,6 +2227,15 @@ test.selectNodes = function ()
   checkEquals (getSelectedNodeCount (cwe), 1)
   checkEquals (getSelectedNodes (cwe), 'C')
 
+  clearSelection (cwe)
+  checkEquals (getSelectedNodeCount (cwe), 0)
+  nodes.to.select = c ('bogus', 'missing')
+  selectNodes (cwe, nodes.to.select)
+  checkEquals (getSelectedNodeCount (cwe), 0)
+  nodes.to.select = c (nodes.to.select, nodes (cwe@graph))
+  selectNodes (cwe, nodes.to.select)
+  checkEquals (getSelectedNodeCount (cwe), 3)
+
   msg (cwe, 'test.selectNodes')
 
   invisible (cwe)

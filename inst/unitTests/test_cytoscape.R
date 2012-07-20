@@ -167,7 +167,7 @@ run.tests = function ()
   test.rcy.edgeNames ()
   test..getNovelEdges ()
   test.setNodeImageDirect ()
-  test.validity ()
+  #test.validity ()
   test.tooltip.delays ()
 
   options ('warn'=0)
@@ -505,6 +505,24 @@ test.setLayoutProperties = function ()
   invisible (cw)
 
 } # test.setLayoutProperties
+#------------------------------------------------------------------------------------------------------------------------
+test.collectTimings = function ()
+{
+  title = 'test.collectTimings'
+  window.prep (title)
+
+  cy = CytoscapeConnection ()
+  if (title %in% as.character (getWindowList (cy)))
+     deleteWindow (cy, title)
+
+  cwe = new.CytoscapeWindow (title, graph=makeSimpleGraph (), collectTimings=TRUE)
+  displayGraph (cwe)
+  layoutNetwork (cwe, 'jgraph-spring')
+  redraw (cwe)
+
+  invisible (cwe)  
+
+} # test.collectTimings
 #------------------------------------------------------------------------------------------------------------------------
 test.sendNodes = function ()
 {
@@ -2227,6 +2245,16 @@ test.selectNodes = function ()
   checkEquals (getSelectedNodeCount (cwe), 1)
   checkEquals (getSelectedNodes (cwe), 'C')
 
+  clearSelection (cwe)
+  checkEquals (getSelectedNodeCount (cwe), 0)
+  nodes.to.select = c ('bogus', 'missing')
+  selectNodes (cwe, nodes.to.select)
+  checkEquals (getSelectedNodeCount (cwe), 0)
+  nodes.to.select = c (nodes.to.select, nodes (cwe@graph))
+  selectNodes (cwe, nodes.to.select)
+  checkEquals (getSelectedNodeCount (cwe), 3)
+  msg (cwe, 'test.selectNodes')
+
   msg (cwe, 'test.selectNodes')
 
   invisible (cwe)
@@ -2490,6 +2518,39 @@ test.setEdgeColorRule = function ()
   invisible (cwe)
 
 } # test.setEdgeColorRule
+#------------------------------------------------------------------------------------------------------------------------
+test.setEdgeOpacityRule = function ()
+{
+  title = 'test.setEdgeOpacityRule'
+  window.prep (title)
+
+  cw = new.CytoscapeWindow (title, graph=RCytoscape::makeSimpleGraph ())
+  displayGraph (cw)
+  layoutNetwork (cw, 'jgraph-spring')
+
+  edgeType.values = c ("phosphorylates", "synthetic lethal", "undefined")
+
+     # want to see edges and both arrows, to check success of opacity rule
+  setEdgeTargetArrowRule (cw, 'edgeType', edgeType.values, rep ('ARROW', 3))
+  setEdgeSourceArrowRule (cw, 'edgeType', edgeType.values, rep ('ARROW', 3))
+  setDefaultEdgeLineWidth (cw, 5)
+
+  redraw (cw)
+
+    # do the lookup rule
+  opacities = c (25, 100, 255)
+  setEdgeOpacityRule (cw, 'edgeType',  edgeType.values, opacities, mode='lookup')
+  redraw (cw)
+
+    # now do the interpolated version
+  opacities = c (10, 125, 255)
+  control.points = c (-12, 0, 35)
+  setEdgeOpacityRule (cw, 'score',  control.points, opacities, mode='interpolate')  
+  redraw (cw)
+
+  invisible (cw)
+
+} # test.setEdgeOpacityRule
 #------------------------------------------------------------------------------------------------------------------------
 test.setEdgeTargetArrowRule = function ()
 {
@@ -4190,15 +4251,15 @@ test..classicGraphToNodePairTable = function ()
 
     # now extend the standard demo graph by adding an edge between C and B, making B & C reciprocally related nodes
 
-  gx = makeSimpleGraph ()
-  gx = graph::addEdge ('C', 'B', gx)
-  edgeData (gx, 'C', 'B', attr='edgeType') = 'synthetic rescue'
-  tbl.egx = RCytoscape:::.classicGraphToNodePairTable (gx)
-  checkEquals (dim (tbl.egx), c (4, 3))
-  checkEquals (colnames (tbl.egx), c ("source", "target", "edgeType"))
-  checkEquals (tbl.egx$edgeType, c ("phosphorylates", "synthetic lethal", "undefined", "synthetic rescue"))
-  checkEquals (tbl.egx$source, c ("A", "B", "C", "C"))
-  checkEquals (tbl.egx$target, c ("B", "C", "A", "B"))
+  #gx = makeSimpleGraph ()
+  #gx = graph::addEdge ('C', 'B', gx)
+  #edgeData (gx, 'C', 'B', attr='edgeType') = 'synthetic rescue'
+  #tbl.egx = RCytoscape:::.classicGraphToNodePairTable (gx)
+  #checkEquals (dim (tbl.egx), c (4, 3))
+  #checkEquals (colnames (tbl.egx), c ("source", "target", "edgeType"))
+  #checkEquals (tbl.egx$edgeType, c ("phosphorylates", "synthetic lethal", "undefined", "synthetic rescue"))
+  #checkEquals (tbl.egx$source, c ("A", "B", "C", "C"))
+  #checkEquals (tbl.egx$target, c ("B", "C", "A", "B"))
 
 } # test..classicGraphToNodePairTable 
 #------------------------------------------------------------------------------------------------------------------------
@@ -4443,4 +4504,101 @@ test.tooltip.delays = function ()
   setTooltipDismissDelay (cw, 1000)
   
 } # test.tooltip.delays
+#------------------------------------------------------------------------------------------------------------------------
+# also not an automated test, though exception testing could accomplish that
+test.detectUnitializedNodeAttributes = function ()
+{
+    # starting with the code in makeSampleGraph, change 3 node and 1 edge attribute to use the  standard (not RCy) 
+    # attribute initializations. this is an error with respect to RCy, which needs explicit typing of the attributes
+    # see if they are caught
+
+  g = new("graphNEL", edgemode = "directed")
+
+  #g = initNodeAttribute(g, "type", "char", "undefined")
+  #g = initNodeAttribute(g, "lfc", "numeric", 1)
+  #g = initNodeAttribute(g, "label", "char", "default node label")
+  g = initNodeAttribute(g, "count", "integer", 0)
+
+  nodeDataDefaults (g, attr='type') = ''
+  nodeDataDefaults (g, attr='lfc') = 0.0
+  nodeDataDefaults (g, attr='label') = ''
+
+  g = initEdgeAttribute(g, "edgeType", "char", "undefined")
+  g = initEdgeAttribute(g, "score", "numeric", 0)
+  g = initEdgeAttribute(g, "misc", "char", "default misc")
+
+  g = graph::addNode("A", g)
+  g = graph::addNode("B", g)
+  g = graph::addNode("C", g)
+  nodeData(g, "A", "type") = "kinase"
+  nodeData(g, "B", "type") = "transcription factor"
+  nodeData(g, "C", "type") = "glycoprotein"
+  nodeData(g, "A", "lfc") = -3
+  nodeData(g, "B", "lfc") = 0
+  nodeData(g, "C", "lfc") = 3
+  nodeData(g, "A", "count") = 2
+  nodeData(g, "B", "count") = 30
+  nodeData(g, "C", "count") = 100
+  nodeData(g, "A", "label") = "Gene A"
+  nodeData(g, "B", "label") = "Gene B"
+  nodeData(g, "C", "label") = "Gene C"
+  g = graph::addEdge("A", "B", g)
+  g = graph::addEdge("B", "C", g)
+  g = graph::addEdge("C", "A", g)
+  edgeData(g, "A", "B", "edgeType") = "phosphorylates"
+  edgeData(g, "B", "C", "edgeType") = "synthetic lethal"
+  edgeData(g, "A", "B", "score") = 35
+  edgeData(g, "B", "C", "score") = -12
+
+  cw = new.CytoscapeWindow (title = 'detect unitialized node attributes', graph = g, deleteAnyWindowsOfSameTitle=TRUE)
+
+
+} # test.detectUnitializedNodeAttributes 
+#------------------------------------------------------------------------------------------------------------------------
+# also not an automated test, though exception testing could accomplish that
+test.detectUnitializedEdgeAttributes = function ()
+{
+    # starting with the code in makeSampleGraph, change 3 node and 1 edge attribute to use the  standard (not RCy) 
+    # attribute initializations. this is an error with respect to RCy, which needs explicit typing of the attributes
+    # see if they are caught
+
+  g = new("graphNEL", edgemode = "directed")
+
+  g = initNodeAttribute(g, "type", "char", "undefined")
+  g = initNodeAttribute(g, "lfc", "numeric", 1)
+  g = initNodeAttribute(g, "label", "char", "default node label")
+  g = initNodeAttribute(g, "count", "integer", 0)
+
+  g = initEdgeAttribute(g, "edgeType", "char", "undefined")
+  g = initEdgeAttribute(g, "score", "numeric", 0)
+  #g = initEdgeAttribute(g, "misc", "char", "default misc")
+  edgeDataDefaults (g, attr='misc') = ''
+
+  g = graph::addNode("A", g)
+  g = graph::addNode("B", g)
+  g = graph::addNode("C", g)
+  nodeData(g, "A", "type") = "kinase"
+  nodeData(g, "B", "type") = "transcription factor"
+  nodeData(g, "C", "type") = "glycoprotein"
+  nodeData(g, "A", "lfc") = -3
+  nodeData(g, "B", "lfc") = 0
+  nodeData(g, "C", "lfc") = 3
+  nodeData(g, "A", "count") = 2
+  nodeData(g, "B", "count") = 30
+  nodeData(g, "C", "count") = 100
+  nodeData(g, "A", "label") = "Gene A"
+  nodeData(g, "B", "label") = "Gene B"
+  nodeData(g, "C", "label") = "Gene C"
+  g = graph::addEdge("A", "B", g)
+  g = graph::addEdge("B", "C", g)
+  g = graph::addEdge("C", "A", g)
+  edgeData(g, "A", "B", "edgeType") = "phosphorylates"
+  edgeData(g, "B", "C", "edgeType") = "synthetic lethal"
+  edgeData(g, "A", "B", "score") = 35
+  edgeData(g, "B", "C", "score") = -12
+
+  cw = new.CytoscapeWindow (title = 'detect unitialized node attributes', graph = g, deleteAnyWindowsOfSameTitle=TRUE)
+
+
+} # test.detectUnitializedNodeAttributes 
 #------------------------------------------------------------------------------------------------------------------------

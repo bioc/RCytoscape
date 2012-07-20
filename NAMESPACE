@@ -4,6 +4,7 @@ exportMethods (
    deleteWindow,
    deleteAllWindows,
    displayGraph,
+   displayGraph.predictedTime,
    getArrowShapes,
 
    getLayoutNames,
@@ -88,6 +89,7 @@ exportMethods (
    setEdgeTargetArrowColorRule,
    setEdgeSourceArrowColorRule,
    setEdgeColorRule,
+   setEdgeOpacityRule,
 
    setEdgeOpacityDirect,
 
@@ -197,8 +199,7 @@ export(
    demoSimpleGraph,
    makeRandomGraph,
    initNodeAttribute,
-   initEdgeAttribute,
-   validCyWin
+   initEdgeAttribute
    )
 
 importClassesFrom(graph, graph, graphBase)

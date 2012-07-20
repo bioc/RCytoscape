@@ -57,7 +57,7 @@ sweave:
 #
 
 pdf:  sweave doc/RCytoscape.tex
-	(cd doc; rm *.pdf; /usr/texbin/latex --output-format=pdf  RCytoscape.tex; open RCytoscape.pdf)
+	(cd doc; rm *.pdf; latex --output-format=pdf  RCytoscape.tex; open RCytoscape.pdf)
 
 # --- vanillaTest
 # run all the unit tests, in a clean context

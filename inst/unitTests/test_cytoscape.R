@@ -4602,3 +4602,38 @@ test.detectUnitializedEdgeAttributes = function ()
 
 } # test.detectUnitializedNodeAttributes 
 #------------------------------------------------------------------------------------------------------------------------
+test.remove.redundancies.in.undirected.graph = function ()
+{
+  print ('----- test.remove.redundancies.in.undirected.graph')
+  nNode <- 500
+  nEdge <- 5000
+  tmpNodes <- as.character(seq(1, nNode))
+  allEdges <- expand.grid(tmpNodes, tmpNodes, stringsAsFactors = F)
+  allEdges <- allEdges[(allEdges[, 1] != allEdges[, 2]), ]
+  allEdges <- allEdges[(sample(nrow(allEdges), nEdge)), ]
+  edgeWeight <- rnorm(nEdge)
+  gu <- new("graphNEL", nodes = tmpNodes, edgemode = "undirected")
+
+  gu = initNodeAttribute(gu, "type", "char", "undefined")
+  gu = initNodeAttribute(gu, "lfc", "numeric", 1)
+  gu = initNodeAttribute(gu, "label", "char", "default node label")
+
+  gu = initEdgeAttribute(gu, "edgeType", "char", "undefined")
+  gu = initEdgeAttribute(gu, "weight", "numeric", 0)
+
+  gu = addEdge(allEdges[, 1], allEdges[, 2], gu, edgeWeight)
+  nodeData (gu, nodes (gu), 'label') = nodes (gu)
+
+  t0 = Sys.time ()
+  g.fixed <<- RCytoscape:::remove.redundancies.in.undirected.graph (gu)
+  t1 = Sys.time ()
+  elapsed.time = as.numeric (difftime (t1, t0, units='secs'))
+  checkTrue (elapsed.time < 5)  # consistently about 0.5 seconds in interactive testing
+  checkTrue (all (nodes (gu) == nodes (g.fixed)))
+  checkTrue (all (edgeNames (gu) == edgeNames (g.fixed)))
+
+    # the main test
+  checkEquals (length (unlist (edges (gu))), 2 * length (unlist (edges (g.fixed))))
+
+} # test.remove.redundancies.in.undirected.graph 
+#------------------------------------------------------------------------------------------------------------------------

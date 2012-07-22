@@ -3416,6 +3416,7 @@ makeRandomGraph = function (node.count=12, seed = 123)
 
 } # makeRandomGraph
 #------------------------------------------------------------------------------------------------------------------------
+# see Robert Flight's replacement below (pshannon, 20 jul 2012)
 # the bioconductor graph class stores undirected graph edge attributes redundantly.  bioc's nishant says (email, 2 sep 2010):
 #
 # The people who started the graph package decided to return duplicate edge attributes / weights for the undirected
@@ -3425,7 +3426,7 @@ makeRandomGraph = function (node.count=12, seed = 123)
 # edgeWeights and edgeData methods in your package that retrieve only the non-duplicated attributes for the undirected
 # case.
 #
-remove.redundancies.in.undirected.graph = function (gu)
+remove.redundancies.in.undirected.graph.old = function (gu)
 {
   if (length (nodes (gu)) == 0)
     return (new ('graphNEL', edgemode='directed'))
@@ -3464,7 +3465,63 @@ remove.redundancies.in.undirected.graph = function (gu)
 
   return (g)
 
-} # remove.redundancies.in.undirected.graph 
+} # remove.redundancies.in.undirected.graph.old
+#------------------------------------------------------------------------------------------------------------------------
+# Robert Flight offered this replacement, having encountered painfully slow execution with a 5k edge undirected graph
+# this fast version, likes its slow predecessor, compensates for the (in my view) flawed implementation of undirected
+# graphNELs by converting them to directed graphs.
+# but because undirected graphs are logically sound, and representationally useful, this is only a temporary fix.
+# a redesign of this aspect of the graphNEL class is needed.
+#
+# original comments:
+# the bioconductor graph class stores undirected graph edge attributes redundantly.  bioc's nishant says (email, 2 sep 2010):
+#
+# The people who started the graph package decided to return duplicate edge attributes / weights for the undirected
+# case. ie if you have an edge a-b and the graph is undirected, methods such as edgeWeights, edgeData etc will end up
+# returning duplicate values for the attribute for a-b and b-a.  That was a design decision taken by the creators of the
+# package and I do not think it will be possible to change that now.  I guess the solution might be to create your own
+# edgeWeights and edgeData methods in your package that retrieve only the non-duplicated attributes for the undirected
+# case.
+#
+remove.redundancies.in.undirected.graph = function(gu) 
+{
+  if (length(nodes(gu)) == 0) 
+      return(new("graphNEL", edgemode = "directed"))
+
+  g <- new("graphNEL", edgemode = "directed")
+
+  if (length(edgeDataDefaults(gu)) > 0) 
+      edgeDataDefaults(g) <- edgeDataDefaults(gu)
+
+  if (length(nodeDataDefaults(gu)) > 0) 
+      nodeDataDefaults(g) <- nodeDataDefaults(gu)
+
+  g <- addNode(nodes(gu), g)
+
+  allNodes <- nodes(gu)
+
+  noa.name <- invisible(lapply(noa.names(gu), function(noa.name) {
+      nodeData(g, allNodes, noa.name) <<- nodeData(gu, allNodes, noa.name)
+  }))
+
+  if (length(edgeNames(gu)) == 0) 
+      return(g)
+
+  edge.names <- edgeNames(gu)
+  edge.node.pairs <- strsplit(edge.names, "\\~")
+  source.nodes <- sapply(edge.node.pairs, function(x) x[1])
+  target.nodes <- sapply(edge.node.pairs, function(x) x[2])
+
+  g = graph::addEdge(source.nodes, target.nodes, g)
+
+  invisible(lapply(eda.names(gu), function(eda.name) {
+      edgeData(g, source.nodes, target.nodes, eda.name) <<- edgeData(gu, source.nodes, 
+          target.nodes, eda.name)
+  }))
+
+  return(g)
+
+}  # remove.redundancies.in.undirected.graph
 #------------------------------------------------------------------------------------------------------------------------
 initNodeAttribute = function (graph, attribute.name, attribute.type, default.value)
 {
@@ -3766,46 +3823,6 @@ hexColorToInt = function (hex.string)
 
 } # hexColorToInt
 #-----------------------------------------------------------------------------------------------------------------------
-# edges are stored variously and confusingly in graphNELs, maybe in other graph classes also
-# this function takes a native bioc graph object, and returns a data frame with 3 columns:  A, B, and edgeType
-#.classicGraphToNodePairTable = function (g)
-#{
-#  nodes.list = edges (g)   # one named entry per node, each containing 0 or more partner (target) nodes
-#
-#  edge.attribute.names = names (edgeDataDefaults (g))
-#
-#  edgeType.supplied = TRUE
-#
-#  if (!'edgeType' %in% edge.attribute.names) {
-#    edgeType.supplied = FALSE
-#    edgeType.default.value = 'unspecified'
-#    }
-#  else {
-#    edgeType.supplied = TRUE
-#    edgeTypes = edgeData (g, attr='edgeType')
-#    }
-#
-#  template = list (source='', target='', edgeType='')
-#  tbl = data.frame (template, stringsAsFactors=F)
-#  for (source.node in names (nodes.list)) {
-#    target.nodes = nodes.list [[source.node]]
-#    if (length (target.nodes) == 0)
-#      next;
-#    for (target.node in target.nodes) {
-#      barred.edge.name = sprintf ('%s|%s', source.node, target.node)      
-#      if (edgeType.supplied)
-#        e.type = edgeTypes [[barred.edge.name]]
-#      else
-#        e.type = edgeType.default.value
-#      new.row = list (source=source.node, target=target.node, edgeType=e.type)
-#      tbl = rbind (tbl, new.row)
-#      } # for target.node
-#    } # for source.node
-#
-#  return (tbl [-1,])
-#
-#} # .classicGraphToNodePairTable
-#------------------------------------------------------------------------------------------------------------------------
 .classicGraphToNodePairTable = function (g)
 {
   #edge.names = as.character (unlist (sapply (names (edges (g)), function (a) paste (a, edges (g)[[a]], sep='~'))))

@@ -91,7 +91,7 @@ setGeneric ('setEdgeAttributesDirect', signature='obj',
     function (obj, attribute.name, attribute.type, edge.names, values) standardGeneric ('setEdgeAttributesDirect'))
 
 setGeneric ('displayGraph',               signature='obj', function (obj) standardGeneric ('displayGraph'))
-setGeneric ('displayGraph.predictedTime', signature='obj', function (obj) standardGeneric ('displayGraph.predictedTime'))
+setGeneric ('predictTimeToDisplayGraph',  signature='obj', function (obj) standardGeneric ('predictTimeToDisplayGraph'))
 setGeneric ('layoutNetwork',              signature='obj', function (obj, layout.name='jgraph-spring') standardGeneric ('layoutNetwork'))
 setGeneric ('saveLayout',                 signature='obj', function (obj, filename, timestamp.in.filename=FALSE) standardGeneric ('saveLayout'))
 setGeneric ('restoreLayout',              signature='obj', function (obj, filename) standardGeneric ('restoreLayout'))
@@ -353,7 +353,8 @@ new.CytoscapeWindow = function (title, graph=new('graphNEL', edgemode='directed'
     }
 
   if (!is.na (getWindowID (cy.tmp, title))) {
-    write (sprintf ('There is already a window in Cytoscape named "%s".  Please use a unique name.', title), stderr ())
+    write (sprintf ('There is already a window in Cytoscape named "%s".', title), stderr ())
+    write (sprintf ('Please use a unique name, or set "overwriteWindow=TRUE".'), stderr ())
     stop ()
     }
 
@@ -1296,12 +1297,7 @@ setMethod ('setEdgeAttributes', 'CytoscapeWindowClass',
      values = eda (obj@graph, attribute.name) [edge.names.with.bars]
      #print (values)
 
-     #write (edge.names, stderr ())
-     #write (values, stderr ())
-
-     #write (sprintf ('about to call setEdgeAttributesDirect %s, %d edge.names, %d values', attribute.name, length (edge.names), length (values)), stderr())
      result = setEdgeAttributesDirect (obj, attribute.name, caller.specified.attribute.class, edge.names, values)
-     #write (sprintf ('back from setEdgeAttributesDirect, leaving setEdgeAttributes'), stderr ())
      invisible (result)
      }) # setEdgeAttributes
 
@@ -1310,7 +1306,8 @@ setMethod ('setEdgeAttributesDirect', 'CytoscapeWindowClass',
 
    function (obj, attribute.name, attribute.type, edge.names, values) {
 
-     write (sprintf ('entering setEdgeAttributesDirect, %s, with %d names and %d values', attribute.name, length (edge.names), length (values)), stderr ())
+     write (sprintf ('entering setEdgeAttributesDirect, %s, with %d names and %d values',
+                     attribute.name, length (edge.names), length (values)), stderr ())
 
      if (length (edge.names) == 0)
        return ()
@@ -1344,7 +1341,6 @@ setMethod ('setEdgeAttributesDirect', 'CytoscapeWindowClass',
        }
 
      if (caller.specified.attribute.class %in% c ('floating', 'numeric', 'double')) {
-       write (sprintf ('calling Cy.addDoubleEdgeAttributes, %s, %d', attribute.name, length (as.numeric (values))))
        timing.info <<- system.time ((result = xml.rpc (obj@uri, 'Cytoscape.addDoubleEdgeAttributes', attribute.name, edge.names, as.numeric (values), .convert=TRUE)))
        write (timing.info, stderr ())                                   
        #write (sprintf ('result of addDoubleEdgeAttributes: %s', result), stderr ())
@@ -1363,7 +1359,6 @@ setMethod ('setEdgeAttributesDirect', 'CytoscapeWindowClass',
        #write (sprintf ('result of addStringEdgeAttribute/s: %s', result), stderr ())
        #write (result, stderr ())
        }
-     write (sprintf ('leaving setEdgeAttributesDirect'))
      invisible (result)
      }) # setEdgeAttributesDirect
 
@@ -1371,7 +1366,6 @@ setMethod ('setEdgeAttributesDirect', 'CytoscapeWindowClass',
 setMethod ('displayGraph', 'CytoscapeWindowClass',
 
    function (obj) {
-     write ('entering RCytoscape::displayGraph', stderr ())
      if (length (nodes (obj@graph)) == 0) {
        write ('RCytoscape::displayGraph, empty graph, returning', stderr ())
        return ()
@@ -1382,11 +1376,8 @@ setMethod ('displayGraph', 'CytoscapeWindowClass',
      node.attribute.count = length (noa.names (obj@graph)) * node.count
      edge.attribute.count = length (eda.names (obj@graph)) * edge.count
      
-     
-     estimated.time = (node.count * 0.002) +
-                      (edge.count * 0.010) +
-                      ((node.attribute.count + edge.attribute.count) * 0.002) + 15
-     
+     estimated.time = predictTimeToDisplayGraph (obj)
+
      if (obj@collectTimings) {
        method.start.time = Sys.time ()
        stepwise.start.time = Sys.time ()
@@ -1430,7 +1421,7 @@ setMethod ('displayGraph', 'CytoscapeWindowClass',
      }) # displayGraph
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod ('displayGraph.predictedTime', 'CytoscapeWindowClass',
+setMethod ('predictTimeToDisplayGraph', 'CytoscapeWindowClass',
 
    function (obj) {
      g = obj@graph

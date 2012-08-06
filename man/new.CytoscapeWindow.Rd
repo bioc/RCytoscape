@@ -7,7 +7,8 @@ new.CytoscapeWindow
 The constructor for the CytoscapeWindowClass
 }
 \usage{
-new.CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = "localhost", rpcPort = 9000, create.window = TRUE)
+new.CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = "localhost", rpcPort = 9000, 
+                    create.window = TRUE, overwriteWindow=FALSE, collectTimings=FALSE)
 }
 
 \arguments{
@@ -31,6 +32,14 @@ new.CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = 
      what in Java we would call 'class methods' -- getWindowList () for
      instance, a CytoscapeWindow without an actual window can be useful.
 }
+  \item{overwriteWndow}{
+     Every Cytoscape window must have a unique title.  If the title you supply is already in use,
+     this method will fail unless you specify TRUE for this parameter, in which case the
+     pre-existing window with the same title will be deleted before this new one is created.
+}
+  \item{collectTimings}{
+     Default FALSE.  Will record and report the time required to send a graph to Cytoscape.
+}
 }
 \value{
   An object of the CytoscapeWindow Class.
@@ -41,7 +50,8 @@ new.CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = 
 
 \seealso{
   CytoscapeWindow
-  existing.CytoscapeWindow
+  existing.CytoscapeWindow,
+  predictTimeToDisplayGraph
   }
 
 \examples{

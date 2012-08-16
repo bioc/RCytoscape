@@ -8,6 +8,7 @@
     \item{\code{title}:}{An \code{attrData} the name of the window.}
     \item{\code{window.id}:}{An \code{attrData} Cytoscape's identifier.}
     \item{\code{graph}:}{An \code{attrData} a graph instance.}
+    \item{\code{collectTimings}:}{An \code{logical} object.}
     \item{\code{uri}:}{An \code{attrData} the address of the Cytoscape
       XMLRPC server.}
   }

@@ -1401,7 +1401,7 @@ setMethod ('displayGraph', 'CytoscapeWindowClass',
      sapply (noa.names (obj@graph), function (name) {print (name); setNodeAttributes (obj, name)})
 
      if (obj@collectTimings) {
-       write (sprintf (' *** send node attributes: %f secs', difftime (Sys.time (), start.time, units='secs')), stderr ())
+       write (sprintf (' *** send node attributes: %f secs', difftime (Sys.time (), stepwise.start.time, units='secs')), stderr ())
        stepwise.start.time = Sys.time ()
        } 
 

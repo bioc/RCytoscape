@@ -31,7 +31,8 @@ check: build
 # check everything
 #
 
-checkfull:  build
+checkfull: 
+	(cd ../..; $(RVER) --vanilla CMD build RCytoscape)
 	(cd ../..; $(RVER) --vanilla CMD check --timings RCytoscape)
 
 

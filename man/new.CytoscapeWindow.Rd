@@ -1,6 +1,5 @@
 \name{new.CytoscapeWindow}
 \alias{new.CytoscapeWindow}
-\alias{CytoscapeWindow}
 \title{
 new.CytoscapeWindow
 }

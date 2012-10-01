@@ -1,7 +1,7 @@
 Package: RCytoscape
 Type: Package
 Title: Display and manipulate graphs in Cytoscape
-Version: 1.8.0
+Version: 1.9.0
 Date: 2012-08-17
 Author: Paul Shannon
 Maintainer: Paul Shannon <pshannon@systemsbiology.org>

@@ -3816,10 +3816,10 @@ hexColorToInt = function (hex.string)
 #-----------------------------------------------------------------------------------------------------------------------
 .classicGraphToNodePairTable = function (g)
 {
-  #edge.names = as.character (unlist (sapply (names (edges (g)), function (a) paste (a, edges (g)[[a]], sep='~'))))
-  edge.names = as.character  (unlist (sapply (names (edges (g)), function (a)  {
-         bs = edges (g)[[a]]; 
-         if (length (bs) > 0) paste (a, edges (g)[[a]], sep='~') 
+  edges.g <- edges(g)
+  edge.names = as.character(unlist(sapply(names(edges.g), function (a) {
+         bs = edges.g[[a]]; 
+         if (length (bs) > 0) paste (a, edges.g[[a]], sep='~') 
          })))
 
   pairs = strsplit (edge.names, '~')

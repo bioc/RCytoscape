@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.9.4
+-------------------------
+
+BUG FIXES
+
+    o Significant (3x) speedup to sendEdges
+
+
 CHANGES IN VERSION 1.8.0
 -------------------------
 

@@ -213,7 +213,7 @@ importMethodsFrom(graph, edgeData, "edgeData<-", edgeDataDefaults,
                  edgemode, "edgemode<-",
                  addNode, addEdge)
 
-importFrom(methods, "@<-", new)
+importFrom(methods, new)
 
 importFrom(XMLRPC, xml.rpc)
 

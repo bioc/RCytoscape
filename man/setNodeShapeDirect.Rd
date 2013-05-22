@@ -29,6 +29,7 @@ None.
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
+  getNodeShapes(cw)
   setNodeShapeDirect (cw, 'A', 'triangle')
   redraw (cw)
 }

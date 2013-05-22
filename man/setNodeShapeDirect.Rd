@@ -21,7 +21,7 @@ None.
 \author{Paul Shannon}
 
 \seealso{
-  getNodeShapeDirects
+  getNodeShapes
  }
 
 \examples{

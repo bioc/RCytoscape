@@ -1086,7 +1086,10 @@ setMethod ('setNodePosition', 'CytoscapeWindowClass',
 
   function (obj, node.names, x.coords, y.coords) {
 
-    unknown.nodes = setdiff (node.names, nodes (obj@graph))
+    unknown.nodes <- setdiff (node.names, getAllNodes (obj))
+
+    recognized.nodes <- intersect(node.names, getAllNodes(obj))
+
     if (length (unknown.nodes) > 0) {
       node.names = intersect (node.names, nodes (obj@graph))
       write (sprintf ("Error!  unknown nodes in RCytoscape::setNodePosition"), stderr ())
@@ -1095,9 +1098,14 @@ setMethod ('setNodePosition', 'CytoscapeWindowClass',
       return ()
       } # if 
 
+    indices <- match(recognized.nodes, node.names)
+    node.names <- recognized.nodes
+    
+    x.coords <- x.coords[indices]
+    y.coords <- y.coords[indices]
     count = length (node.names)
-    stopifnot (length (x.coords) == count)
-    stopifnot (length (y.coords) == count)
+    #stopifnot (length (x.coords) == count)
+    #stopifnot (length (y.coords) == count)
 
     if (count == 0)
       return ()

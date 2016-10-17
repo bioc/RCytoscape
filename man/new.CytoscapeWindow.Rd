@@ -55,7 +55,9 @@ new.CytoscapeWindow(title, graph = new("graphNEL", edgemode='directed'), host = 
   }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('new.demo', new ('graphNEL'))
-}
+}}
+
 
 \keyword{ graph }

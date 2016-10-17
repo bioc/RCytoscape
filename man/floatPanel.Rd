@@ -29,10 +29,12 @@ Nothing.
 }
 
 \examples{
+\donttest{
   cy  <- CytoscapeConnection ()
   floatPanel (cy, 'Control Panel')
     # or with less typing
   floatPanel (cy, 'c')
-}
+}}
+
 
 \keyword{graph}

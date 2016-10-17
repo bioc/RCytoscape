@@ -25,10 +25,12 @@ Paul Shannon
 noa.names
 }
 \examples{
+\donttest{
   g <- makeSimpleGraph ()
   noa (g, 'type')
     #           A.A                    B.B                    C.C 
     #      "kinase" "transcription factor"         "glycoprotein" 
 
-}
+}}
+
 \keyword{graph}

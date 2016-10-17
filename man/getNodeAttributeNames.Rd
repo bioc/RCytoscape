@@ -32,10 +32,12 @@ A list of names.
 
 
 \examples{
+\donttest{
 
   cy = CytoscapeConnection ()
   print (getNodeAttributeNames (cy))
 
-}
+}}
+
 
 \keyword{graph}

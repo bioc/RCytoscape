@@ -26,9 +26,11 @@ Nothing.
 
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   hideAllPanels (cy)
-}
+}}
+
 
 
 \keyword{graph}

@@ -24,12 +24,14 @@ Time in seconds.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('predictTimeToDisplayGraph.test', graph=makeSimpleGraph(), 
                              collectTimings=TRUE)
   message (paste ('estimated time: ', predictTimeToDisplayGraph (cw)))
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
-}
+}}
+
 
 
 \keyword{graph}

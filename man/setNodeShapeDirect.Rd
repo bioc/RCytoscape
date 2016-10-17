@@ -25,6 +25,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setNodeShapeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -32,7 +33,8 @@ None.
   getNodeShapes(cw)
   setNodeShapeDirect (cw, 'A', 'triangle')
   redraw (cw)
-}
+}}
+
 
 
 \keyword{graph}

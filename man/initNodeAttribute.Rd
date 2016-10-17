@@ -34,7 +34,9 @@ Paul Shannon
 }
 
 \examples{
+\donttest{
   g = new ('graphNEL', edgemode='directed')
   g = initNodeAttribute (g, 'lfc', 'numeric', 1.0)
-}
+}}
+
 \keyword{graph}

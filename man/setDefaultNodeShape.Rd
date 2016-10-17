@@ -36,6 +36,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setDefaultNodeShape.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -44,7 +45,8 @@ None.
   # stopifnot ('diamond' %in% legal.shapes)
   setDefaultNodeShape (cw, 'diamond')
   redraw (cw)
-}
+}}
+
 
 
 \keyword{graph}

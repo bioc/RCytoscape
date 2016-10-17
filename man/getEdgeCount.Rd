@@ -18,6 +18,7 @@ A list of character strings.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('getEdgeCount.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -25,6 +26,7 @@ A list of character strings.
     # in Cytoscape, interactively select two nodes, or
   getEdgeCount (cw)
   # [1] 3
-}
+}}
+
 
 \keyword{graph}

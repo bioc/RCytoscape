@@ -16,7 +16,9 @@ Returns a CytoscapeWindow object, for subsequent manipulation
 Paul Shannon
 }
 \examples{
+\donttest{
 cwd <- demoSimpleGraph ()
-}
+}}
+
 
 \keyword{graph}

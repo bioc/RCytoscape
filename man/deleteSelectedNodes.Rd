@@ -25,6 +25,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('deleteSelectedNodes.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -32,7 +33,8 @@ None.
   print (nodes (cw@graph))
   selectNodes (cw, "B")
   deleteSelectedNodes (cw)
-}
+}}
+
 
 
 \keyword{graph}

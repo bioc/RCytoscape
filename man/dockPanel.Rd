@@ -30,10 +30,12 @@ Nothing.
 }
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   dockPanel (cy, 'Control Panel')
    # or
   dockPanel (cy, 'c')
-}
+}}
+
 
 \keyword{graph}

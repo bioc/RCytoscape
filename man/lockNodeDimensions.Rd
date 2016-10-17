@@ -27,6 +27,7 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('lockNodeDimensions demo', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw)
@@ -35,6 +36,7 @@ None.
   setNodeWidthDirect (cw, 'A', 100)
   setNodeHeightDirect (cw, 'A', 50)
 
-}
+}}
+
 
 \keyword{graph}

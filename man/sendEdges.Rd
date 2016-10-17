@@ -25,9 +25,11 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('sendEdges.test', graph=makeSimpleGraph())
   sendEdges (cw)
-}
+}}
+
 
 
 \keyword{graph}

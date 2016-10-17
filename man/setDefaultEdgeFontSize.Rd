@@ -33,6 +33,7 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('test setDefaultEdgeFontSize', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -40,7 +41,8 @@ None.
   setEdgeLabelRule (cw, 'edgeType')
   setDefaultEdgeFontSize (cw, 66)
   redraw (cw)
-}
+}}
+
 
 
 \keyword{graph}

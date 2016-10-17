@@ -19,9 +19,11 @@ A graph object.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cw <- CytoscapeWindow ('getGraph.test', graph=makeSimpleGraph())
   displayGraph (cw)
   print (getGraph (cw))
-}
+}}
+
 
 \keyword{graph}

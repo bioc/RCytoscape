@@ -43,6 +43,7 @@ The attribute in question, which may be of any scalar type.
 
 
 \examples{
+\donttest{
 
   window.name = 'demo.getNodeAttribute'
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
@@ -52,6 +53,7 @@ The attribute in question, which may be of any scalar type.
 
   count.B = getNodeAttribute (cw, "B", 'count')
 
-}
+}}
+
 
 \keyword{graph}

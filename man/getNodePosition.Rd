@@ -21,10 +21,12 @@ when the graph was created.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('getNodePosition.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw)
   getNodePosition (cw, c ('A', 'B', 'C'))
-}
+}}
+
 
 \keyword{graph}

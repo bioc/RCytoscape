@@ -34,8 +34,10 @@ Paul Shannon
 }
 
 \examples{
+\donttest{
   g = new ('graphNEL', edgemode='directed')
   g = initEdgeAttribute (g, 'edgeType', 'char', 'associates with')
-}
+}}
+
 
 \keyword{graph}

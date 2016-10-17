@@ -28,6 +28,7 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('selectEdges.test', graph=makeSimpleGraph())
   displayGraph (cw); layoutNetwork(cw); redraw (cw)
   clearSelection (cw)
@@ -35,6 +36,7 @@ None.
   getSelectedEdges (cw)
     # more complicated, but more realistic:
   #selectEdges (cw, as.character ( cy2.en (g, names (which (eda (g, 'edgeType') == 'phosphorylates')))))
-}
+}}
+
 
 \keyword{graph}

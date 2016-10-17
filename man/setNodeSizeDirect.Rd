@@ -28,13 +28,15 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setNodeSizeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setNodeSizeDirect (cw, 'A', 32)
   redraw (cw)
-}
+}}
+
 
 
 \keyword{graph}

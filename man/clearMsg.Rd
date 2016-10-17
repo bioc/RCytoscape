@@ -24,9 +24,11 @@ Nothing.
 
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   clearMsg (cy)
-}
+}}
+
 
 
 \keyword{graph}

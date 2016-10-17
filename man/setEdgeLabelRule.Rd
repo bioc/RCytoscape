@@ -23,11 +23,13 @@ None.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeLabelRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
   redraw (cw)
   setEdgeLabelRule (cw, 'edgeType')
-}
+}}
+
 
 \keyword{graph}

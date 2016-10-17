@@ -24,6 +24,7 @@ Nothing.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('saveLayout.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -31,7 +32,8 @@ Nothing.
   layoutNetwork(cw, 'jgraph-circle')
   restoreLayout (cw, 'layout.RData')
   saveLayout (cw, 'layout2', timestamp.in.filename=TRUE)
-}
+}}
+
 
 
 \keyword{graph}

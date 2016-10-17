@@ -22,9 +22,11 @@ A list of character strings, e.g., 'WHITE_DIAMOND', 'BLACK_T'
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   getArrowShapes (cy)
     # [1] "No Arrow" "Diamond" "Delta" "Arrow" "T" "Circle" "Half Arrow Top"  "Half Arrow Bottom"
-}
+}}
+
 
 \keyword{graph}

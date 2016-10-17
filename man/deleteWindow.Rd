@@ -28,6 +28,7 @@ Nothing.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   window.title <- 'demo deleteWindow'
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
@@ -37,6 +38,7 @@ Nothing.
   cw2 <- new.CytoscapeWindow ('demo 2')
   cy = CytoscapeConnection ()
   deleteWindow (cy, 'demo 2')
-}
+}}
+
 
 \keyword{graph}

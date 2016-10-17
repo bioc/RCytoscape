@@ -32,10 +32,12 @@ A list of character strings, e.g., "jgraph-circle" "attribute-circle" "jgraph-an
  }
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   getLayoutNames (cy)
    #  [1] "jgraph-circle" "attribute-circle" "jgraph-annealing"  ...
 
-}
+}}
+
 
 \keyword{graph}

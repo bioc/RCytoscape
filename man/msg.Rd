@@ -24,9 +24,11 @@ Nothing.
 }
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   msg (cy, 'this message will appear in the Cytoscape Desktop status bar, which is found at the lower corner of the Desktop')
-}
+}}
+
 
 
 \keyword{graph}

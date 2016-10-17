@@ -31,11 +31,13 @@ Nothing.
 
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   hidePanel (cy, 'Control Panel')
    # or
   hidePanel (cy, 'c')
-}
+}}
+
 
 
 \keyword{graph}

@@ -23,6 +23,7 @@ None.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setNodeLabelRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -36,6 +37,7 @@ None.
   redraw (cw)
   setNodeLabelRule (cw, 'label')
   redraw (cw)
-}
+}}
+
 
 \keyword{graph}

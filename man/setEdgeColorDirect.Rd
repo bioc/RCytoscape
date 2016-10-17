@@ -26,6 +26,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeColorDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -34,6 +35,7 @@ None.
   setEdgeColorDirect (cw, edge.names, '#F833AA')
   redraw (cw)
 
-}
+}}
+
 
 \keyword{graph}

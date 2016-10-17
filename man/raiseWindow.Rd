@@ -23,8 +23,10 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('raiseWindow.test', graph=makeSimpleGraph())
   raiseWindow (cw)
-}
+}}
+
 
 \keyword{graph}

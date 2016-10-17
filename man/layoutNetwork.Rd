@@ -24,12 +24,14 @@ Nothing.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('layout.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork (cw, 'jgraph-spring')
   redraw (cw)  # applies default vizmap (rendering) rules, plus any you
                # have specified
-}
+}}
+
 
 
 \keyword{graph}

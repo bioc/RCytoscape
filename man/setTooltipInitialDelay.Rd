@@ -29,6 +29,7 @@ None.
  }
 
 \examples{
+\donttest{
   window.title = 'setTooltipInitialDelay demo'
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
     # use node type as the tooltip
@@ -43,6 +44,7 @@ None.
      # remains on top of that node or edge
   setTooltipInitialDelay (cw, 0)
   setTooltipDismissDelay (cw, 0)
-}
+}}
+
 
 \keyword{graph}

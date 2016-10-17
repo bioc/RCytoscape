@@ -28,6 +28,7 @@ None.
  }
 
 \examples{
+\donttest{
   window.title = 'setCenter demo'
   cw <- new.CytoscapeWindow (window.title, graph=makeSimpleGraph())
   displayGraph (cw)
@@ -49,7 +50,8 @@ None.
   setCenter (cw, 200, 90)
   system ('sleep 1')
   setCenter (cw, original.center$x, original.center$y)
-}
+}}
+
 
 
 \keyword{graph}

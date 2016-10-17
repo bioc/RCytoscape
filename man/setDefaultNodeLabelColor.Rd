@@ -34,13 +34,15 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setDefaultNodeLabelColor.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setDefaultNodeLabelColor (cw, '#FFFFFF') # white node labels
   redraw (cw)
-}
+}}
+
 
 
 \keyword{graph}

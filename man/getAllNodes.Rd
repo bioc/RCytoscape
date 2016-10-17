@@ -21,10 +21,12 @@ look at the graph in Cytoscape.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cw <- CytoscapeWindow ('getAllNodes.test', graph=makeSimpleGraph())
   displayGraph (cw)
   print (getAllNodes (cw))
     #  [1] "C" "B" "A"
-}
+}}
+
 
 \keyword{graph}

@@ -24,13 +24,15 @@ Nothing.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('restoreLayout.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
   saveLayout (cw, 'layout.RData')
   layoutNetwork(cw, 'jgraph-circle')
   restoreLayout (cw, 'layout.RData')
-}
+}}
+
 
 
 \keyword{graph}

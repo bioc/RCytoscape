@@ -62,6 +62,7 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setNodeColorRule.test', graph=makeSimpleGraph())
   control.points <- c (-3.0, 0.0, 3.0)   # typical range of log-fold-change ratio values
     # paint negative values shades of green, positive values shades of
@@ -74,7 +75,8 @@ None.
   data.values <- c ("kinase", "transcription factor", "glycoprotein")
   node.colors <- c ("#0000AA", "#FFFF00", "#0000AA") 
   setNodeColorRule (cw, node.attribute.name='type', data.values,   node.colors, mode='lookup', default.color='#AA0000')
-}
+}}
+
 
 
 \keyword{graph}

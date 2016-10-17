@@ -20,11 +20,13 @@ The modified CytoscapeWindow object.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setGraph.test')  # an empty graph is created by default
   graph <- makeSimpleGraph ()
   setGraph (cw, graph)
   print (length (nodes (getGraph (cw))))
 
-}
+}}
+
 
 \keyword{graph}

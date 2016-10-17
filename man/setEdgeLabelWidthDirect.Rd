@@ -44,6 +44,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeLabelWidthDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -53,11 +54,12 @@ None.
     setEdgeLabelWidthDirect (cw, edge.names, i)
     redraw (cw)
     }
+
   for (i in 10:1) {
     setEdgeLabelWidthDirect (cw, edge.names, i)
     redraw (cw)
     }
-
+}
 }
 
 \keyword{graph}

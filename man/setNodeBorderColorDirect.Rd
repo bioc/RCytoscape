@@ -24,13 +24,15 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setNodeBorderColorDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setNodeBorderColorDirect (cw, 'A', '#FFFF00')
   redraw (cw)
-}
+}}
+
 
 
 \keyword{graph}

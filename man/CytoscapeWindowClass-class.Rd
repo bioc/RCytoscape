@@ -32,10 +32,12 @@
 \author{Paul Shannon}
 
 \examples{
+\donttest{
      # create a CytoscapeWindowClass object by calling the constructor
   c2 <- CytoscapeWindow ('cwc demo', makeSimpleGraph ())  
 
-}
+}}
+
 \keyword{graphs}
 \keyword{classes}
 

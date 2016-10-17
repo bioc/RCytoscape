@@ -28,9 +28,11 @@ Paul Shannon
 }
 
 \examples{
+\donttest{
   g <- makeSimpleGraph ()
   print (nodes (g))
   print (getAdjacentEdgeNames (g, 'A'))
-}
+}}
+
 
 \keyword{graph}

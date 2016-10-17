@@ -29,13 +29,15 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeAttributes.test', graph=makeSimpleGraph())
   attribute.names = eda.names (cw@graph)
 
   for (attribute.name in attribute.names)
     result = setEdgeAttributes (cw, attribute.name)
 
-}
+}}
+
 
 
 \keyword{graph}

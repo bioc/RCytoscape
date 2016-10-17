@@ -23,6 +23,7 @@ nodes and edges.
 Paul Shannon
 }
 \examples{
+\donttest{
 g = makeRandomGraph (node.count=12, seed=123)
 
 ## The function is currently defined as
@@ -35,7 +36,8 @@ function (node.count = 12, seed = 123)
     edgeDataDefaults(g, "pmid") = "9988778899"
     attr(edgeDataDefaults(g, attr = "pmid"), "class") = "STRING"
     return(g)
-}
+}}
+
 
 }
 

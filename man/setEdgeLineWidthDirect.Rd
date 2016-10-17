@@ -26,6 +26,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeLineWidthDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -36,7 +37,9 @@ None.
     redraw (cw)
     }
 
+
  setEdgeLineWidthDirect (cw, edge.names, 1)
+}
 
 }
 

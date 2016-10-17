@@ -32,12 +32,14 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setNodeShapeRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   shapes <- c ("trapezoid", "round_rect", "ellipse")
   molecule.types <- c ("kinase", "transcription factor", "glycoprotein")
   setNodeShapeRule (cw, node.attribute.name='type', molecule.types,  shapes)
   redraw (cw)
-}
+}}
+
 
 \keyword{graph}

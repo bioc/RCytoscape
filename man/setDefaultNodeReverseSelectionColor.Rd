@@ -21,8 +21,10 @@ Nothing.
 \author{Paul Shannon}
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   print (setDefaultNodeReverseSelectionColor (cy, '#FF0000'))
-}
+}}
+
 
 \keyword{graph}

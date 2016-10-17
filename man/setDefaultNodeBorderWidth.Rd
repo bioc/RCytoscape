@@ -35,13 +35,15 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setDefaultNodeBorderWidth.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setDefaultNodeBorderWidth (cw, 5)
   redraw (cw)
-}
+}}
+
 
 
 \keyword{graph}

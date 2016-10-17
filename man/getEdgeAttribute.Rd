@@ -43,6 +43,7 @@ The attribute in question, which may be of any scalar type.
 
 
 \examples{
+\donttest{
 
   window.name = 'demo.getEdgeAttribute'
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
@@ -54,6 +55,7 @@ The attribute in question, which may be of any scalar type.
   score.bc = getEdgeAttribute (cw, "B (synthetic lethal) C", 'score')
   print (paste ("should be -12: ", score.bc))
 
-}
+}}
+
 
 \keyword{graph}

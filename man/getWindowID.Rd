@@ -27,10 +27,12 @@ identifer appears to be an integer.
   }
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   cw <- new.CytoscapeWindow ('getWindowID.test', graph=makeSimpleGraph())
   displayGraph (cw)
   getWindowID (cy, 'getWindowID.test')
-}
+}}
+
 
 \keyword{graph}

@@ -46,6 +46,7 @@ None.
   }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeLineStyleDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -68,9 +69,11 @@ None.
     redraw (cw)
     }
 
+
      # restore the default
   setEdgeLineStyleDirect (cw, edges.of.interest, 'SOLID')
   redraw (cw)
 }
 
+}
 \keyword{graph}

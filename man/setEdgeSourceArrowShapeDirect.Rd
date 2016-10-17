@@ -1,3 +1,4 @@
+
 \name{setEdgeSourceArrowShapeDirect}
 \alias{setEdgeSourceArrowShapeDirect}
 \alias{setEdgeSourceArrowShapeDirect,CytoscapeWindowClass-method}
@@ -30,6 +31,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeSourceArrowShapeDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -56,11 +58,12 @@ None.
     redraw (cw)
     }
 
+
     # restore the default
   setEdgeSourceArrowShapeDirect (cw, edges.of.interest, 'No Arrow')
   redraw (cw)
 
-
+}
 }
 
 \keyword{graph}

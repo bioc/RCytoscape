@@ -33,6 +33,7 @@ Nothing.
 
 
 \examples{
+\donttest{
 
   window.name = 'demo.setVisualStyle'
   cw = new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
@@ -45,7 +46,8 @@ Nothing.
   for (style in styles) {
     print (paste ("about to set new style:", style))
     setVisualStyle (cw, style)
-    }
+    }}
+
 }
 
 \keyword{graph}

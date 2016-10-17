@@ -58,10 +58,11 @@ CytoscapeConnection (host = "localhost", rpcPort = 9000)
 
 
 \examples{
+\donttest{
   cy <- CytoscapeConnection ()
   deleteAllWindows (cy)
   getNodeShapes (cy)
   hidePanel (cy, 'Control')
-}
+}}
 
 \keyword{ graph }

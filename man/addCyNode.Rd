@@ -28,6 +28,7 @@ None.
 }
 
 \examples{
+\donttest{
   window.name <- 'demo addCyNode'
   cw <- new.CytoscapeWindow (window.name, graph=makeSimpleGraph ())
   displayGraph (cw)
@@ -36,6 +37,7 @@ None.
   layoutNetwork(cw)
 
 
-}
+}}
+
 
 \keyword{graph}

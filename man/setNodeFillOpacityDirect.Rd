@@ -28,14 +28,15 @@ None.
  }
 
 
-\examples{
+ \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setNodeFillOpacityDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
   layoutNetwork(cw, 'jgraph-spring')
   setNodeFillOpacityDirect (cw, 'A', 220)
   redraw (cw)
-}
+}}
 
 
 \keyword{graph}

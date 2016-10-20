@@ -27,6 +27,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeSourceArrowOpacityDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -54,10 +55,12 @@ None.
     redraw (cw)
     }
 
+
+
     # restore the default
   setEdgeSourceArrowOpacityDirect (cw, edges.of.interest, 255)
   redraw (cw)
-
+}
 }
 
 \keyword{graph}

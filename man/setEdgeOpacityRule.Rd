@@ -29,6 +29,7 @@ None.
 }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeOpacityRule.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork (cw, 'jgraph-spring')
@@ -52,6 +53,7 @@ None.
   control.points <- c (-12, 0, 35)
   setEdgeOpacityRule (cw, 'score',  control.points, opacities, mode='interpolate')  
   redraw (cw)
-}
+}}
+
 
 \keyword{graph}

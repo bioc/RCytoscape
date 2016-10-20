@@ -1,3 +1,4 @@
+
 \name{setEdgeTargetArrowOpacityDirect}
 \alias{setEdgeTargetArrowOpacityDirect}
 \alias{setEdgeTargetArrowOpacityDirect,CytoscapeWindowClass-method}
@@ -27,6 +28,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeTargetArrowOpacityDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   layoutNetwork(cw, 'jgraph-spring')
@@ -52,10 +54,11 @@ None.
     redraw (cw)
     }
 
+
     # restore the default
   setEdgeTargetArrowOpacityDirect (cw, edges.of.interest, 255)
   redraw (cw)
-
+}
 }
 
 \keyword{graph}

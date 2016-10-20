@@ -27,6 +27,7 @@ None.
  }
 
 \examples{
+\donttest{
   cw <- new.CytoscapeWindow ('setEdgeOpacityDirect.test', graph=makeSimpleGraph())
   displayGraph (cw)
   redraw (cw)
@@ -36,11 +37,12 @@ None.
     setEdgeOpacityDirect (cw, edge.names, 255 - (i * 25))
     redraw (cw)
     }
+
   for (i in 1:10) {
     setEdgeOpacityDirect (cw, edge.names, i * 25)
     redraw (cw)
     }
-
+}
 }
 
 \keyword{graph}

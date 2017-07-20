@@ -1,7 +1,7 @@
 Package: RCytoscape
 Type: Package
 Title: Display and manipulate graphs in Cytoscape
-Version: 1.27.0
+Version: 1.27.1
 Date: 2016-10-16
 Author: Paul Shannon
 Maintainer: Paul Shannon <pshannon@systemsbiology.org>
@@ -14,3 +14,4 @@ License: GPL-2
 URL: http://rcytoscape.systemsbiology.net
 LazyLoad: yes
 biocViews: Visualization, GraphAndNetwork, ThirdPartyClient
+PackageStatus: Deprecated
